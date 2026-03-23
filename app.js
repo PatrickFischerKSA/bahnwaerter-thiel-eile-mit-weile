@@ -187,7 +187,7 @@ const LITERATURE_CARDS = {
       title: 'Der abgelegene Posten',
       prompt: 'Was prägt Thiels Dienstort besonders stark?',
       options: [
-        'Lärm der Grossstadt und dauernde Menschenmengen.',
+        'Lärm der Großstadt und dauernde Menschenmengen.',
         'Die Nähe zu einem Hafen.',
         'Die Abgeschiedenheit im märkischen Kiefernforst.',
         'Ein Militärlager neben dem Übergang.'

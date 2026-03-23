@@ -1,6 +1,6 @@
-# Bahnwaerter Thiel: Eile mit Weile
+# Bahnwärter Thiel: Eile mit Weile
 
-Volldigitales, DOG-inspiriertes Literaturspiel zu Gerhart Hauptmanns `Bahnwaerter Thiel`.
+Volldigitales, DOG-inspiriertes Literaturspiel zu Gerhart Hauptmanns `Bahnwärter Thiel`.
 
 ## Inhalt
 
@@ -18,7 +18,7 @@ Volldigitales, DOG-inspiriertes Literaturspiel zu Gerhart Hauptmanns `Bahnwaerte
 
 ## Textgrundlage
 
-Die Spielinhalte beruhen auf dem Primärtext `Bahnwaerter Thiel` von Gerhart Hauptmann sowie auf einer lokal vorliegenden Materialsammlung mit Text- und Medienhinweisen.
+Die Spielinhalte beruhen auf dem Primärtext `Bahnwärter Thiel` von Gerhart Hauptmann sowie auf einer lokal vorliegenden Materialsammlung mit Text- und Medienhinweisen.
 
 ## Lokal starten
 
