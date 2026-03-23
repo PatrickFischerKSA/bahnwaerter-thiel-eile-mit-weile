@@ -2762,7 +2762,7 @@ function getBaseBoardUrl() {
 }
 
 function getQrCodeUrl(value) {
-  return `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(value)}`;
+  return `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(value)}`;
 }
 
 function setBoardView(view) {
@@ -2798,12 +2798,59 @@ function setHostPanel(panel) {
   });
 }
 
-function encodeSignalPayload(value) {
-  return btoa(unescape(encodeURIComponent(JSON.stringify(value))));
+function bytesToBase64(bytes) {
+  let binary = '';
+  const chunkSize = 0x8000;
+  for (let offset = 0; offset < bytes.length; offset += chunkSize) {
+    const chunk = bytes.subarray(offset, offset + chunkSize);
+    binary += String.fromCharCode(...chunk);
+  }
+  return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
 }
 
-function decodeSignalPayload(value) {
-  return JSON.parse(decodeURIComponent(escape(atob(value))));
+function base64ToBytes(value) {
+  const normalized = value.replace(/-/g, '+').replace(/_/g, '/');
+  const padded = normalized + '='.repeat((4 - (normalized.length % 4 || 4)) % 4);
+  const binary = atob(padded);
+  const bytes = new Uint8Array(binary.length);
+  for (let index = 0; index < binary.length; index += 1) {
+    bytes[index] = binary.charCodeAt(index);
+  }
+  return bytes;
+}
+
+async function compressSignalBytes(bytes) {
+  if (typeof CompressionStream === 'undefined') return bytes;
+  const stream = new CompressionStream('gzip');
+  const writer = stream.writable.getWriter();
+  await writer.write(bytes);
+  await writer.close();
+  const buffer = await new Response(stream.readable).arrayBuffer();
+  return new Uint8Array(buffer);
+}
+
+async function decompressSignalBytes(bytes) {
+  if (typeof DecompressionStream === 'undefined') return bytes;
+  const stream = new DecompressionStream('gzip');
+  const writer = stream.writable.getWriter();
+  await writer.write(bytes);
+  await writer.close();
+  const buffer = await new Response(stream.readable).arrayBuffer();
+  return new Uint8Array(buffer);
+}
+
+async function encodeSignalPayload(value) {
+  const rawBytes = new TextEncoder().encode(JSON.stringify(value));
+  const compressedBytes = await compressSignalBytes(rawBytes);
+  const useCompressed = compressedBytes.length + 8 < rawBytes.length;
+  return `${useCompressed ? 'c' : 'u'}:${bytesToBase64(useCompressed ? compressedBytes : rawBytes)}`;
+}
+
+async function decodeSignalPayload(value) {
+  const [mode, payload] = value.split(':', 2);
+  const bytes = base64ToBytes(payload || '');
+  const decodedBytes = mode === 'c' ? await decompressSignalBytes(bytes) : bytes;
+  return JSON.parse(new TextDecoder().decode(decodedBytes));
 }
 
 function waitForIceComplete(pc) {
@@ -2873,7 +2920,7 @@ async function createPhoneInvite(playerIndex) {
   await waitForIceComplete(pc);
 
   const localDescription = pc.localDescription?.toJSON?.() || pc.localDescription;
-  const offerCode = encodeSignalPayload(localDescription);
+  const offerCode = await encodeSignalPayload(localDescription);
   const inviteLink = `${getBaseBoardUrl()}?screen=phone&player=${playerIndex}&offer=${encodeURIComponent(offerCode)}`;
 
   updateConnectionStatus(playerIndex, 'offer-ready', {
@@ -2888,7 +2935,7 @@ async function applyPhoneAnswer(playerIndex, answerText) {
   const connection = hostConnections.get(playerIndex);
   if (!connection?.pc) return;
 
-  const answer = decodeSignalPayload(answerText.trim());
+  const answer = await decodeSignalPayload(answerText.trim());
   await connection.pc.setRemoteDescription(answer);
   updateConnectionStatus(playerIndex, 'awaiting-open', { answerDraft: answerText.trim() });
 }
@@ -3133,10 +3180,19 @@ function renderConnectionList() {
 
       const qrBox = document.createElement('div');
       qrBox.className = 'qr-box';
-      qrBox.innerHTML = `
-        <img src="${getQrCodeUrl(connection.inviteLink)}" alt="QR-Code für ${getConnectionDisplayName(playerIndex)}" />
-        <p>Mit der Handy-Kamera scannen oder alternativ den Link kopieren. Danach den Antwort-Code vom Handy wieder links einfügen.</p>
-      `;
+      const qrImage = document.createElement('img');
+      qrImage.src = getQrCodeUrl(connection.inviteLink);
+      qrImage.alt = `QR-Code für ${getConnectionDisplayName(playerIndex)}`;
+      qrImage.addEventListener('error', () => {
+        qrImage.hidden = true;
+        qrBox.classList.add('qr-box-fallback');
+        qrHint.textContent = 'QR-Code konnte nicht geladen werden. Nutze stattdessen den Link links und öffne ihn direkt auf dem Handy.';
+      });
+
+      const qrHint = document.createElement('p');
+      qrHint.textContent = 'Mit der Handy-Kamera scannen oder alternativ den Link kopieren. Danach den Antwort-Code vom Handy wieder links einfügen.';
+
+      qrBox.append(qrImage, qrHint);
 
       grid.append(left, qrBox);
       card.appendChild(grid);
@@ -3551,14 +3607,14 @@ async function initPhoneClient() {
     });
   });
 
-  const offer = decodeSignalPayload(offerCode);
+  const offer = await decodeSignalPayload(offerCode);
   await pc.setRemoteDescription(offer);
   const answer = await pc.createAnswer();
   await pc.setLocalDescription(answer);
   await waitForIceComplete(pc);
 
   const localDescription = pc.localDescription?.toJSON?.() || pc.localDescription;
-  phoneClient.answerCode = encodeSignalPayload(localDescription);
+  phoneClient.answerCode = await encodeSignalPayload(localDescription);
   phoneAnswerOutputEl.value = phoneClient.answerCode;
   phoneStatusTextEl.textContent = 'Jetzt diesen Code kopieren, am Brett einfügen und dort bestätigen. Danach verbindet sich dieses Handy automatisch.';
 }

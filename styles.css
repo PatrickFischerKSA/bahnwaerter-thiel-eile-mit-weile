@@ -848,6 +848,10 @@ li {
   line-height: 1.45;
 }
 
+.qr-box.qr-box-fallback {
+  background: rgba(166, 124, 26, 0.12);
+}
+
 .signal-field label {
   font-weight: 700;
   color: var(--muted);
