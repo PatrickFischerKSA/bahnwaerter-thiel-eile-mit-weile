@@ -1272,37 +1272,86 @@ li {
 
 .host-console {
   display: grid;
-  gap: 16px;
+  gap: 14px;
   position: sticky;
   top: 86px;
   align-self: start;
 }
 
-.host-panel-tabs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+.host-focus-card,
+.host-disclosure {
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid var(--line);
+  box-shadow: 0 14px 32px rgba(22, 17, 12, 0.06);
 }
 
-.host-panel-tab {
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  padding: 9px 12px;
-  background: rgba(255, 255, 255, 0.84);
-  color: var(--ink);
+.host-focus-card {
+  padding: 14px 16px;
+  display: grid;
+  gap: 10px;
+}
+
+.host-focus-card .recent-card {
+  padding: 14px;
+}
+
+.host-disclosure {
+  overflow: hidden;
+}
+
+.host-disclosure summary {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
   font-weight: 800;
   cursor: pointer;
 }
 
-.host-panel-tab.active {
-  background: linear-gradient(135deg, rgba(49, 90, 130, 0.92), rgba(33, 59, 82, 0.96));
-  color: #fffdf8;
-  box-shadow: 0 10px 24px rgba(49, 90, 130, 0.22);
+.host-disclosure summary::-webkit-details-marker {
+  display: none;
 }
 
+.host-disclosure summary::after {
+  content: "+";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: rgba(49, 90, 130, 0.1);
+  color: var(--accent);
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.host-disclosure[open] summary::after {
+  content: "–";
+}
+
+.host-disclosure[open] summary {
+  border-bottom: 1px solid var(--line);
+}
+
+.host-disclosure-body,
 .host-panel-pane {
   display: grid;
   gap: 12px;
+}
+
+.host-disclosure-body {
+  padding: 14px 16px 16px;
+}
+
+.detail-intro,
+.action-panel-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.88rem;
 }
 
 .host-turn-grid {
@@ -1314,12 +1363,8 @@ li {
 .host-turn-grid .action-panel {
   padding: 14px;
   border-radius: 18px;
-  background: rgba(255, 255, 255, 0.82);
+  background: rgba(249, 247, 242, 0.96);
   border: 1px solid var(--line);
-}
-
-.host-turn-grid .action-panel + .action-panel {
-  margin-top: 0;
 }
 
 .player-list {
@@ -1768,11 +1813,6 @@ li {
   .connection-card,
   .phone-panel {
     border-radius: 18px;
-  }
-
-  .host-panel-tabs {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .demo-phone-stack {

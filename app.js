@@ -1047,7 +1047,6 @@ const demoPhoneTwoEl = document.getElementById('demoPhoneTwo');
 const demoPrevBtn = document.getElementById('demoPrevBtn');
 const demoPlayBtn = document.getElementById('demoPlayBtn');
 const demoNextBtn = document.getElementById('demoNextBtn');
-const hostPanelTabsEl = document.getElementById('hostPanelTabs');
 
 const phoneTitleEl = document.getElementById('phoneTitle');
 const phoneStatusTextEl = document.getElementById('phoneStatusText');
@@ -2792,16 +2791,10 @@ function setBoardView(view) {
 function setHostPanel(panel) {
   currentHostPanel = panel;
 
-  if (hostPanelTabsEl) {
-    [...hostPanelTabsEl.querySelectorAll('.host-panel-tab')].forEach((button) => {
-      button.classList.toggle('active', button.dataset.panel === panel);
-    });
-  }
-
   ['zug', 'spielstand', 'letzte', 'protokoll', 'handys'].forEach((name) => {
-    const pane = document.getElementById(`hostPane-${name}`);
-    if (!pane) return;
-    pane.classList.toggle('hidden', name !== panel);
+    const section = document.getElementById(`hostSection-${name}`);
+    if (!section) return;
+    section.open = name === panel;
   });
 }
 
@@ -3832,10 +3825,18 @@ function initBoardApp() {
     setBoardView(button.dataset.view);
   });
 
-  hostPanelTabsEl?.addEventListener('click', (event) => {
-    const button = event.target.closest('.host-panel-tab');
-    if (!button) return;
-    setHostPanel(button.dataset.panel);
+  [...document.querySelectorAll('.host-disclosure')].forEach((section) => {
+    section.addEventListener('toggle', () => {
+      if (!(section instanceof HTMLDetailsElement) || !section.open) return;
+      const panel = section.dataset.panel;
+      if (!panel) return;
+      currentHostPanel = panel;
+      [...document.querySelectorAll('.host-disclosure')].forEach((other) => {
+        if (other !== section && other instanceof HTMLDetailsElement) {
+          other.open = false;
+        }
+      });
+    });
   });
 
   playerCountPicker.addEventListener('click', (event) => {

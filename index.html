@@ -202,19 +202,20 @@
               </div>
             </div>
 
-            <div id="hostPanelTabs" class="host-panel-tabs" aria-label="Host-Konsole">
-              <button class="host-panel-tab active" type="button" data-panel="zug">Zug</button>
-              <button class="host-panel-tab" type="button" data-panel="spielstand">Spielstand</button>
-              <button class="host-panel-tab" type="button" data-panel="letzte">Letzte Karte</button>
-              <button class="host-panel-tab" type="button" data-panel="protokoll">Protokoll</button>
-              <button class="host-panel-tab" type="button" data-panel="handys">Handys</button>
-            </div>
-
-            <section id="hostPane-zug" class="host-panel-pane">
+            <section class="host-focus-card">
+              <p class="mini-label">Zugfokus</p>
               <p id="turnHint" class="turn-hint">
                 Partie starten und dann eine Aktionskarte ausspielen. Bewegliche Figuren leuchten auf dem Brett.
               </p>
+              <div id="activeCardSummary" class="recent-card empty">
+                Wähle eine spielbare Aktionskarte aus deiner Hand.
+              </div>
+            </section>
 
+            <details id="hostSection-zug" class="host-disclosure" data-panel="zug" open>
+              <summary>Spielzug</summary>
+              <div class="host-disclosure-body host-panel-pane">
+                <p class="detail-intro">Hier liegen nur die aktuellen Zugdetails. Alles andere bleibt zugeklappt, bis du es brauchst.</p>
               <div class="host-turn-grid">
                 <div class="action-panel">
                   <p class="mini-label">Handkarten</p>
@@ -225,50 +226,52 @@
                 </div>
 
                 <div class="action-panel">
-                  <p class="mini-label">Aktive Karte</p>
-                  <div id="activeCardSummary" class="recent-card empty">
-                    Wähle eine spielbare Aktionskarte aus deiner Hand.
-                  </div>
+                  <p class="mini-label">Mögliche Aktionen</p>
+                  <p class="action-panel-note">Sobald eine Karte gewählt ist, erscheinen hier Varianten, Teilschritte oder Brettaktionen.</p>
                   <div id="actionOptions" class="action-options"></div>
                 </div>
               </div>
-            </section>
-
-            <section id="hostPane-spielstand" class="host-panel-pane hidden">
-              <div class="panel-head compact">
-                <h2>Spielstand</h2>
-                <p>Fortschritt, Schutzmarken und Erkenntnispunkte.</p>
               </div>
-              <div id="playerList" class="player-list"></div>
-            </section>
+            </details>
 
-            <section id="hostPane-letzte" class="host-panel-pane hidden">
-              <div class="panel-head compact">
-                <h2>Letzte Karte</h2>
-                <p>Hier bleibt die zuletzt gelöste Szene oder Frage sichtbar.</p>
+            <details id="hostSection-spielstand" class="host-disclosure" data-panel="spielstand">
+              <summary>Spielstand</summary>
+              <div class="host-disclosure-body host-panel-pane">
+                <p class="detail-intro">Fortschritt, Schutzmarken und Erkenntnispunkte aller Spielpersonen.</p>
+                <div id="playerList" class="player-list"></div>
               </div>
-              <div id="recentCard" class="recent-card empty">
-                Noch keine Karte aufgedeckt.
-              </div>
-            </section>
+            </details>
 
-            <section id="hostPane-protokoll" class="host-panel-pane hidden">
-              <div class="panel-head compact">
-                <h2>Protokoll</h2>
-                <p>Kurze Spielspur für Unterrichts- oder Gruppenrunden.</p>
-              </div>
-              <ul id="logList" class="log-list"></ul>
-            </section>
-
-            <section id="hostPane-handys" class="host-panel-pane hidden">
-              <section id="phoneControlPanel" class="phone-control-panel">
-                <div class="panel-head compact">
-                  <h2>Verbindungsassistent</h2>
-                  <p>Für jede Spielperson gleich: Einladung erzeugen, am Handy öffnen oder scannen, Antwort-Code zurückkopieren und hier einfügen.</p>
+            <details id="hostSection-letzte" class="host-disclosure" data-panel="letzte">
+              <summary>Letzte Karte</summary>
+              <div class="host-disclosure-body host-panel-pane">
+                <p class="detail-intro">Hier bleibt die zuletzt gelöste Szene oder Frage sichtbar.</p>
+                <div id="recentCard" class="recent-card empty">
+                  Noch keine Karte aufgedeckt.
                 </div>
-                <div id="connectionList" class="connection-list"></div>
-              </section>
-            </section>
+              </div>
+            </details>
+
+            <details id="hostSection-protokoll" class="host-disclosure" data-panel="protokoll">
+              <summary>Protokoll</summary>
+              <div class="host-disclosure-body host-panel-pane">
+                <p class="detail-intro">Kurze Spielspur für Unterrichts- oder Gruppenrunden.</p>
+                <ul id="logList" class="log-list"></ul>
+              </div>
+            </details>
+
+            <details id="hostSection-handys" class="host-disclosure" data-panel="handys">
+              <summary>Handys</summary>
+              <div class="host-disclosure-body host-panel-pane">
+                <section id="phoneControlPanel" class="phone-control-panel">
+                  <div class="panel-head compact">
+                    <h2>Verbindungsassistent</h2>
+                    <p>Für jede Spielperson gleich: Einladung erzeugen, am Handy öffnen oder scannen, Antwort-Code zurückkopieren und hier einfügen.</p>
+                  </div>
+                  <div id="connectionList" class="connection-list"></div>
+                </section>
+              </div>
+            </details>
           </section>
 
           <section class="board-panel panel">
