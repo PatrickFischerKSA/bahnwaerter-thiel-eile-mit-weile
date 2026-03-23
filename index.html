@@ -6,7 +6,7 @@
   <title>Bahnwärter Thiel: Eile mit Weile</title>
   <meta
     name="description"
-    content="Volldigitales Eile-mit-Weile-Spiel zu Gerhart Hauptmanns Bahnwärter Thiel mit Brett, Wissenskarten und Literatur-Kompass."
+    content="Volldigitales, DOG-inspiriertes Kartenspiel zu Gerhart Hauptmanns Bahnwärter Thiel mit Brett, Aktionskarten, Wissenskarten und Literatur-Kompass."
   />
   <link rel="stylesheet" href="styles.css" />
 </head>
@@ -17,8 +17,8 @@
         <p class="eyebrow">Volldigitales Literaturspiel</p>
         <h1>Bahnwärter Thiel: Eile mit Weile</h1>
         <p class="lead">
-          Ein vollständig spielbares Brettspiel im Stil von <em>Eile mit Weile</em>:
-          mit Würfelglück, Schutzbänken, Wissenskarten, Deutungsfragen und
+          Ein vollständig spielbares Brettspiel in einer DOG-inspirierten Kartenvariante:
+          mit Aktionskarten, Startzügen, Tauschkarte, 4 ±, 7er-Aufteilung, Wissenskarten und
           literarischen Schicksalsfeldern rund um Gerhart Hauptmanns
           <em>Bahnwärter Thiel</em>.
         </p>
@@ -53,9 +53,9 @@
         </div>
 
         <div class="rule-strip">
-          <span>5 bringt eine Figur ins Spiel.</span>
-          <span>6 zählt doppelt als 12 und gibt einen Zusatzwurf.</span>
-          <span>Drei 6en in Folge bestrafen offene Figuren.</span>
+          <span>Startkarten bringen Figuren aus dem Depot aufs Startfeld.</span>
+          <span>4 ± erlaubt Vor- oder Rückwärtszug wie bei DOG.</span>
+          <span>7 kann auf mehrere eigene Figuren verteilt werden.</span>
         </div>
       </section>
 
@@ -65,7 +65,7 @@
             <div>
               <h2>Spielbrett</h2>
               <p>
-                Schutzbänke sichern Figuren, Wissensfelder öffnen Karten,
+                Startfelder, Kartenlogik und literarische Ereignisfelder greifen ineinander,
                 das Zentrum markiert die Zielstation.
               </p>
             </div>
@@ -73,7 +73,7 @@
               <span class="legend-item"><i class="legend-dot text"></i> Text</span>
               <span class="legend-item"><i class="legend-dot deutung"></i> Deutung</span>
               <span class="legend-item"><i class="legend-dot schicksal"></i> Schicksal</span>
-              <span class="legend-item"><i class="legend-dot bank"></i> Bank</span>
+              <span class="legend-item"><i class="legend-dot start"></i> Startfeld</span>
             </div>
           </div>
           <div id="board" class="board" aria-label="Spielbrett"></div>
@@ -88,18 +88,30 @@
 
             <div class="dice-panel">
               <div class="dice-box">
-                <span class="dice-label">Würfel</span>
-                <strong id="diceRaw">-</strong>
+                <span class="dice-label">Runde</span>
+                <strong id="roundSize">6</strong>
               </div>
               <div class="dice-box">
-                <span class="dice-label">Zugweite</span>
-                <strong id="diceMove">-</strong>
+                <span class="dice-label">Deck</span>
+                <strong id="deckCount">0</strong>
               </div>
             </div>
 
-            <button id="rollBtn" class="primary-btn wide" type="button">Würfeln</button>
+            <div class="action-panel">
+              <p class="mini-label">Handkarten</p>
+              <div id="handArea" class="hand-area"></div>
+            </div>
+
+            <div class="action-panel">
+              <p class="mini-label">Aktive Karte</p>
+              <div id="activeCardSummary" class="recent-card empty">
+                Wähle eine spielbare Aktionskarte aus deiner Hand.
+              </div>
+              <div id="actionOptions" class="action-options"></div>
+            </div>
+
             <p id="turnHint" class="turn-hint">
-              Partie starten und dann würfeln. Bewegliche Figuren leuchten auf dem Brett.
+              Partie starten und dann eine Aktionskarte ausspielen. Bewegliche Figuren leuchten auf dem Brett.
             </p>
           </section>
 

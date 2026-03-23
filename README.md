@@ -1,11 +1,12 @@
 # Bahnwaerter Thiel: Eile mit Weile
 
-Volldigitales Literaturspiel zu Gerhart Hauptmanns `Bahnwaerter Thiel`.
+Volldigitales, DOG-inspiriertes Literaturspiel zu Gerhart Hauptmanns `Bahnwaerter Thiel`.
 
 ## Inhalt
 
-- digitales Brettspiel im Stil von `Eile mit Weile`
+- digitales Brettspiel mit kartengetriebener DOG-Mechanik
 - 2 bis 4 lokale Spielende
+- Startkarten, `4 +/-`, `7` zum Aufteilen, Tauschkarte und Joker
 - Wissens-, Deutungs- und Schicksalskarten zum Primärtext
 - integrierter Literatur-Kompass mit Figuren, Motiven, Konflikten und Naturalismus-Bezug
 
