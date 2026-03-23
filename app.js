@@ -2827,15 +2827,15 @@ function renderConnectionList() {
   explainer.innerHTML = `
     <div class="connect-step">
       <strong>1. Einladung erzeugen</strong>
-      <span>Das Brett erstellt pro Spielperson einen Link.</span>
+      <span>Das Brett erstellt pro Spielperson einen privaten Handy-Link.</span>
     </div>
     <div class="connect-step">
       <strong>2. QR scannen</strong>
-      <span>Am einfachsten mit der Handy-Kamera direkt den kleinen QR-Code öffnen.</span>
+      <span>Am einfachsten den QR-Code mit der Handy-Kamera öffnen oder den Link kopieren.</span>
     </div>
     <div class="connect-step">
       <strong>3. Antwort-Code zurück</strong>
-      <span>Das Handy zeigt danach einen Code, den du hier am Brett einfügst.</span>
+      <span>Das Handy zeigt danach einen Antwort-Code, den du hier am Brett einfügst, damit die Verbindung live startet.</span>
     </div>
   `;
   connectionListEl.appendChild(explainer);
@@ -2857,14 +2857,14 @@ function renderConnectionList() {
     status.textContent = connection?.status === 'connected'
       ? 'Verbunden'
       : connection?.status === 'awaiting-open'
-        ? 'Warte auf Datenkanal'
+        ? 'Handy geöffnet, warte auf Antwort'
         : connection?.status === 'offer-ready'
-          ? 'Einladungslink bereit'
+          ? 'Bereit zum Scannen'
           : connection?.status === 'building'
-            ? 'Erzeuge Einladung'
+            ? 'Erzeuge QR-Link'
             : connection?.status === 'closed'
               ? 'Verbindung geschlossen'
-              : 'Noch nicht gekoppelt';
+              : 'Noch nicht verbunden';
 
     header.append(name, status);
     card.appendChild(header);
@@ -2899,7 +2899,7 @@ function renderConnectionList() {
       const left = document.createElement('div');
       const inviteField = document.createElement('div');
       inviteField.className = 'signal-field';
-      inviteField.innerHTML = '<label>Einladungslink fürs Handy</label>';
+      inviteField.innerHTML = '<label>1. Diesen Link am Handy öffnen</label>';
       const textarea = document.createElement('textarea');
       textarea.className = 'signal-textarea';
       textarea.rows = 5;
@@ -2910,7 +2910,7 @@ function renderConnectionList() {
 
       const answerField = document.createElement('div');
       answerField.className = 'signal-field';
-      answerField.innerHTML = '<label>Antwort-Code vom Handy</label>';
+      answerField.innerHTML = '<label>3. Antwort-Code vom Handy hier einfügen</label>';
       const input = document.createElement('textarea');
       input.className = 'signal-textarea';
       input.rows = 5;
@@ -2927,7 +2927,7 @@ function renderConnectionList() {
       applyBtn.className = 'count-btn';
       applyBtn.dataset.action = 'apply-answer';
       applyBtn.dataset.playerIndex = String(playerIndex);
-      applyBtn.textContent = 'Antwort übernehmen';
+      applyBtn.textContent = 'Code übernehmen und verbinden';
       answerButtons.appendChild(applyBtn);
       left.appendChild(answerButtons);
 
@@ -2935,7 +2935,7 @@ function renderConnectionList() {
       qrBox.className = 'qr-box';
       qrBox.innerHTML = `
         <img src="${getQrCodeUrl(connection.inviteLink)}" alt="QR-Code für ${getConnectionDisplayName(playerIndex)}" />
-        <p>Mit der Handy-Kamera scannen oder alternativ den Link kopieren.</p>
+        <p>Mit der Handy-Kamera scannen oder alternativ den Link kopieren. Danach den Antwort-Code vom Handy wieder links einfügen.</p>
       `;
 
       grid.append(left, qrBox);
@@ -3274,7 +3274,7 @@ async function initPhoneClient() {
   phoneClient.playerIndex = Number.isNaN(playerIndex) ? null : playerIndex;
 
   if (phoneClient.playerIndex === null || !offerCode) {
-    phoneStatusTextEl.textContent = 'Diese Handy-Ansicht braucht einen vollständigen Einladungslink vom Brett.';
+    phoneStatusTextEl.textContent = 'Diese private Handy-Ansicht braucht einen vollständigen Einladungslink oder QR-Code vom Brett.';
     phoneConnectPanelEl.classList.add('hidden');
     return;
   }
@@ -3288,7 +3288,7 @@ async function initPhoneClient() {
     channel.addEventListener('open', () => {
       phoneConnectPanelEl.classList.add('hidden');
       phoneGamePanelEl.classList.remove('hidden');
-      phoneStatusTextEl.textContent = 'Verbindung offen. Deine geheimen Karten werden jetzt live synchronisiert.';
+      phoneStatusTextEl.textContent = 'Verbindung steht. Deine geheimen Karten und Entscheidungen werden jetzt live mit dem Brett abgeglichen.';
     });
     channel.addEventListener('message', (messageEvent) => {
       let payload;
@@ -3313,7 +3313,7 @@ async function initPhoneClient() {
   const localDescription = pc.localDescription?.toJSON?.() || pc.localDescription;
   phoneClient.answerCode = encodeSignalPayload(localDescription);
   phoneAnswerOutputEl.value = phoneClient.answerCode;
-  phoneStatusTextEl.textContent = 'Antwort-Code kopieren und am Brett einfügen. Danach öffnet sich die Live-Verbindung automatisch.';
+  phoneStatusTextEl.textContent = 'Jetzt diesen Code kopieren, am Brett einfügen und dort bestätigen. Danach verbindet sich dieses Handy automatisch.';
 }
 
 function sendPhoneMessage(payload) {

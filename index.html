@@ -18,21 +18,21 @@
           <p class="eyebrow">Handy-Modus</p>
           <h1 id="phoneTitle">Privater Spielschirm</h1>
           <p id="phoneStatusText" class="lead compact">
-            Diese Ansicht verbindet sich mit dem Host-Brett und zeigt nur die geheimen Karten einer Spielperson.
+            Diese private Ansicht gehört genau einer Spielperson. Hier erscheinen nur die geheimen Karten und Entscheidungen dieses Handys.
           </p>
         </div>
 
         <section id="phoneConnectPanel" class="panel phone-panel">
           <div class="panel-head compact">
             <h2>Verbindung herstellen</h2>
-            <p>Öffne den Einladungslink vom Brett auf diesem Handy. Danach den Antwort-Code zurück am Brett einfügen.</p>
+            <p>1. Link oder QR-Code vom Brett auf diesem Handy öffnen. 2. Den hier angezeigten Antwort-Code kopieren. 3. Den Code zurück am Brett einfügen.</p>
           </div>
 
           <div class="phone-connect-box">
-            <label for="phoneAnswerOutput">Antwort-Code für das Brett</label>
+            <label for="phoneAnswerOutput">2. Diesen Antwort-Code zurück ans Brett geben</label>
             <textarea id="phoneAnswerOutput" class="signal-textarea" rows="8" readonly></textarea>
             <div class="button-row">
-              <button id="copyPhoneAnswerBtn" class="primary-btn" type="button">Antwort-Code kopieren</button>
+              <button id="copyPhoneAnswerBtn" class="primary-btn" type="button">Code kopieren</button>
             </div>
           </div>
         </section>
@@ -150,7 +150,7 @@
         <section id="phoneControlPanel" class="phone-control-panel hidden">
           <div class="panel-head compact">
             <h2>Handy-Verbindungen</h2>
-            <p>Erzeuge pro Spielperson einen Einladungslink, öffne ihn am Handy und füge den Antwort-Code hier wieder ein.</p>
+            <p>Für jede Spielperson gleich: Einladung erzeugen, am Handy öffnen oder scannen, Antwort-Code zurückkopieren und hier einfügen.</p>
           </div>
           <div id="connectionList" class="connection-list"></div>
         </section>
