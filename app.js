@@ -925,6 +925,29 @@ const RTC_CONFIG = {
   iceServers: [{ urls: ['stun:stun.l.google.com:19302'] }]
 };
 const MAX_INFLUENCE_HAND = 2;
+const GAME_MODES = {
+  normal: {
+    key: 'normal',
+    label: 'Normal',
+    title: 'Normalmodus',
+    description: 'Vier Figuren müssen ins Ziel, der Kartenzyklus läuft 6-5-4-3-2-1.',
+    targetFinishedPieces: 4,
+    dealCycle: [6, 5, 4, 3, 2, 1]
+  },
+  kurz: {
+    key: 'kurz',
+    label: 'Kurz',
+    title: 'Kurzmodus',
+    description: 'Zwei Figuren müssen ins Ziel, der Kartenzyklus läuft 5-4-3.',
+    targetFinishedPieces: 2,
+    dealCycle: [5, 4, 3]
+  }
+};
+
+function getModeConfig(modeKey) {
+  return GAME_MODES[modeKey] || GAME_MODES.normal;
+}
+
 const INFLUENCE_LIBRARY = [
   {
     key: 'rueckenwind',
@@ -982,6 +1005,8 @@ const pageNavButtonsEl = document.getElementById('pageNavButtons');
 const boardEl = document.getElementById('board');
 const playerInputsEl = document.getElementById('playerInputs');
 const playerCountPicker = document.getElementById('playerCountPicker');
+const gameModePickerEl = document.getElementById('gameModePicker');
+const gameModeDescriptionEl = document.getElementById('gameModeDescription');
 const newGameBtn = document.getElementById('newGameBtn');
 const phoneModeToggleEl = document.getElementById('phoneModeToggle');
 const phoneControlPanelEl = document.getElementById('phoneControlPanel');
@@ -1038,6 +1063,7 @@ const phoneActionOptionsEl = document.getElementById('phoneActionOptions');
 const phoneScoreListEl = document.getElementById('phoneScoreList');
 
 let selectedPlayerCount = 2;
+let selectedGameMode = 'normal';
 let phoneModeEnabled = false;
 let uniqueCardId = 0;
 let state = createInitialState();
@@ -1358,13 +1384,16 @@ const DEMO_STEPS = [
 ];
 
 function createInitialState() {
+  const mode = getModeConfig(selectedGameMode);
   return {
+    modeKey: mode.key,
+    targetFinishedPieces: mode.targetFinishedPieces,
+    dealCycle: [...mode.dealCycle],
+    dealCycleIndex: 0,
     players: [],
     currentPlayer: 0,
     currentRound: 0,
-    activeDealSize: 6,
-    currentDealSize: 6,
-    nextDealSize: 5,
+    activeDealSize: mode.dealCycle[0],
     deck: [],
     discard: [],
     influenceDeck: [],
@@ -1500,6 +1529,15 @@ function renderPlayerInputs() {
     wrapper.append(label, input);
     playerInputsEl.appendChild(wrapper);
   });
+}
+
+function renderGameModePicker() {
+  if (!gameModePickerEl || !gameModeDescriptionEl) return;
+  const mode = getModeConfig(selectedGameMode);
+  [...gameModePickerEl.querySelectorAll('[data-mode]')].forEach((button) => {
+    button.classList.toggle('active', button.dataset.mode === selectedGameMode);
+  });
+  gameModeDescriptionEl.innerHTML = `<strong>${mode.title}</strong><p>${mode.description}</p>`;
 }
 
 function buildCellMeta() {
@@ -1886,7 +1924,7 @@ function refillInfluenceHands() {
 }
 
 function dealNextRound() {
-  const dealSize = state.currentDealSize;
+  const dealSize = state.dealCycle[state.dealCycleIndex];
   state.players.forEach((player) => {
     player.outForRound = false;
     player.hand = [];
@@ -1904,8 +1942,7 @@ function dealNextRound() {
   state.currentRound += 1;
   state.activeDealSize = dealSize;
   addLog(`Neue Kartenrunde ${state.currentRound}: ${dealSize} Aktionskarten pro Person.`);
-  state.currentDealSize = state.nextDealSize;
-  state.nextDealSize = state.nextDealSize === 1 ? 6 : state.nextDealSize - 1;
+  state.dealCycleIndex = (state.dealCycleIndex + 1) % state.dealCycle.length;
 }
 
 function getSelectedCard() {
@@ -2089,7 +2126,7 @@ function playInfluenceCard(playerIndex, cardId, targetPlayerIndex = null) {
 function finishPlayedCard() {
   const player = getCurrentPlayer();
   const playedCard = getSelectedCard();
-  const won = player.pieces.every((piece) => piece.steps === 44);
+  const won = player.pieces.filter((piece) => piece.steps === 44).length >= state.targetFinishedPieces;
   if (playedCard) {
     addLog(`${player.name} spielt ${playedCard.label}.`);
   }
@@ -2167,7 +2204,7 @@ function startNewGame() {
   state.players = setupPlayers(selectedPlayerCount);
   state.deck = buildActionDeck();
   state.influenceDeck = buildInfluenceDeck();
-  state.log = ['Neue Partie gestartet.'];
+  state.log = [`Neue Partie gestartet (${getModeConfig(selectedGameMode).label}).`];
   dealNextRound();
   state.currentPlayer = 0;
   setHostPanel('zug');
@@ -2482,7 +2519,7 @@ function renderPlayerSummaryInto(container) {
       `Hand ${player.hand.length}`,
       `Einfluss ${player.influenceHand.length}`,
       `Unterwegs ${active}`,
-      `Im Ziel ${finished}`,
+      `Im Ziel ${finished}/${state.targetFinishedPieces}`,
       `Schutz ${player.shields}`,
       `Erkenntnis ${player.insights}`
     ].forEach((label) => {
@@ -2707,7 +2744,7 @@ function renderBoard() {
         centerTitle.textContent = 'Zielstation';
         const centerSub = document.createElement('div');
         centerSub.className = 'center-sub';
-        centerSub.textContent = `${state.players.reduce((sum, player) => sum + player.pieces.filter((piece) => piece.steps === 44).length, 0)} Figuren im Ziel`;
+        centerSub.textContent = `${state.players.reduce((sum, player) => sum + player.pieces.filter((piece) => piece.steps === 44).length, 0)} Figuren im Ziel · ${getModeConfig(state.modeKey).label}`;
         cell.append(centerTitle, centerSub);
       }
 
@@ -2899,6 +2936,8 @@ function buildPhoneView(playerIndex) {
       : [],
     roundSize: state.activeDealSize,
     deckCount: state.deck.length,
+    modeLabel: getModeConfig(state.modeKey).label,
+    targetFinishedPieces: state.targetFinishedPieces,
     activeCard: selectedCard
       ? { label: selectedCard.label, summary: selectedCard.summary }
       : null,
@@ -2915,6 +2954,7 @@ function buildPhoneView(playerIndex) {
       current: index === state.currentPlayer,
       handCount: entry.hand.length,
       influenceCount: entry.influenceHand.length,
+      finishedCount: entry.pieces.filter((piece) => piece.steps === 44).length,
       shields: entry.shields,
       insights: entry.insights
     }))
@@ -3220,7 +3260,7 @@ function renderPhoneView() {
   summary.className = 'recent-card';
   summary.innerHTML = `
     <h3>Öffentliche Runde</h3>
-    <p>Runde ${view.roundSize} · Deck ${view.deckCount} Karten · ${view.turnOwner} ist am Zug.</p>
+    <p>${view.modeLabel} · Runde ${view.roundSize} · Deck ${view.deckCount} Karten · ${view.turnOwner} ist am Zug.</p>
     <p>${view.recentCard ? `Letzte Karte: ${view.recentCard.title} · ${view.recentCard.rewardText}` : 'Noch keine Literaturkarte aufgedeckt.'}</p>
   `;
   phoneScoreListEl.appendChild(summary);
@@ -3236,6 +3276,7 @@ function renderPhoneView() {
       <div class="player-card-meta">
         <span class="meta-pill">Hand ${player.handCount}</span>
         <span class="meta-pill">Einfluss ${player.influenceCount}</span>
+        <span class="meta-pill">Ziel ${player.finishedCount}/${view.targetFinishedPieces}</span>
         <span class="meta-pill">Schutz ${player.shields}</span>
         <span class="meta-pill">Erkenntnis ${player.insights}</span>
       </div>
@@ -3555,6 +3596,13 @@ function initBoardApp() {
     renderConnectionList();
   });
 
+  gameModePickerEl?.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-mode]');
+    if (!button) return;
+    selectedGameMode = button.dataset.mode;
+    renderGameModePicker();
+  });
+
   phoneModeToggleEl.addEventListener('change', () => {
     phoneModeEnabled = phoneModeToggleEl.checked;
     state.phoneMode = phoneModeEnabled;
@@ -3599,6 +3647,7 @@ function initBoardApp() {
   });
 
   renderPlayerInputs();
+  renderGameModePicker();
   setBoardView(currentBoardView);
   setHostPanel(currentHostPanel);
   renderConnectionList();

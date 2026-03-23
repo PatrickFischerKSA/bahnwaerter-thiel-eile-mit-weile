@@ -212,11 +212,21 @@ li {
 }
 
 .count-picker,
+.mode-picker,
 .button-row,
 .rule-strip {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
+}
+
+.game-mode-card {
+  display: grid;
+  gap: 12px;
+}
+
+.mode-description {
+  margin-top: 0;
 }
 
 .count-btn,

@@ -131,6 +131,21 @@
           <button class="count-btn" type="button" data-count="4">4</button>
         </div>
 
+        <section class="game-mode-card">
+          <div class="panel-head compact">
+            <h2>Spielmodus</h2>
+            <p>Wähle zwischen voller Partie und einer kürzeren Unterrichts- oder Proberunde.</p>
+          </div>
+          <div id="gameModePicker" class="mode-picker" aria-label="Spielmodus">
+            <button class="count-btn active" type="button" data-mode="normal">Normal</button>
+            <button class="count-btn" type="button" data-mode="kurz">Kurz</button>
+          </div>
+          <div id="gameModeDescription" class="setup-note-card mode-description">
+            <strong>Normalmodus</strong>
+            <p>Vier Figuren müssen ins Ziel, der Kartenzyklus läuft 6-5-4-3-2-1.</p>
+          </div>
+        </section>
+
         <div id="playerInputs" class="player-inputs"></div>
 
         <div class="mode-toggle">
@@ -156,6 +171,7 @@
           <span>Startkarten bringen Figuren aus dem Depot aufs Startfeld.</span>
           <span>4 ± erlaubt Vor- oder Rückwärtszug wie bei DOG.</span>
           <span>7 kann auf mehrere eigene Figuren verteilt werden.</span>
+          <span>Kurzmodus: 2 Figuren ins Ziel, Kartenzyklus 5-4-3.</span>
         </div>
       </section>
 
