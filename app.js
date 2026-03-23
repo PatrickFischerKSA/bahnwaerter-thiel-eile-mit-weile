@@ -1056,41 +1056,42 @@ const phoneClient = {
 const DEMO_STEPS = [
   {
     kicker: 'Schritt 1',
-    title: 'Partie vorbereiten und Rollen verteilen',
-    text: 'Zu Beginn legst du 2 bis 4 Spielende fest. Dieser erste Schritt eignet sich gut für die Projektion im Unterricht: Das Brett zeigt die gemeinsame Ausgangslage, während der Handy-Modus erklärt, warum spätere Entscheidungen nicht offen auf dem Beamer liegen.',
+    title: 'Partie vorbereiten, Schnellnavigation zeigen und Handys koppeln',
+    text: 'Zu Beginn legst du 2 bis 4 Spielende fest und öffnest die Ansicht gezielt über die Schnellnavigation. Für Unterricht und Präsentation ist dieser Einstieg jetzt klarer aufgebaut: Das Host-Brett bleibt öffentlich, während die privaten Handys per QR-Code mit der Partie verbunden werden.',
     notes: [
-      'Host-Brett für alle sichtbar',
-      'Private Handy-Ansicht pro Spielperson',
+      'Schnellnavigation reduziert Scrollen',
+      'QR-Code oder Link öffnet die private Handy-Ansicht',
       'Namen und Farben bleiben öffentlich'
     ],
     hostTitle: 'Öffentliche Startübersicht',
     hostBoxes: [
-      { title: 'Host-Brett', text: 'Spielendenzahl wählen, Handy-Modus einschalten und Partie starten.' },
-      { title: 'Verbindungen', text: 'Das Brett erzeugt pro Person einen Einladungslink und wartet auf den Antwort-Code.' }
+      { title: 'Host-Brett', text: 'Spielendenzahl wählen, Handy-Modus einschalten, dann über "Spiel" direkt in die Partie springen.' },
+      { title: 'Verbindungen', text: 'Das Brett erzeugt pro Person einen Einladungslink mit QR-Code und wartet anschliessend auf den Antwort-Code.' }
     ],
     hostRow: [
+      { label: 'Tab "Spiel" aktiv', tone: 'gelb' },
       { label: 'Signalrot bereit', tone: 'rot' },
-      { label: 'Nebelblau bereit', tone: 'blau' }
+      { label: 'QR bereit', tone: 'blau' }
     ],
     phoneOne: {
       label: 'Signalrot',
       status: 'Noch keine Karten. Das Handy koppelt sich zuerst mit dem Brett.',
       cards: [
-        { title: 'Einladungslink öffnen', text: 'Die Kopplung lässt sich zu Beginn einmal gemeinsam demonstrieren.', kind: 'quiz' }
+        { title: 'QR-Code scannen', text: 'Die Kopplung lässt sich zu Beginn einmal gemeinsam demonstrieren und bleibt danach privat.', kind: 'quiz' }
       ]
     },
     phoneTwo: {
       label: 'Nebelblau',
-      status: 'Auch die zweite Person erhält eine eigene, geheime Ansicht.',
+      status: 'Auch die zweite Person erhält per Link oder QR ihre eigene, geheime Ansicht.',
       cards: [
-        { title: 'Privater Spielschirm', text: 'Nach der Kopplung erscheinen nur die eigenen Karten und Optionen.', kind: 'buff' }
+        { title: 'Privater Spielschirm', text: 'Nach der Kopplung erscheinen nur die eigenen Karten, Einflusskarten und Optionen.', kind: 'buff' }
       ]
     }
   },
   {
     kicker: 'Schritt 2',
     title: 'Aktionskarten bleiben geheim auf dem Handy',
-    text: 'Zu Beginn einer Kartenrunde zieht jede Person ihre DOG-inspirierten Aktionskarten. Für Präsentation und Unterricht ist hier der Kern sichtbar: Das Publikum sieht am Host die Struktur der Runde, aber nicht die konkrete Kartenhand der aktiven Person.',
+    text: 'Zu Beginn einer Kartenrunde zieht jede Person ihre DOG-inspirierten Aktionskarten. Über die Schnellnavigation kann die Präsentation nun direkt im Spielbereich bleiben: Das Publikum sieht am Host die Struktur der Runde, aber nicht die konkrete Kartenhand der aktiven Person.',
     notes: [
       'Handkarten sind privat',
       'Das Brett zeigt nur Kartenanzahl und Zugperson',
@@ -1102,6 +1103,7 @@ const DEMO_STEPS = [
       { title: 'Öffentliche Infos', text: 'Deckgrösse, Figurenstellung und Spielstand bleiben sichtbar.' }
     ],
     hostRow: [
+      { label: 'Fokus auf Spiel', tone: 'gelb' },
       { label: '4 geheime Karten', tone: 'rot' },
       { label: 'Zug bei Signalrot', tone: 'rot' }
     ],
@@ -1160,22 +1162,23 @@ const DEMO_STEPS = [
   },
   {
     kicker: 'Schritt 4',
-    title: 'Die Bewegung läuft weiterhin über das öffentliche Brett',
-    text: 'Die geheime Karte wird am Handy gewählt, aber die Figur selbst ziehst du weiterhin auf dem zentralen Brett. Dadurch bleibt der Ablauf für Klasse oder Publikum jederzeit nachvollziehbar, obwohl die taktische Entscheidung privat bleibt.',
+    title: 'Die Bewegung läuft über das öffentliche, neu betonte Brett',
+    text: 'Die geheime Karte wird am Handy gewählt, aber die Figur selbst ziehst du weiterhin auf dem zentralen Brett. Gerade in der neuen Fassung ist dieser Moment stärker hervorgehoben: Das Host-Brett arbeitet mit klareren Feldern, Badges und Markierungen, damit Klasse oder Publikum den Zug sofort lesen können.',
     notes: [
       'Kartenwahl privat',
       'Figurenbewegung öffentlich',
-      'Das Brett markiert legal wählbare Figuren'
+      'Das Brett markiert legal wählbare Figuren deutlicher'
     ],
     hostTitle: 'Gemeinsamer Brettmoment',
     hostBoxes: [
-      { title: 'Host-Brett', text: 'Nach der Handy-Auswahl leuchten die möglichen Figuren auf.' },
+      { title: 'Host-Brett', text: 'Nach der Handy-Auswahl leuchten die möglichen Figuren auf, und Spezialfelder springen optisch stärker ins Auge.' },
       { title: 'Gemeinsame Beobachtung', text: 'Alle sehen die Zugfolge, niemand sieht die geheime Kartenhand.' }
     ],
     hostRow: [
       { label: 'Startfeld', tone: 'rot' },
       { label: 'Literaturfeld in Reichweite', tone: 'gelb' },
-      { label: 'Gegnerfigur bedroht', tone: 'blau' }
+      { label: 'Gegnerfigur bedroht', tone: 'blau' },
+      { label: 'Markierung aktiv', tone: 'gruen' }
     ],
     phoneOne: {
       label: 'Signalrot',
@@ -1229,7 +1232,7 @@ const DEMO_STEPS = [
   {
     kicker: 'Schritt 6',
     title: 'So endet eine Runde und schliesslich die ganze Partie',
-    text: 'Nach dem ausgespielten Zug geht die Runde zur nächsten Person weiter. Sobald alle Hände leer sind, wird neu ausgeteilt. Gewonnen hat, wer alle vier Figuren in die Zielstation bringt. Für eine Einführung erklärt dieser letzte Schritt noch einmal den ganzen Zyklus vom Koppeln über die geheime Wahl bis zum literarischen Auswerten.',
+    text: 'Nach dem ausgespielten Zug geht die Runde zur nächsten Person weiter. Sobald alle Hände leer sind, wird neu ausgeteilt. Gewonnen hat, wer alle vier Figuren in die Zielstation bringt. Für eine Einführung fasst dieser letzte Schritt noch einmal den ganzen Zyklus zusammen: Navigation, QR-Kopplung, geheime Kartenwahl, öffentlicher Brettzug und literarische Auswertung.',
     notes: [
       'Rundenfolge 6-5-4-3-2-1 bleibt bestehen',
       'Neue Kartenrunde nach leerer Hand',
