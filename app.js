@@ -1060,13 +1060,31 @@ const DEMO_STEPS = [
   {
     kicker: 'Schritt 1',
     title: 'Partie vorbereiten, Schnellnavigation zeigen und Handys koppeln',
-    text: 'Zu Beginn legst du 2 bis 4 Spielende fest und öffnest die Ansicht gezielt über die Schnellnavigation. Für Unterricht und Präsentation ist dieser Einstieg jetzt klarer aufgebaut: Das Host-Brett bleibt öffentlich, während die privaten Handys per QR-Code mit der Partie verbunden werden.',
+    text: 'Zu Beginn legst du 2 bis 4 Spielende fest und öffnest die Ansicht gezielt über die Schnellnavigation. Für Unterricht und Präsentation ist dieser Einstieg jetzt klarer aufgebaut: Das Host-Brett bleibt öffentlich, die frühere rechte Leiste ist in eine Host-Konsole unter dem Spielfeld gewandert, und die privaten Handys werden per QR-Code verbunden.',
     notes: [
       'Schnellnavigation reduziert Scrollen',
+      'Host-Konsole statt rechter Menüleiste',
       'QR-Code oder Link öffnet die private Handy-Ansicht',
       'Namen und Farben bleiben öffentlich'
     ],
     hostTitle: 'Öffentliche Startübersicht',
+    hostMetrics: [
+      { label: 'Am Zug', value: 'Noch offen' },
+      { label: 'Runde', value: '6' },
+      { label: 'Handys', value: '0 / 2' }
+    ],
+    hostTabs: [
+      { label: 'Zug' },
+      { label: 'Spielstand' },
+      { label: 'Letzte Karte' },
+      { label: 'Protokoll' },
+      { label: 'Handys', active: true }
+    ],
+    hostProgress: [
+      { title: '1. Einladung', text: 'QR und Link werden erzeugt', state: 'current' },
+      { title: '2. Handy öffnen', text: 'Spielperson scannt den QR-Code', state: 'pending' },
+      { title: '3. Live verbinden', text: 'Antwort-Code fehlt noch', state: 'pending' }
+    ],
     hostBoxes: [
       { title: 'Host-Brett', text: 'Spielendenzahl wählen, Handy-Modus einschalten, dann über "Spiel" direkt in die Partie springen.' },
       { title: 'Host-Konsole', text: 'Im Tab "Handys" erzeugt das Brett pro Person einen Einladungslink mit QR-Code und wartet anschliessend auf den Antwort-Code.' }
@@ -1080,27 +1098,42 @@ const DEMO_STEPS = [
       label: 'Signalrot',
       status: 'Noch keine Karten. Das Handy koppelt sich zuerst mit dem Brett.',
       cards: [
-        { title: 'QR-Code scannen', text: 'Die Kopplung lässt sich zu Beginn einmal gemeinsam demonstrieren und bleibt danach privat.', kind: 'quiz' }
+        { title: 'QR-Code scannen', text: 'Die Kopplung lässt sich zu Beginn einmal gemeinsam demonstrieren und bleibt danach privat.', kind: 'quiz' },
+        { title: 'Antwort-Code', text: 'Danach wandert nur noch der Verbindungs-Code zurück ans Brett.', kind: 'buff' }
       ]
     },
     phoneTwo: {
       label: 'Nebelblau',
       status: 'Auch die zweite Person erhält per Link oder QR ihre eigene, geheime Ansicht.',
       cards: [
-        { title: 'Privater Spielschirm', text: 'Nach der Kopplung erscheinen nur die eigenen Karten, Einflusskarten und Optionen.', kind: 'buff' }
+        { title: 'Privater Spielschirm', text: 'Nach der Kopplung erscheinen nur die eigenen Karten, Einflusskarten und Optionen.', kind: 'buff' },
+        { title: 'Öffentliche Runde', text: 'Runde, Deck und letzte Karte erscheinen zusätzlich in kompakter Form auf dem Handy.', kind: 'quiz' }
       ]
     }
   },
   {
     kicker: 'Schritt 2',
     title: 'Aktionskarten bleiben geheim auf dem Handy',
-    text: 'Zu Beginn einer Kartenrunde zieht jede Person ihre DOG-inspirierten Aktionskarten. Über die Schnellnavigation kann die Präsentation nun direkt im Spielbereich bleiben: Das Publikum sieht am Host die Struktur der Runde, aber nicht die konkrete Kartenhand der aktiven Person.',
+    text: 'Zu Beginn einer Kartenrunde zieht jede Person ihre DOG-inspirierten Aktionskarten. Über die Schnellnavigation kann die Präsentation nun direkt im Spielbereich bleiben: Das Publikum sieht am Host nur die Kerndaten der Runde, während die konkrete Kartenhand und ein Teil der offenen Infos auf die Handys ausgelagert sind.',
     notes: [
       'Handkarten sind privat',
       'Das Brett zeigt nur Kartenanzahl und Zugperson',
+      'Öffentliche Zusatzinfos erscheinen auch auf dem Handy',
       'Start, 4 ±, Tausch, 7 und Joker bleiben erhalten'
     ],
     hostTitle: 'Brett mit verdeckter Hand',
+    hostMetrics: [
+      { label: 'Am Zug', value: 'Signalrot' },
+      { label: 'Runde', value: '6' },
+      { label: 'Handys', value: '2 / 2' }
+    ],
+    hostTabs: [
+      { label: 'Zug', active: true },
+      { label: 'Spielstand' },
+      { label: 'Letzte Karte' },
+      { label: 'Protokoll' },
+      { label: 'Handys' }
+    ],
     hostBoxes: [
       { title: 'Am Zug', text: 'Signalrot ist dran. Das Brett meldet nur: geheime Aktionshand auf dem Handy.' },
       { title: 'Öffentliche Infos', text: 'Deckgrösse, Figurenstellung und Spielstand bleiben sichtbar.' }
@@ -1116,7 +1149,8 @@ const DEMO_STEPS = [
       cards: [
         { title: '1 / 11', text: 'Start oder 11 Felder vor', kind: 'buff' },
         { title: '7', text: 'Auf mehrere Figuren aufteilen', kind: 'quiz' },
-        { title: 'Tausch', text: 'Eigene Figur mit gegnerischer tauschen', kind: 'impact' }
+        { title: 'Tausch', text: 'Eigene Figur mit gegnerischer tauschen', kind: 'impact' },
+        { title: 'Öffentliche Runde', text: 'Runde 6 · Deck 104 · Signalrot ist am Zug', kind: 'quiz' }
       ]
     },
     phoneTwo: {
@@ -1124,7 +1158,8 @@ const DEMO_STEPS = [
       status: 'Nebelblau sieht nur die eigene Hand, nicht Signalrots Auswahl.',
       cards: [
         { title: '13', text: 'Start oder 13 Felder vor', kind: 'buff' },
-        { title: '4 ±', text: '4 vor oder 4 zurück', kind: 'quiz' }
+        { title: '4 ±', text: '4 vor oder 4 zurück', kind: 'quiz' },
+        { title: 'Öffentliche Runde', text: 'Auch wartende Spielende sehen auf dem Handy den offenen Spielstand kompakt mit.', kind: 'buff' }
       ]
     }
   },
@@ -1135,9 +1170,22 @@ const DEMO_STEPS = [
     notes: [
       'Positive Karten für dich selbst',
       'Negative Karten gegen andere',
+      'Die Folgen erscheinen in Host-Konsole und Handy-Übersicht',
       'Nur eine Einflusskarte pro eigenem Zug'
     ],
     hostTitle: 'Brett sieht nur die Folgen',
+    hostMetrics: [
+      { label: 'Am Zug', value: 'Signalrot' },
+      { label: 'Runde', value: '6' },
+      { label: 'Handys', value: '2 / 2' }
+    ],
+    hostTabs: [
+      { label: 'Zug' },
+      { label: 'Spielstand' },
+      { label: 'Letzte Karte' },
+      { label: 'Protokoll', active: true },
+      { label: 'Handys' }
+    ],
     hostBoxes: [
       { title: 'Öffentlicher Effekt', text: 'Das Host-Brett protokolliert Schutzverlust, Zusatzkarte oder blockierten Literaturbonus.' },
       { title: 'Keine Kartenoffenlegung', text: 'Die konkrete Einflusskarte bleibt für die Gruppe unsichtbar, wenn du das möchtest.' }
@@ -1151,7 +1199,8 @@ const DEMO_STEPS = [
       status: 'Positive Karten geben dir Polster oder Nachschub.',
       cards: [
         { title: 'Rückenwind', text: 'Sofort 1 Schutzmarke', kind: 'buff' },
-        { title: 'Reservelaterne', text: 'Ziehe 1 zusätzliche Aktionskarte', kind: 'buff' }
+        { title: 'Reservelaterne', text: 'Ziehe 1 zusätzliche Aktionskarte', kind: 'buff' },
+        { title: 'Öffentliche Runde', text: 'Die offenen Werte bleiben trotzdem auf dem Handy sichtbar.', kind: 'quiz' }
       ]
     },
     phoneTwo: {
@@ -1170,9 +1219,22 @@ const DEMO_STEPS = [
     notes: [
       'Kartenwahl privat',
       'Figurenbewegung öffentlich',
-      'Das Brett markiert legal wählbare Figuren deutlicher'
+      'Das Brett markiert legal wählbare Figuren deutlicher',
+      'Die Host-Konsole nimmt dem Spielfeld keine Breite mehr weg'
     ],
     hostTitle: 'Gemeinsamer Brettmoment',
+    hostMetrics: [
+      { label: 'Am Zug', value: 'Signalrot' },
+      { label: 'Runde', value: '6' },
+      { label: 'Handys', value: '2 / 2' }
+    ],
+    hostTabs: [
+      { label: 'Zug', active: true },
+      { label: 'Spielstand' },
+      { label: 'Letzte Karte' },
+      { label: 'Protokoll' },
+      { label: 'Handys' }
+    ],
     hostBoxes: [
       { title: 'Host-Brett', text: 'Nach der Handy-Auswahl leuchten die möglichen Figuren auf, und Spezialfelder springen optisch stärker ins Auge.' },
       { title: 'Host-Konsole', text: 'Spielstand, letzte Karte und Protokoll bleiben unter dem Brett erreichbar, ohne dem Spielfeld Raum zu nehmen.' }
@@ -1205,9 +1267,22 @@ const DEMO_STEPS = [
     notes: [
       'Text- und Deutungskarten als Quiz',
       'Schicksalskarten sofort wirksam',
+      'Letzte Karte bleibt in der Host-Konsole und auf den Handys sichtbar',
       'Richtige Antwort gibt Bonus'
     ],
     hostTitle: 'Literaturmoment im Zentrum',
+    hostMetrics: [
+      { label: 'Am Zug', value: 'Signalrot' },
+      { label: 'Runde', value: '6' },
+      { label: 'Handys', value: '2 / 2' }
+    ],
+    hostTabs: [
+      { label: 'Zug' },
+      { label: 'Spielstand' },
+      { label: 'Letzte Karte', active: true },
+      { label: 'Protokoll' },
+      { label: 'Handys' }
+    ],
     hostBoxes: [
       { title: 'Öffentliche Karte', text: 'Die Gruppe sieht die Frage und die Erklärung gemeinsam am Host.' },
       { title: 'Belohnung oder Blockade', text: 'Schutz, Erkenntnis oder Bonusfeld werden sofort sichtbar verbucht.' }
@@ -1221,7 +1296,8 @@ const DEMO_STEPS = [
       label: 'Signalrot',
       status: 'Die Spielfigur erreicht ein Literaturfeld.',
       cards: [
-        { title: 'Textkarte', text: 'Warum heiratet Thiel nach Minnas Tod erneut? Ideal als kurzer Gesprächsimpuls.', kind: 'quiz' }
+        { title: 'Textkarte', text: 'Warum heiratet Thiel nach Minnas Tod erneut? Ideal als kurzer Gesprächsimpuls.', kind: 'quiz' },
+        { title: 'Letzte Karte', text: 'Die zuletzt gelöste Literaturkarte bleibt auch auf dem Handy als offene Info sichtbar.', kind: 'buff' }
       ]
     },
     phoneTwo: {
@@ -1239,9 +1315,22 @@ const DEMO_STEPS = [
     notes: [
       'Rundenfolge 6-5-4-3-2-1 bleibt bestehen',
       'Neue Kartenrunde nach leerer Hand',
+      'Spielstand kann aus der Host-Konsole oder vom Handy verfolgt werden',
       'Sieg mit vier Figuren im Ziel'
     ],
     hostTitle: 'Kompletter Spielzyklus',
+    hostMetrics: [
+      { label: 'Am Zug', value: 'Nächste Person' },
+      { label: 'Runde', value: '5' },
+      { label: 'Handys', value: '2 / 2' }
+    ],
+    hostTabs: [
+      { label: 'Zug' },
+      { label: 'Spielstand', active: true },
+      { label: 'Letzte Karte' },
+      { label: 'Protokoll' },
+      { label: 'Handys' }
+    ],
     hostBoxes: [
       { title: 'Rundenwechsel', text: 'Nächste Person wird aktiv, neue geheime Auswahl beginnt.' },
       { title: 'Siegbedingung', text: 'Vier eigene Figuren in der Zielstation beenden die Partie.' }
@@ -1254,7 +1343,8 @@ const DEMO_STEPS = [
       label: 'Signalrot',
       status: 'Neue Kartenrunde beginnt automatisch.',
       cards: [
-        { title: 'Neue Hand', text: 'Frische Aktions- und Einflusskarten für die nächste Unterrichtsphase', kind: 'buff' }
+        { title: 'Neue Hand', text: 'Frische Aktions- und Einflusskarten für die nächste Unterrichtsphase', kind: 'buff' },
+        { title: 'Öffentliche Runde', text: 'Auch die nächste Runde bleibt auf dem Handy mit offenen Werten nachvollziehbar.', kind: 'quiz' }
       ]
     },
     phoneTwo: {
@@ -3212,6 +3302,30 @@ function renderDemoStep() {
   const strip = document.createElement('div');
   strip.className = 'demo-board-strip';
 
+  if (step.hostMetrics?.length) {
+    const metrics = document.createElement('div');
+    metrics.className = 'demo-host-metrics';
+    step.hostMetrics.forEach((entry) => {
+      const card = document.createElement('div');
+      card.className = 'demo-host-metric';
+      card.innerHTML = `<span>${entry.label}</span><strong>${entry.value}</strong>`;
+      metrics.appendChild(card);
+    });
+    strip.appendChild(metrics);
+  }
+
+  if (step.hostTabs?.length) {
+    const tabs = document.createElement('div');
+    tabs.className = 'demo-host-tabs';
+    step.hostTabs.forEach((entry) => {
+      const tab = document.createElement('span');
+      tab.className = `demo-host-tab${entry.active ? ' active' : ''}`;
+      tab.textContent = entry.label;
+      tabs.appendChild(tab);
+    });
+    strip.appendChild(tabs);
+  }
+
   if (step.hostRow?.length) {
     const row = document.createElement('div');
     row.className = 'demo-board-row';
@@ -3223,6 +3337,18 @@ function renderDemoStep() {
       row.appendChild(chip);
     });
     strip.appendChild(row);
+  }
+
+  if (step.hostProgress?.length) {
+    const progress = document.createElement('div');
+    progress.className = 'demo-connection-progress';
+    step.hostProgress.forEach((entry) => {
+      const card = document.createElement('div');
+      card.className = `demo-connection-card ${entry.state || 'pending'}`;
+      card.innerHTML = `<strong>${entry.title}</strong><span>${entry.text}</span>`;
+      progress.appendChild(card);
+    });
+    strip.appendChild(progress);
   }
 
   step.hostBoxes.forEach((box) => {

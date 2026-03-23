@@ -482,10 +482,62 @@ li {
   gap: 10px;
 }
 
+.demo-host-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.demo-host-metric {
+  padding: 11px 12px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid var(--line);
+}
+
+.demo-host-metric span,
+.demo-host-metric strong {
+  display: block;
+}
+
+.demo-host-metric span {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.demo-host-metric strong {
+  margin-top: 4px;
+  font-size: 1rem;
+}
+
 .demo-board-row {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
+}
+
+.demo-host-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.demo-host-tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 11px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.demo-host-tab.active {
+  background: linear-gradient(135deg, rgba(49, 90, 130, 0.92), rgba(33, 59, 82, 0.96));
+  color: #fffdf8;
 }
 
 .demo-chip,
@@ -535,6 +587,42 @@ li {
   margin: 0;
   color: var(--muted);
   font-size: 0.92rem;
+}
+
+.demo-connection-progress {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.demo-connection-card {
+  padding: 10px 12px;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.84);
+}
+
+.demo-connection-card strong,
+.demo-connection-card span {
+  display: block;
+}
+
+.demo-connection-card span {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.demo-connection-card.done {
+  background: rgba(68, 113, 82, 0.14);
+}
+
+.demo-connection-card.current {
+  background: rgba(166, 124, 26, 0.16);
+}
+
+.demo-connection-card.pending {
+  opacity: 0.82;
 }
 
 .demo-phone-stack {
@@ -1569,6 +1657,11 @@ li {
 
   .demo-layout,
   .demo-visuals {
+    grid-template-columns: 1fr;
+  }
+
+  .demo-host-metrics,
+  .demo-connection-progress {
     grid-template-columns: 1fr;
   }
 
