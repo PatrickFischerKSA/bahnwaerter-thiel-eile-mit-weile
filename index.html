@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bahnwärter Thiel: Eile mit Weile</title>
+  <meta
+    name="description"
+    content="Volldigitales Eile-mit-Weile-Spiel zu Gerhart Hauptmanns Bahnwärter Thiel mit Brett, Wissenskarten und Literatur-Kompass."
+  />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="page-shell">
+    <header class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">Volldigitales Literaturspiel</p>
+        <h1>Bahnwärter Thiel: Eile mit Weile</h1>
+        <p class="lead">
+          Ein vollständig spielbares Brettspiel im Stil von <em>Eile mit Weile</em>:
+          mit Würfelglück, Schutzbänken, Wissenskarten, Deutungsfragen und
+          literarischen Schicksalsfeldern rund um Gerhart Hauptmanns
+          <em>Bahnwärter Thiel</em>.
+        </p>
+      </div>
+      <div class="hero-note">
+        <p class="note-kicker">Textgrundlage</p>
+        <p>
+          Die Spielinhalte bündeln die wesentlichen Informationen aus dem Primärtext:
+          Figurenkonstellation, Handlungsverlauf, Naturraum, Bahnmotiv, Gewalt,
+          Visionen, Schuld und Wahnsinn.
+        </p>
+      </div>
+    </header>
+
+    <main class="layout">
+      <section class="setup-card panel">
+        <div class="panel-head">
+          <h2>Partie vorbereiten</h2>
+          <p>Wähle 2 bis 4 lokale Spielende. Namen können direkt angepasst werden.</p>
+        </div>
+
+        <div class="count-picker" id="playerCountPicker" aria-label="Spielendenzahl">
+          <button class="count-btn active" type="button" data-count="2">2</button>
+          <button class="count-btn" type="button" data-count="3">3</button>
+          <button class="count-btn" type="button" data-count="4">4</button>
+        </div>
+
+        <div id="playerInputs" class="player-inputs"></div>
+
+        <div class="button-row">
+          <button id="newGameBtn" class="primary-btn" type="button">Neue Partie starten</button>
+        </div>
+
+        <div class="rule-strip">
+          <span>5 bringt eine Figur ins Spiel.</span>
+          <span>6 zählt doppelt als 12 und gibt einen Zusatzwurf.</span>
+          <span>Drei 6en in Folge bestrafen offene Figuren.</span>
+        </div>
+      </section>
+
+      <section class="game-stage">
+        <section class="board-panel panel">
+          <div class="panel-head board-head">
+            <div>
+              <h2>Spielbrett</h2>
+              <p>
+                Schutzbänke sichern Figuren, Wissensfelder öffnen Karten,
+                das Zentrum markiert die Zielstation.
+              </p>
+            </div>
+            <div class="legend">
+              <span class="legend-item"><i class="legend-dot text"></i> Text</span>
+              <span class="legend-item"><i class="legend-dot deutung"></i> Deutung</span>
+              <span class="legend-item"><i class="legend-dot schicksal"></i> Schicksal</span>
+              <span class="legend-item"><i class="legend-dot bank"></i> Bank</span>
+            </div>
+          </div>
+          <div id="board" class="board" aria-label="Spielbrett"></div>
+        </section>
+
+        <aside class="sidebar">
+          <section class="turn-panel panel">
+            <div class="turn-topline">
+              <p class="mini-label">Am Zug</p>
+              <div id="currentPlayerChip" class="player-chip">Signalrot</div>
+            </div>
+
+            <div class="dice-panel">
+              <div class="dice-box">
+                <span class="dice-label">Würfel</span>
+                <strong id="diceRaw">-</strong>
+              </div>
+              <div class="dice-box">
+                <span class="dice-label">Zugweite</span>
+                <strong id="diceMove">-</strong>
+              </div>
+            </div>
+
+            <button id="rollBtn" class="primary-btn wide" type="button">Würfeln</button>
+            <p id="turnHint" class="turn-hint">
+              Partie starten und dann würfeln. Bewegliche Figuren leuchten auf dem Brett.
+            </p>
+          </section>
+
+          <section class="score-panel panel">
+            <div class="panel-head compact">
+              <h2>Spielstand</h2>
+              <p>Fortschritt, Schutzmarken und Erkenntnispunkte.</p>
+            </div>
+            <div id="playerList" class="player-list"></div>
+          </section>
+
+          <section class="card-panel panel">
+            <div class="panel-head compact">
+              <h2>Letzte Karte</h2>
+              <p>Hier bleibt die zuletzt gelöste Szene oder Frage sichtbar.</p>
+            </div>
+            <div id="recentCard" class="recent-card empty">
+              Noch keine Karte aufgedeckt.
+            </div>
+          </section>
+
+          <section class="log-panel panel">
+            <div class="panel-head compact">
+              <h2>Protokoll</h2>
+              <p>Kurze Spielspur für Unterrichts- oder Gruppenrunden.</p>
+            </div>
+            <ul id="logList" class="log-list"></ul>
+          </section>
+        </aside>
+      </section>
+
+      <section class="compass panel">
+        <div class="panel-head">
+          <h2>Literatur-Kompass</h2>
+          <p>Kompakte Orientierung zum Text, direkt im Spiel eingebettet.</p>
+        </div>
+
+        <div class="compass-grid">
+          <article class="compass-card">
+            <h3>Figuren</h3>
+            <ul>
+              <li>Thiel: pflichtbewusst, innerlich gespalten, zunehmend psychisch zerrüttet.</li>
+              <li>Minna: erste Frau, zart, früh verstorben, bleibt als idealisierte Gegenfigur präsent.</li>
+              <li>Lene: zweite Frau, arbeitsstark, herrisch, brutal gegenüber Tobias.</li>
+              <li>Tobias: schwaches Kind, Zentrum von Fürsorge, Schuld und Katastrophe.</li>
+            </ul>
+          </article>
+
+          <article class="compass-card">
+            <h3>Räume und Motive</h3>
+            <ul>
+              <li>Märkischer Kiefernforst und abgelegener Bahnposten verstärken Isolation.</li>
+              <li>Die Bahn verbindet Technik, Tempo und tödliche Gefahr.</li>
+              <li>Das Wärterhäuschen wird nachts zur fast sakralen Erinnerungsstätte für Minna.</li>
+              <li>Pfiffe, Glocken, Dampf und Barrieren treiben die Spannung permanent an.</li>
+            </ul>
+          </article>
+
+          <article class="compass-card">
+            <h3>Zentrale Konflikte</h3>
+            <ul>
+              <li>Pflichtethos gegen sinnliche Abhängigkeit.</li>
+              <li>Idealisiertes Totengedenken gegen rohe Gegenwart mit Lene.</li>
+              <li>Väterliche Fürsorge gegen häusliche Gewalt.</li>
+              <li>Kontrollwunsch gegen psychischen Zusammenbruch.</li>
+            </ul>
+          </article>
+
+          <article class="compass-card">
+            <h3>Naturalistische Spuren</h3>
+            <ul>
+              <li>Milieu, Arbeitswelt und Körperlichkeit wirken stark auf das Verhalten der Figuren.</li>
+              <li>Die Erzählung beobachtet soziale Härte und psychische Eskalation fast studienhaft.</li>
+              <li>Der Text zeigt, wie Umgebung, Trieb und Gewalt ineinandergreifen.</li>
+              <li>Am Ende kippt die Beobachtung in Wahnsinn, Mord und totale Entgrenzung.</li>
+            </ul>
+          </article>
+        </div>
+
+        <div class="source-box">
+          <h3>Quellenhinweis</h3>
+          <p>
+            Die Karten und Infotexte beruhen auf dem Primärtext
+            <a href="https://projekt-gutenberg.org/authors/gerhart-hauptmann/books/bahnwaerter-thiel/" target="_blank" rel="noreferrer">Projekt Gutenberg: <em>Bahnwärter Thiel</em></a>
+            und auf der lokal vorhandenen Craft-Vorschau zum Materialdokument.
+          </p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="cardModal" class="modal hidden" aria-hidden="true">
+    <div class="modal-backdrop" data-close="true"></div>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="cardTitle">
+      <p id="cardType" class="modal-kicker">Karte</p>
+      <h2 id="cardTitle">Literaturkarte</h2>
+      <p id="cardPrompt" class="modal-prompt"></p>
+      <div id="cardOptions" class="option-list"></div>
+      <p id="cardFeedback" class="card-feedback"></p>
+      <div class="modal-actions">
+        <button id="cardContinueBtn" class="primary-btn hidden" type="button">Weiter</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
