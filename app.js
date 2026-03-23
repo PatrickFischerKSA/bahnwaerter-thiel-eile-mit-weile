@@ -1055,7 +1055,7 @@ const DEMO_STEPS = [
   {
     kicker: 'Schritt 1',
     title: 'Partie vorbereiten und Rollen verteilen',
-    text: 'Zu Beginn legst du 2 bis 4 Spielende fest. Am Brett bleiben nur öffentliche Informationen sichtbar. Sobald der Handy-Modus aktiv ist, bekommt jede Spielperson einen privaten Spielschirm für geheime Aktions- und Einflusskarten.',
+    text: 'Zu Beginn legst du 2 bis 4 Spielende fest. Dieser erste Schritt eignet sich gut für die Projektion im Unterricht: Das Brett zeigt die gemeinsame Ausgangslage, während der Handy-Modus erklärt, warum spätere Entscheidungen nicht offen auf dem Beamer liegen.',
     notes: [
       'Host-Brett für alle sichtbar',
       'Private Handy-Ansicht pro Spielperson',
@@ -1074,21 +1074,21 @@ const DEMO_STEPS = [
       label: 'Signalrot',
       status: 'Noch keine Karten. Das Handy koppelt sich zuerst mit dem Brett.',
       cards: [
-        { title: 'Einladungslink öffnen', text: 'Handy verbindet sich per Antwort-Code mit dem Host.', kind: 'quiz' }
+        { title: 'Einladungslink öffnen', text: 'Die Kopplung lässt sich zu Beginn einmal gemeinsam demonstrieren.', kind: 'quiz' }
       ]
     },
     phoneTwo: {
       label: 'Nebelblau',
       status: 'Auch die zweite Person erhält eine eigene, geheime Ansicht.',
       cards: [
-        { title: 'Privater Spielschirm', text: 'Nach der Kopplung erscheinen nur die eigenen Karten.', kind: 'buff' }
+        { title: 'Privater Spielschirm', text: 'Nach der Kopplung erscheinen nur die eigenen Karten und Optionen.', kind: 'buff' }
       ]
     }
   },
   {
     kicker: 'Schritt 2',
     title: 'Aktionskarten bleiben geheim auf dem Handy',
-    text: 'Zu Beginn einer Kartenrunde zieht jede Person ihre DOG-inspirierten Aktionskarten. Im Handy-Modus zeigt das Brett nur noch, dass eine geheime Hand existiert. Die konkrete Auswahl findet ausschliesslich auf dem jeweiligen Telefon statt.',
+    text: 'Zu Beginn einer Kartenrunde zieht jede Person ihre DOG-inspirierten Aktionskarten. Für Präsentation und Unterricht ist hier der Kern sichtbar: Das Publikum sieht am Host die Struktur der Runde, aber nicht die konkrete Kartenhand der aktiven Person.',
     notes: [
       'Handkarten sind privat',
       'Das Brett zeigt nur Kartenanzahl und Zugperson',
@@ -1124,7 +1124,7 @@ const DEMO_STEPS = [
   {
     kicker: 'Schritt 3',
     title: 'Einflusskarten greifen gezielt in die Partie ein',
-    text: 'Zusätzlich zu den normalen Aktionskarten besitzt jede Person eine kleine geheime Einfluss-Hand. Diese Karten verbessern den eigenen Verlauf oder stören gezielt andere Spielende. So bekommt jede Runde mehr Taktik und Interaktion.',
+    text: 'Zusätzlich zu den normalen Aktionskarten besitzt jede Person eine kleine geheime Einfluss-Hand. Diese Karten verbessern den eigenen Verlauf oder stören gezielt andere Spielende. Im Unterricht lässt sich daran sehr gut über Strategie, Fairness und Eingriffsmöglichkeiten sprechen.',
     notes: [
       'Positive Karten für dich selbst',
       'Negative Karten gegen andere',
@@ -1159,7 +1159,7 @@ const DEMO_STEPS = [
   {
     kicker: 'Schritt 4',
     title: 'Die Bewegung läuft weiterhin über das öffentliche Brett',
-    text: 'Die geheime Karte wird am Handy gewählt, aber die Figur selbst ziehst du weiterhin auf dem zentralen Brett. So bleibt für alle sichtbar, wie die Partie voranschreitet. Das passt besonders gut für Unterricht, Gruppenrunden und gemeinsames Mitdenken.',
+    text: 'Die geheime Karte wird am Handy gewählt, aber die Figur selbst ziehst du weiterhin auf dem zentralen Brett. Dadurch bleibt der Ablauf für Klasse oder Publikum jederzeit nachvollziehbar, obwohl die taktische Entscheidung privat bleibt.',
     notes: [
       'Kartenwahl privat',
       'Figurenbewegung öffentlich',
@@ -1186,14 +1186,14 @@ const DEMO_STEPS = [
       label: 'Nebelblau',
       status: 'Die andere Person wartet und sieht nur den öffentlichen Brettzug.',
       cards: [
-        { title: 'Warte auf Brettzug', text: 'Keine geheime Info über Signalrots Karte.', kind: 'buff' }
+        { title: 'Warte auf Brettzug', text: 'Für das Publikum bleibt nur der sichtbare Brettschritt relevant.', kind: 'buff' }
       ]
     }
   },
   {
     kicker: 'Schritt 5',
     title: 'Literaturfelder unterbrechen den Zug mit einer inhaltlichen Karte',
-    text: 'Landet eine Figur auf einem Text-, Deutungs- oder Schicksalsfeld, öffnet sich eine Literaturkarte. Text- und Deutungskarten fragen vier Antwortoptionen ab. Nur richtige Antworten geben Bonus, Schicksalskarten wirken sofort. Einflusskarten können diesen Bonus sogar vorher blockieren.',
+    text: 'Landet eine Figur auf einem Text-, Deutungs- oder Schicksalsfeld, öffnet sich eine Literaturkarte. Genau hier wird das Spiel zur Unterrichtsform: Text- und Deutungskarten aktivieren Vorwissen, Gespräch und Interpretation direkt im Spielzug.',
     notes: [
       'Text- und Deutungskarten als Quiz',
       'Schicksalskarten sofort wirksam',
@@ -1213,7 +1213,7 @@ const DEMO_STEPS = [
       label: 'Signalrot',
       status: 'Die Spielfigur erreicht ein Literaturfeld.',
       cards: [
-        { title: 'Textkarte', text: 'Warum heiratet Thiel nach Minnas Tod erneut?', kind: 'quiz' }
+        { title: 'Textkarte', text: 'Warum heiratet Thiel nach Minnas Tod erneut? Ideal als kurzer Gesprächsimpuls.', kind: 'quiz' }
       ]
     },
     phoneTwo: {
@@ -1227,7 +1227,7 @@ const DEMO_STEPS = [
   {
     kicker: 'Schritt 6',
     title: 'So endet eine Runde und schliesslich die ganze Partie',
-    text: 'Nach dem ausgespielten Zug geht die Runde zur nächsten Person weiter. Sobald alle Hände leer sind, wird neu ausgeteilt. Gewonnen hat, wer alle vier Figuren in die Zielstation bringt. Das Demo zeigt also den ganzen Zyklus: koppeln, geheim wählen, öffentlich ziehen, Literatur lösen, Einfluss nutzen und erneut austeilen.',
+    text: 'Nach dem ausgespielten Zug geht die Runde zur nächsten Person weiter. Sobald alle Hände leer sind, wird neu ausgeteilt. Gewonnen hat, wer alle vier Figuren in die Zielstation bringt. Für eine Einführung erklärt dieser letzte Schritt noch einmal den ganzen Zyklus vom Koppeln über die geheime Wahl bis zum literarischen Auswerten.',
     notes: [
       'Rundenfolge 6-5-4-3-2-1 bleibt bestehen',
       'Neue Kartenrunde nach leerer Hand',
@@ -1246,7 +1246,7 @@ const DEMO_STEPS = [
       label: 'Signalrot',
       status: 'Neue Kartenrunde beginnt automatisch.',
       cards: [
-        { title: 'Neue Hand', text: 'Frische Aktions- und Einflusskarten', kind: 'buff' }
+        { title: 'Neue Hand', text: 'Frische Aktions- und Einflusskarten für die nächste Unterrichtsphase', kind: 'buff' }
       ]
     },
     phoneTwo: {
