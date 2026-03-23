@@ -592,13 +592,13 @@ li {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 9px 12px;
+  padding: 8px 11px;
   border-radius: 999px;
   background: rgba(235, 230, 215, 0.94);
   border: 1px solid var(--line);
   color: var(--ink);
   font-weight: 700;
-  font-size: 0.88rem;
+  font-size: 0.82rem;
 }
 
 .demo-chip[data-tone="rot"] {
@@ -1225,14 +1225,14 @@ li {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: clamp(92px, 16%, 120px);
-  min-height: clamp(92px, 16%, 120px);
-  padding: 10px 8px;
-  border-radius: 28px;
+  width: clamp(66px, 11.5%, 84px);
+  min-height: clamp(66px, 11.5%, 84px);
+  padding: 7px 5px;
+  border-radius: 18px;
   display: grid;
   place-items: center;
   align-content: center;
-  gap: 2px;
+  gap: 1px;
   text-align: center;
   pointer-events: none;
   z-index: 2;
@@ -1246,34 +1246,26 @@ li {
     0 10px 24px rgba(53, 40, 28, 0.12);
 }
 
-.board-center-icon {
-  font-size: clamp(1rem, 2vw, 1.4rem);
-  line-height: 1;
+.board-center-kicker {
+  font-size: 0.36rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--red);
 }
 
-.board-center-title {
+.board-center-place {
   font-family: "Iowan Old Style", "Palatino Linotype", serif;
-  font-size: clamp(0.72rem, 1vw, 0.9rem);
+  font-size: clamp(0.52rem, 0.72vw, 0.64rem);
   font-weight: 800;
   line-height: 1;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-}
-
-.board-center-sub,
-.board-center-mode {
-  color: var(--muted);
-  line-height: 1.12;
+  letter-spacing: 0;
 }
 
 .board-center-sub {
-  font-size: 0.54rem;
-}
-
-.board-center-mode {
-  font-size: 0.48rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  color: var(--muted);
+  line-height: 1.12;
+  font-size: 0.37rem;
 }
 
 .token-stack {
@@ -1289,34 +1281,57 @@ li {
 }
 
 .token {
-  width: clamp(16px, 1.45vw, 22px);
-  height: clamp(16px, 1.45vw, 22px);
+  position: relative;
+  width: clamp(20px, 1.8vw, 28px);
+  height: clamp(20px, 1.8vw, 28px);
   border: 0;
-  border-radius: 50%;
+  border-radius: 12px;
   cursor: pointer;
   display: grid;
   place-items: center;
-  font-size: clamp(0.48rem, 0.55vw, 0.64rem);
-  font-weight: 900;
+  padding: 0;
   color: #fffdf8;
   box-shadow: 0 6px 12px rgba(20, 14, 11, 0.18);
 }
 
 .token[data-tone="rot"] {
-  background: linear-gradient(145deg, #b34d3d, #853223);
+  background: linear-gradient(145deg, #f4ddd8, #c88a7d);
 }
 
 .token[data-tone="blau"] {
-  background: linear-gradient(145deg, #48709b, #274866);
+  background: linear-gradient(145deg, #dce9f5, #84a7c9);
 }
 
 .token[data-tone="gruen"] {
-  background: linear-gradient(145deg, #5b8a68, #395c44);
+  background: linear-gradient(145deg, #deeadf, #8eb195);
 }
 
 .token[data-tone="gelb"] {
-  color: #2f2412;
-  background: linear-gradient(145deg, #d9b44d, #a57916);
+  background: linear-gradient(145deg, #f4e8c1, #d8b35f);
+}
+
+.token-icon {
+  font-size: clamp(0.72rem, 0.95vw, 1rem);
+  line-height: 1;
+  filter: saturate(0.94) drop-shadow(0 1px 1px rgba(31, 27, 22, 0.14));
+}
+
+.token-marker {
+  position: absolute;
+  right: -2px;
+  bottom: -2px;
+  min-width: 10px;
+  height: 10px;
+  padding: 0 2px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  font-size: 0.4rem;
+  font-weight: 900;
+  line-height: 1;
+  background: rgba(31, 27, 22, 0.86);
+  color: #fffdf8;
+  box-shadow: 0 2px 6px rgba(20, 14, 11, 0.2);
 }
 
 .token.selectable {
@@ -1913,23 +1928,32 @@ li {
   }
 
   .board-center-emblem {
-    width: clamp(84px, 18%, 104px);
-    min-height: clamp(84px, 18%, 104px);
-    border-radius: 24px;
+    width: clamp(62px, 14%, 76px);
+    min-height: clamp(62px, 14%, 76px);
+    border-radius: 16px;
   }
 
-  .board-center-title {
-    font-size: 0.68rem;
+  .board-center-place {
+    font-size: 0.52rem;
   }
 
   .board-center-sub {
-    font-size: 0.5rem;
+    font-size: 0.35rem;
   }
 
   .token {
-    width: 18px;
-    height: 18px;
-    font-size: 0.52rem;
+    width: 22px;
+    height: 22px;
+  }
+
+  .token-icon {
+    font-size: 0.82rem;
+  }
+
+  .token-marker {
+    min-width: 9px;
+    height: 9px;
+    font-size: 0.34rem;
   }
 
   .rule-strip span,

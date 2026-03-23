@@ -1,14 +1,57 @@
 const GRID_SIZE = 13;
 const START_INDICES = new Set([0, 10, 20, 30]);
+const SPECIAL_SPACES = new Map([
+  [2, {
+    kind: 'text',
+    place: 'Wärterhäuschen',
+    icon: '🕯',
+    fieldEffect: { kind: 'shield', amount: 1, text: 'Ortsbonus Wärterhäuschen: Du erhältst 1 Schutzmarke.' }
+  }],
+  [7, {
+    kind: 'schicksal',
+    place: 'Bahnübergang',
+    icon: '🚧',
+    fieldEffect: { kind: 'advance', amount: 1, text: 'Ortswirkung Bahnübergang: Deine Figur rückt 1 Feld vor.' }
+  }],
+  [12, {
+    kind: 'deutung',
+    place: 'Neu-Zittau',
+    icon: '⛪',
+    fieldEffect: { kind: 'insight', amount: 1, text: 'Ortsbonus Neu-Zittau: Du gewinnst 1 Erkenntnispunkt.' }
+  }],
+  [18, {
+    kind: 'text',
+    place: 'Acker an den Gleisen',
+    icon: '🌾',
+    fieldEffect: { kind: 'advance', amount: 1, text: 'Ortswirkung Acker: Deine Figur rückt 1 Feld vor.' }
+  }],
+  [23, {
+    kind: 'schicksal',
+    place: 'Bahndamm',
+    icon: '🛤',
+    fieldEffect: { kind: 'loseShield', amount: 1, text: 'Ortswirkung Bahndamm: Du verlierst 1 Schutzmarke, falls vorhanden.' }
+  }],
+  [28, {
+    kind: 'deutung',
+    place: 'Kiefernforst',
+    icon: '🌲',
+    fieldEffect: { kind: 'insight', amount: 1, text: 'Ortsbonus Kiefernforst: Du gewinnst 1 Erkenntnispunkt.' }
+  }],
+  [33, {
+    kind: 'text',
+    place: 'Barriere',
+    icon: '🚦',
+    fieldEffect: { kind: 'shield', amount: 1, text: 'Ortsbonus Barriere: Du erhältst 1 Schutzmarke.' }
+  }],
+  [38, {
+    kind: 'schicksal',
+    place: 'Schönschornstein',
+    icon: '💨',
+    fieldEffect: { kind: 'advance', amount: 1, text: 'Ortswirkung Schönschornstein: Deine Figur rückt 1 Feld vor.' }
+  }]
+]);
 const SPECIAL_FIELDS = new Map([
-  [2, 'text'],
-  [7, 'schicksal'],
-  [12, 'deutung'],
-  [18, 'text'],
-  [23, 'schicksal'],
-  [28, 'deutung'],
-  [33, 'text'],
-  [38, 'schicksal']
+  ...[...SPECIAL_SPACES.entries()].map(([index, meta]) => [index, meta.kind])
 ]);
 
 const TRACK_COORDS = [
@@ -448,12 +491,12 @@ const LITERATURE_CARDS = {
       prompt: 'Wo zeigt die Novelle Thiel nach der Gewalttat zuletzt?',
       options: [
         'Als geachteten Bahnwärter an alter Stelle.',
-        'In einer Heilanstalt beziehungsweise Anstalt geistiger Umnachtung.',
+        'In der Charité.',
         'Auf einem Schiff nach Übersee.',
         'Als Einsiedler im märkischen Forst.'
       ],
       correct: 1,
-      explanation: 'Der Schluss rahmt Thiel als endgültig zerstörte Figur im Anstaltskontext.',
+      explanation: 'Der Schluss rahmt Thiel als endgültig zerstörte Figur im Kontext der Charité.',
       reward: { kind: 'shield', amount: 1, text: 'Du erhältst 1 Schutzmarke.' }
     }
   ],
@@ -745,8 +788,8 @@ const LITERATURE_CARDS = {
       reward: { kind: 'shield', amount: 1, text: 'Du erhältst 1 Schutzmarke.' }
     },
     {
-      title: 'Anstaltsende',
-      prompt: 'Wie lässt sich das Ende in der Anstalt literarisch deuten?',
+      title: 'Schluss in der Charité',
+      prompt: 'Wie lässt sich das Ende in der Charité literarisch deuten?',
       options: [
         'Als glückliche Genesung und Wiedereingliederung.',
         'Als endgültige Pathologisierung einer von Milieu und Schuld zerstörten Figur.',
@@ -754,7 +797,7 @@ const LITERATURE_CARDS = {
         'Als Beweis dafür, dass alles nur geträumt war.'
       ],
       correct: 1,
-      explanation: 'Die Anstalt markiert keinen Ausweg, sondern die letzte Form des Zusammenbruchs.',
+      explanation: 'Die Charité markiert keinen Ausweg, sondern die letzte Form des Zusammenbruchs.',
       reward: { kind: 'insight', amount: 1, text: 'Du gewinnst 1 Erkenntnispunkt.' }
     },
     {
@@ -1088,10 +1131,10 @@ const DEMO_STEPS = [
   {
     kicker: 'Schritt 1',
     title: 'Partie vorbereiten, Schnellnavigation zeigen und Handys koppeln',
-    text: 'Zu Beginn legst du 2 bis 4 Spielende fest und öffnest die Ansicht gezielt über die Schnellnavigation. Für Unterricht und Präsentation ist dieser Einstieg jetzt klarer aufgebaut: Das Host-Brett bleibt öffentlich, die frühere rechte Leiste ist in eine Host-Konsole unter dem Spielfeld gewandert, und die privaten Handys werden per QR-Code verbunden.',
+    text: 'Zu Beginn legst du 2 bis 4 Spielende fest und öffnest die Ansicht gezielt über die Schnellnavigation. Für Unterricht und Präsentation ist dieser Einstieg jetzt klarer aufgebaut: Das Host-Brett bleibt öffentlich, links sitzt eine kompakte Host-Konsole mit aufklappbaren Bereichen, und die privaten Handys werden per QR-Code verbunden.',
     notes: [
       'Schnellnavigation reduziert Scrollen',
-      'Host-Konsole statt rechter Menüleiste',
+      'Linke Host-Konsole mit Aufklapp-Bereichen',
       'QR-Code oder Link öffnet die private Handy-Ansicht',
       'Namen und Farben bleiben öffentlich'
     ],
@@ -1102,7 +1145,7 @@ const DEMO_STEPS = [
       { label: 'Handys', value: '0 / 2' }
     ],
     hostTabs: [
-      { label: 'Zug' },
+      { label: 'Spielzug' },
       { label: 'Spielstand' },
       { label: 'Letzte Karte' },
       { label: 'Protokoll' },
@@ -1115,11 +1158,11 @@ const DEMO_STEPS = [
     ],
     hostBoxes: [
       { title: 'Host-Brett', text: 'Spielendenzahl wählen, Handy-Modus einschalten, dann über "Spiel" direkt in die Partie springen.' },
-      { title: 'Host-Konsole', text: 'Im Tab "Handys" erzeugt das Brett pro Person einen Einladungslink mit QR-Code und wartet anschliessend auf den Antwort-Code.' }
+      { title: 'Host-Konsole', text: 'Im Bereich "Handys" erzeugt das Brett pro Person einen Einladungslink mit QR-Code und wartet anschliessend auf den Antwort-Code.' }
     ],
     hostRow: [
-      { label: 'Tab "Spiel" aktiv', tone: 'gelb' },
-      { label: 'Signalrot bereit', tone: 'rot' },
+      { label: 'Ansicht "Spiel" aktiv', tone: 'gelb' },
+      { label: '🚂 Signalrot bereit', tone: 'rot' },
       { label: 'QR bereit', tone: 'blau' }
     ],
     phoneOne: {
@@ -1142,7 +1185,7 @@ const DEMO_STEPS = [
   {
     kicker: 'Schritt 2',
     title: 'Aktionskarten bleiben geheim auf dem Handy',
-    text: 'Zu Beginn einer Kartenrunde zieht jede Person ihre DOG-inspirierten Aktionskarten. Über die Schnellnavigation kann die Präsentation nun direkt im Spielbereich bleiben: Das Publikum sieht am Host nur die Kerndaten der Runde, während die konkrete Kartenhand und ein Teil der offenen Infos auf die Handys ausgelagert sind.',
+    text: 'Zu Beginn einer Kartenrunde zieht jede Person ihre DOG-inspirierten Aktionskarten. Über die Schnellnavigation kann die Präsentation nun direkt im Spielbereich bleiben: Das Publikum sieht am Host nur die Kerndaten der Runde und die kleinen Dampflokomotiven auf dem Brett, während die konkrete Kartenhand und ein Teil der offenen Infos auf die Handys ausgelagert sind.',
     notes: [
       'Handkarten sind privat',
       'Das Brett zeigt nur Kartenanzahl und Zugperson',
@@ -1156,7 +1199,7 @@ const DEMO_STEPS = [
       { label: 'Handys', value: '2 / 2' }
     ],
     hostTabs: [
-      { label: 'Zug', active: true },
+      { label: 'Spielzug', active: true },
       { label: 'Spielstand' },
       { label: 'Letzte Karte' },
       { label: 'Protokoll' },
@@ -1169,7 +1212,12 @@ const DEMO_STEPS = [
     hostRow: [
       { label: 'Fokus auf Spiel', tone: 'gelb' },
       { label: '4 geheime Karten', tone: 'rot' },
-      { label: 'Zug bei Signalrot', tone: 'rot' }
+      { label: '🚂 Zug bei Signalrot', tone: 'rot' }
+    ],
+    hostPlaces: [
+      { label: '🕯 Wärterhäuschen' },
+      { label: '🌾 Acker an den Gleisen' },
+      { label: '🌲 Kiefernforst' }
     ],
     phoneOne: {
       label: 'Signalrot',
@@ -1208,7 +1256,7 @@ const DEMO_STEPS = [
       { label: 'Handys', value: '2 / 2' }
     ],
     hostTabs: [
-      { label: 'Zug' },
+      { label: 'Spielzug' },
       { label: 'Spielstand' },
       { label: 'Letzte Karte' },
       { label: 'Protokoll', active: true },
@@ -1243,7 +1291,7 @@ const DEMO_STEPS = [
   {
     kicker: 'Schritt 4',
     title: 'Die Bewegung läuft über das öffentliche, neu betonte Brett',
-    text: 'Die geheime Karte wird am Handy gewählt, aber die Figur selbst ziehst du weiterhin auf dem zentralen Brett. Gerade in der neuen Fassung ist dieser Moment stärker hervorgehoben: Das Host-Brett arbeitet mit klareren Feldern, Badges und Markierungen, während Zusatzinfos platzsparend in der Host-Konsole unter dem Spielfeld liegen.',
+    text: 'Die geheime Karte wird am Handy gewählt, aber die Figur selbst ziehst du weiterhin auf dem zentralen Brett. Gerade in der neuen Fassung ist dieser Moment stärker hervorgehoben: Das Host-Brett arbeitet mit thematischen Ortsfeldern, Dampflokomotiven und einem klaren Schlussbild der Charité, während Zusatzinfos platzsparend in der linken Host-Konsole liegen.',
     notes: [
       'Kartenwahl privat',
       'Figurenbewegung öffentlich',
@@ -1257,21 +1305,26 @@ const DEMO_STEPS = [
       { label: 'Handys', value: '2 / 2' }
     ],
     hostTabs: [
-      { label: 'Zug', active: true },
+      { label: 'Spielzug', active: true },
       { label: 'Spielstand' },
       { label: 'Letzte Karte' },
       { label: 'Protokoll' },
       { label: 'Handys' }
     ],
     hostBoxes: [
-      { title: 'Host-Brett', text: 'Nach der Handy-Auswahl leuchten die möglichen Figuren auf, und Spezialfelder springen optisch stärker ins Auge.' },
-      { title: 'Host-Konsole', text: 'Spielstand, letzte Karte und Protokoll bleiben unter dem Brett erreichbar, ohne dem Spielfeld Raum zu nehmen.' }
+      { title: 'Host-Brett', text: 'Nach der Handy-Auswahl leuchten die möglichen Dampflokomotiven auf, und Ortsfelder wie Wärterhäuschen, Bahnübergang oder Schönschornstein springen optisch ins Auge.' },
+      { title: 'Host-Konsole', text: 'Spielstand, letzte Karte und Protokoll bleiben links erreichbar, ohne dem Spielfeld Raum zu nehmen.' }
     ],
     hostRow: [
-      { label: 'Startfeld', tone: 'rot' },
-      { label: 'Literaturfeld in Reichweite', tone: 'gelb' },
-      { label: 'Gegnerfigur bedroht', tone: 'blau' },
+      { label: '🚦 Startfeld', tone: 'rot' },
+      { label: '🚂 Lok markiert', tone: 'gelb' },
+      { label: '🛤 Bahndamm in Reichweite', tone: 'blau' },
       { label: 'Markierung aktiv', tone: 'gruen' }
+    ],
+    hostPlaces: [
+      { label: '🚧 Bahnübergang' },
+      { label: '💨 Schönschornstein' },
+      { label: '🏥 Charité' }
     ],
     phoneOne: {
       label: 'Signalrot',
@@ -1295,6 +1348,7 @@ const DEMO_STEPS = [
     notes: [
       'Text- und Deutungskarten als Quiz',
       'Schicksalskarten sofort wirksam',
+      'Ortsname und Ortswirkung werden mit angezeigt',
       'Letzte Karte bleibt in der Host-Konsole und auf den Handys sichtbar',
       'Richtige Antwort gibt Bonus'
     ],
@@ -1305,18 +1359,18 @@ const DEMO_STEPS = [
       { label: 'Handys', value: '2 / 2' }
     ],
     hostTabs: [
-      { label: 'Zug' },
+      { label: 'Spielzug' },
       { label: 'Spielstand' },
       { label: 'Letzte Karte', active: true },
       { label: 'Protokoll' },
       { label: 'Handys' }
     ],
     hostBoxes: [
-      { title: 'Öffentliche Karte', text: 'Die Gruppe sieht die Frage und die Erklärung gemeinsam am Host.' },
-      { title: 'Belohnung oder Blockade', text: 'Schutz, Erkenntnis oder Bonusfeld werden sofort sichtbar verbucht.' }
+      { title: 'Öffentliche Karte', text: 'Die Gruppe sieht die Frage, den Ortsnamen und die Erklärung gemeinsam am Host.' },
+      { title: 'Belohnung oder Blockade', text: 'Schutz, Erkenntnis, Ortsbonus oder Bonusfeld werden sofort sichtbar verbucht.' }
     ],
     hostRow: [
-      { label: 'Textkarte', tone: 'gelb' },
+      { label: '📖 Textkarte · Acker an den Gleisen', tone: 'gelb' },
       { label: 'Erklärung eingeblendet', tone: 'gruen' },
       { label: 'Bonus sichtbar', tone: 'rot' }
     ],
@@ -1324,7 +1378,7 @@ const DEMO_STEPS = [
       label: 'Signalrot',
       status: 'Die Spielfigur erreicht ein Literaturfeld.',
       cards: [
-        { title: 'Textkarte', text: 'Warum heiratet Thiel nach Minnas Tod erneut? Ideal als kurzer Gesprächsimpuls.', kind: 'quiz' },
+        { title: 'Textkarte · Wärterhäuschen', text: 'Warum heiratet Thiel nach Minnas Tod erneut? Danach kommt zusätzlich der Ortsbonus des Feldes ins Spiel.', kind: 'quiz' },
         { title: 'Letzte Karte', text: 'Die zuletzt gelöste Literaturkarte bleibt auch auf dem Handy als offene Info sichtbar.', kind: 'buff' }
       ]
     },
@@ -1339,12 +1393,12 @@ const DEMO_STEPS = [
   {
     kicker: 'Schritt 6',
     title: 'So endet eine Runde und schliesslich die ganze Partie',
-    text: 'Nach dem ausgespielten Zug geht die Runde zur nächsten Person weiter. Sobald alle Hände leer sind, wird neu ausgeteilt. Gewonnen hat, wer alle vier Figuren in die Zielstation bringt. Für eine Einführung fasst dieser letzte Schritt noch einmal den ganzen Zyklus zusammen: Navigation, QR-Kopplung, geheime Kartenwahl, öffentlicher Brettzug, Host-Konsole und literarische Auswertung.',
+    text: 'Nach dem ausgespielten Zug geht die Runde zur nächsten Person weiter. Sobald alle Hände leer sind, wird neu ausgeteilt. Gewonnen hat, wer alle vier Figuren ins Schlussbild der Charité bringt. Für eine Einführung fasst dieser letzte Schritt noch einmal den ganzen Zyklus zusammen: Navigation, QR-Kopplung, geheime Kartenwahl, öffentlicher Brettzug, Host-Konsole und literarische Auswertung.',
     notes: [
       'Rundenfolge 6-5-4-3-2-1 bleibt bestehen',
       'Neue Kartenrunde nach leerer Hand',
       'Spielstand kann aus der Host-Konsole oder vom Handy verfolgt werden',
-      'Sieg mit vier Figuren im Ziel'
+      'Sieg mit vier Figuren in der Charité'
     ],
     hostTitle: 'Kompletter Spielzyklus',
     hostMetrics: [
@@ -1353,7 +1407,7 @@ const DEMO_STEPS = [
       { label: 'Handys', value: '2 / 2' }
     ],
     hostTabs: [
-      { label: 'Zug' },
+      { label: 'Spielzug' },
       { label: 'Spielstand', active: true },
       { label: 'Letzte Karte' },
       { label: 'Protokoll' },
@@ -1361,11 +1415,15 @@ const DEMO_STEPS = [
     ],
     hostBoxes: [
       { title: 'Rundenwechsel', text: 'Nächste Person wird aktiv, neue geheime Auswahl beginnt.' },
-      { title: 'Siegbedingung', text: 'Vier eigene Figuren in der Zielstation beenden die Partie.' }
+      { title: 'Siegbedingung', text: 'Vier eigene Figuren im Schlussbild der Charité beenden die Partie.' }
     ],
     hostRow: [
       { label: 'Neue Runde 5 Karten', tone: 'gelb' },
-      { label: 'Zielstation 4/4', tone: 'rot' }
+      { label: '🏥 Charité 4/4', tone: 'rot' }
+    ],
+    hostPlaces: [
+      { label: '🚂 alle Loks angekommen' },
+      { label: '🏥 Schlussbild Charité' }
     ],
     phoneOne: {
       label: 'Signalrot',
@@ -1547,11 +1605,15 @@ function buildCellMeta() {
 
   TRACK_COORDS.forEach((coord, index) => {
     const preset = PLAYER_PRESETS.find((entry) => entry.startIndex === index);
+    const specialMeta = SPECIAL_SPACES.get(index) || null;
     meta.set(coordKey(coord.x, coord.y), {
       type: 'track',
       index,
-      special: SPECIAL_FIELDS.get(index) || null,
-      startTone: preset ? preset.tone : null
+      special: specialMeta?.kind || null,
+      startTone: preset ? preset.tone : null,
+      place: specialMeta?.place || null,
+      fieldIcon: specialMeta?.icon || null,
+      fieldEffect: specialMeta?.fieldEffect || null
     });
   });
 
@@ -1739,7 +1801,17 @@ function queueLiteratureFromTrack(playerIndex, pieceId) {
   const deckIndex = player.deckIndices[type] % player.literatureDecks[type].length;
   const card = player.literatureDecks[type][deckIndex];
   player.deckIndices[type] += 1;
-  state.pendingLiterature = { playerIndex, pieceId, type, card };
+  const fieldMeta = SPECIAL_SPACES.get(pieceState.absoluteIndex) || null;
+  if (fieldMeta?.place) {
+    addLog(`${player.name} landet bei ${fieldMeta.place}.`);
+  }
+  state.pendingLiterature = {
+    playerIndex,
+    pieceId,
+    type,
+    card,
+    fieldMeta
+  };
 }
 
 function movePieceByAmount(playerIndex, pieceId, amount, registerLiterature = true) {
@@ -1757,7 +1829,7 @@ function movePieceByAmount(playerIndex, pieceId, amount, registerLiterature = tr
   }
 
   if (pieceState.zone === 'finish') {
-    addLog(`${player.name} bringt eine Figur in die Zielstation.`);
+    addLog(`${player.name} bringt eine Figur ins Schlussbild der Charité.`);
   }
 
   return true;
@@ -2394,10 +2466,11 @@ function openLiteratureModal() {
   const pending = state.pendingLiterature;
   if (!pending) return;
 
-  const { card, type } = pending;
+  const { card, type, fieldMeta } = pending;
   modalEl.classList.remove('hidden');
   modalEl.setAttribute('aria-hidden', 'false');
-  cardTypeEl.textContent = type === 'text' ? 'Textkarte' : type === 'deutung' ? 'Deutungskarte' : 'Schicksalskarte';
+  const typeLabel = type === 'text' ? 'Textkarte' : type === 'deutung' ? 'Deutungskarte' : 'Schicksalskarte';
+  cardTypeEl.textContent = fieldMeta?.place ? `${typeLabel} · ${fieldMeta.place}` : typeLabel;
   cardTitleEl.textContent = card.title;
   cardPromptEl.textContent = card.prompt;
   cardOptionsEl.innerHTML = '';
@@ -2406,8 +2479,9 @@ function openLiteratureModal() {
 
   if (type === 'schicksal') {
     const rewardText = applyLiteratureRewardConsideringBlock(pending.playerIndex, pending.pieceId, card.reward, false);
-    cardFeedbackEl.textContent = `${card.explanation} ${rewardText}`.trim();
-    updateRecentCard(type, card.title, `${card.prompt} ${card.explanation}`, rewardText);
+    const fieldEffectText = applyFieldEffect(pending.playerIndex, pending.pieceId, fieldMeta);
+    cardFeedbackEl.textContent = joinTexts(card.explanation, rewardText, fieldEffectText);
+    updateRecentCard(type, card.title, joinTexts(card.prompt, card.explanation), joinTexts(rewardText, fieldEffectText), fieldMeta?.place);
     cardContinueBtn.classList.remove('hidden');
     return;
   }
@@ -2426,7 +2500,7 @@ function resolveLiteratureAnswer(optionIndex) {
   const pending = state.pendingLiterature;
   if (!pending || pending.type === 'schicksal') return;
 
-  const { card } = pending;
+  const { card, fieldMeta } = pending;
   const correct = optionIndex === card.correct;
   const buttons = [...cardOptionsEl.querySelectorAll('.option-btn')];
 
@@ -2437,16 +2511,24 @@ function resolveLiteratureAnswer(optionIndex) {
   });
 
   let rewardText = 'Kein Bonus.';
+  let fieldEffectText = '';
   if (correct) {
     rewardText = applyLiteratureRewardConsideringBlock(pending.playerIndex, pending.pieceId, card.reward, true);
+    fieldEffectText = applyFieldEffect(pending.playerIndex, pending.pieceId, fieldMeta);
   }
 
-  cardFeedbackEl.textContent = `${correct ? 'Richtig.' : 'Noch nicht.'} ${card.explanation} ${correct ? rewardText : ''}`.trim();
+  cardFeedbackEl.textContent = joinTexts(
+    correct ? 'Richtig.' : 'Noch nicht.',
+    card.explanation,
+    correct ? rewardText : '',
+    correct ? fieldEffectText : ''
+  );
   updateRecentCard(
     pending.type,
     card.title,
-    `${card.prompt} ${card.explanation}`,
-    correct ? rewardText : 'Antwort ohne Bonus abgeschlossen.'
+    joinTexts(card.prompt, card.explanation),
+    correct ? joinTexts(rewardText, fieldEffectText) : 'Antwort ohne Bonus abgeschlossen.',
+    fieldMeta?.place
   );
   cardContinueBtn.classList.remove('hidden');
   render();
@@ -2459,8 +2541,14 @@ function closeLiteratureModal() {
   moveToNextPlayer();
 }
 
-function updateRecentCard(type, title, body, rewardText) {
-  state.recentCard = { type, title, body, rewardText };
+function updateRecentCard(type, title, body, rewardText, location = '') {
+  state.recentCard = {
+    type,
+    title,
+    body,
+    rewardText,
+    location
+  };
 }
 
 function renderRecentCard() {
@@ -2475,11 +2563,12 @@ function renderRecentCard() {
 
   const kicker = document.createElement('p');
   kicker.className = 'mini-label';
-  kicker.textContent = state.recentCard.type === 'text'
+  const typeLabel = state.recentCard.type === 'text'
     ? 'Text'
     : state.recentCard.type === 'deutung'
       ? 'Deutung'
       : 'Schicksal';
+  kicker.textContent = state.recentCard.location ? `${typeLabel} · ${state.recentCard.location}` : typeLabel;
 
   const title = document.createElement('h3');
   title.textContent = state.recentCard.title;
@@ -2665,7 +2754,18 @@ function createTokenButton(playerIndex, piece) {
   button.dataset.playerIndex = String(playerIndex);
   button.dataset.pieceId = piece.id;
   button.dataset.tone = player.tone;
-  button.textContent = String(piece.pieceIndex + 1);
+  button.setAttribute('aria-label', `${player.name} Dampflokomotive ${piece.pieceIndex + 1}`);
+
+  const icon = document.createElement('span');
+  icon.className = 'token-icon';
+  icon.setAttribute('aria-hidden', 'true');
+  icon.textContent = '🚂';
+
+  const marker = document.createElement('span');
+  marker.className = 'token-marker';
+  marker.textContent = String(piece.pieceIndex + 1);
+
+  button.append(icon, marker);
 
   if (isTokenSelectable(playerIndex, piece)) {
     button.classList.add('selectable');
@@ -2681,15 +2781,24 @@ function getTrackSymbol(meta) {
     return { icon: '🚦', label: 'Startsignal', kind: 'start' };
   }
   if (meta.special === 'text') {
-    return { icon: '📖', label: 'Textkarte', kind: 'text' };
+    return { icon: meta.fieldIcon || '📖', label: meta.place || 'Textkarte', kind: 'text' };
   }
   if (meta.special === 'deutung') {
-    return { icon: '👁', label: 'Deutungskarte', kind: 'deutung' };
+    return { icon: meta.fieldIcon || '👁', label: meta.place || 'Deutungskarte', kind: 'deutung' };
   }
   if (meta.special === 'schicksal') {
-    return { icon: '⚡', label: 'Schicksalskarte', kind: 'schicksal' };
+    return { icon: meta.fieldIcon || '⚡', label: meta.place || 'Schicksalskarte', kind: 'schicksal' };
   }
   return null;
+}
+
+function joinTexts(...parts) {
+  return parts.filter(Boolean).join(' ');
+}
+
+function applyFieldEffect(playerIndex, pieceId, fieldMeta) {
+  if (!fieldMeta?.fieldEffect) return '';
+  return applyRawReward(playerIndex, pieceId, fieldMeta.fieldEffect);
 }
 
 function renderBoard() {
@@ -2710,6 +2819,7 @@ function renderBoard() {
 
         const symbolMeta = getTrackSymbol(meta);
         if (symbolMeta) {
+          cell.title = symbolMeta.label;
           const symbol = document.createElement('div');
           symbol.className = `cell-symbol symbol-${symbolMeta.kind}`;
           symbol.setAttribute('aria-hidden', 'true');
@@ -2771,23 +2881,19 @@ function renderBoard() {
   const centerEmblem = document.createElement('div');
   centerEmblem.className = 'board-center-emblem';
 
-  const centerIcon = document.createElement('div');
-  centerIcon.className = 'board-center-icon';
-  centerIcon.textContent = '🚂';
+  const centerKicker = document.createElement('div');
+  centerKicker.className = 'board-center-kicker';
+  centerKicker.textContent = 'Schlussbild';
 
-  const centerTitle = document.createElement('div');
-  centerTitle.className = 'board-center-title';
-  centerTitle.textContent = 'Endstation';
+  const centerPlace = document.createElement('div');
+  centerPlace.className = 'board-center-place';
+  centerPlace.textContent = 'Charité';
 
   const centerSub = document.createElement('div');
   centerSub.className = 'board-center-sub';
-  centerSub.textContent = `${state.players.reduce((sum, player) => sum + player.pieces.filter((piece) => piece.steps === 44).length, 0)} Figuren im Ziel`;
+  centerSub.textContent = `${state.players.reduce((sum, player) => sum + player.pieces.filter((piece) => piece.steps === 44).length, 0)} Figuren angekommen`;
 
-  const centerMode = document.createElement('div');
-  centerMode.className = 'board-center-mode';
-  centerMode.textContent = getModeConfig(state.modeKey).label;
-
-  centerEmblem.append(centerIcon, centerTitle, centerSub, centerMode);
+  centerEmblem.append(centerKicker, centerPlace, centerSub);
   boardEl.appendChild(centerEmblem);
 }
 
@@ -3638,6 +3744,18 @@ function renderDemoStep() {
       row.appendChild(chip);
     });
     strip.appendChild(row);
+  }
+
+  if (step.hostPlaces?.length) {
+    const places = document.createElement('div');
+    places.className = 'demo-board-row';
+    step.hostPlaces.forEach((entry) => {
+      const pill = document.createElement('span');
+      pill.className = 'demo-card-pill';
+      pill.textContent = entry.label;
+      places.appendChild(pill);
+    });
+    strip.appendChild(places);
   }
 
   if (step.hostProgress?.length) {
