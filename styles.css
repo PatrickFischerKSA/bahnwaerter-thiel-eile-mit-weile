@@ -47,7 +47,7 @@ input {
 }
 
 .page-shell {
-  width: min(1440px, calc(100vw - 32px));
+  width: min(1680px, calc(100vw - 24px));
   margin: 24px auto 40px;
 }
 
@@ -181,6 +181,12 @@ li {
   position: sticky;
   top: 12px;
   z-index: 18;
+}
+
+#boardApp[data-view="spiel"] .hero,
+#boardApp[data-view="demo"] .hero,
+#boardApp[data-view="kompass"] .hero {
+  display: none;
 }
 
 .page-nav-buttons {
@@ -346,14 +352,12 @@ li {
 
 .game-stage {
   display: grid;
-  grid-template-columns: minmax(0, 1.25fr) minmax(320px, 0.75fr);
-  gap: 24px;
-  align-items: start;
+  gap: 18px;
 }
 
-.board-panel {
-  position: sticky;
-  top: 102px;
+.board-stage {
+  display: grid;
+  gap: 18px;
 }
 
 .demo {
@@ -631,6 +635,23 @@ li {
   border: 1px solid var(--line);
 }
 
+.setup-note-card {
+  padding: 16px 18px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid var(--line);
+}
+
+.setup-note-card strong,
+.setup-note-card p {
+  display: block;
+}
+
+.setup-note-card p {
+  margin: 6px 0 0;
+  color: var(--muted);
+}
+
 .connect-explainer {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -754,6 +775,32 @@ li {
   align-items: center;
 }
 
+.host-status-strip {
+  display: grid;
+  grid-template-columns: minmax(220px, 1.4fr) repeat(3, minmax(120px, 0.6fr));
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.host-status-card {
+  padding: 14px 16px;
+  border-radius: 22px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.86);
+  display: grid;
+  gap: 8px;
+  align-content: center;
+}
+
+.host-status-card strong {
+  font-size: clamp(1.4rem, 2vw, 2rem);
+  line-height: 1;
+}
+
+.host-status-card.emphasis {
+  background: linear-gradient(135deg, rgba(41, 57, 46, 0.08), rgba(255, 255, 255, 0.92));
+}
+
 .legend {
   display: flex;
   flex-wrap: wrap;
@@ -800,10 +847,10 @@ li {
   display: grid;
   grid-template-columns: repeat(13, minmax(26px, 1fr));
   grid-template-rows: repeat(13, minmax(26px, 1fr));
-  gap: 6px;
-  width: min(100%, 760px);
+  gap: clamp(4px, 0.52vw, 6px);
+  width: min(100%, calc(100svh - 280px), 860px);
   aspect-ratio: 1;
-  padding: 18px;
+  padding: clamp(10px, 1.4vw, 18px);
   margin: 0 auto;
   border-radius: 28px;
   background:
@@ -995,14 +1042,14 @@ li {
 }
 
 .token {
-  width: 28px;
-  height: 28px;
+  width: clamp(20px, 2.1vw, 28px);
+  height: clamp(20px, 2.1vw, 28px);
   border: 0;
   border-radius: 50%;
   cursor: pointer;
   display: grid;
   place-items: center;
-  font-size: 0.76rem;
+  font-size: clamp(0.62rem, 0.72vw, 0.76rem);
   font-weight: 900;
   color: #fffdf8;
   box-shadow: 0 6px 12px rgba(20, 14, 11, 0.18);
@@ -1033,13 +1080,6 @@ li {
 
 .token:disabled {
   cursor: default;
-}
-
-.sidebar {
-  display: grid;
-  gap: 24px;
-  position: sticky;
-  top: 102px;
 }
 
 .turn-topline {
@@ -1095,6 +1135,55 @@ li {
 .dice-box strong {
   font-size: 2rem;
   line-height: 1;
+}
+
+.host-console {
+  display: grid;
+  gap: 16px;
+}
+
+.host-panel-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.host-panel-tab {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 11px 14px;
+  background: rgba(255, 255, 255, 0.84);
+  color: var(--ink);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.host-panel-tab.active {
+  background: linear-gradient(135deg, rgba(49, 90, 130, 0.92), rgba(33, 59, 82, 0.96));
+  color: #fffdf8;
+  box-shadow: 0 10px 24px rgba(49, 90, 130, 0.22);
+}
+
+.host-panel-pane {
+  display: grid;
+  gap: 14px;
+}
+
+.host-turn-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
+  gap: 16px;
+}
+
+.host-turn-grid .action-panel {
+  padding: 16px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid var(--line);
+}
+
+.host-turn-grid .action-panel + .action-panel {
+  margin-top: 0;
 }
 
 .player-list {
@@ -1433,16 +1522,49 @@ li {
   cursor: not-allowed;
 }
 
+.connection-progress {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 12px 0 14px;
+}
+
+.connection-progress-card {
+  padding: 10px 12px;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.86);
+}
+
+.connection-progress-card strong,
+.connection-progress-card span {
+  display: block;
+}
+
+.connection-progress-card span {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.connection-progress-card.done {
+  background: rgba(68, 113, 82, 0.14);
+}
+
+.connection-progress-card.current {
+  background: rgba(166, 124, 26, 0.16);
+}
+
+.connection-progress-card.pending {
+  opacity: 0.8;
+}
+
 @media (max-width: 1180px) {
   .hero,
-  .game-stage {
+  .game-stage,
+  .host-turn-grid,
+  .host-status-strip {
     grid-template-columns: 1fr;
-  }
-
-  .board-panel,
-  .sidebar,
-  .page-nav {
-    position: static;
   }
 
   .demo-layout,
@@ -1481,6 +1603,7 @@ li {
   .board {
     gap: 4px;
     padding: 10px;
+    width: min(100%, calc(100svh - 240px));
   }
 
   .token {
@@ -1498,6 +1621,11 @@ li {
   .connection-card,
   .phone-panel {
     border-radius: 18px;
+  }
+
+  .host-panel-tabs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .demo-phone-stack {

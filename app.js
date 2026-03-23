@@ -986,6 +986,7 @@ const newGameBtn = document.getElementById('newGameBtn');
 const phoneModeToggleEl = document.getElementById('phoneModeToggle');
 const phoneControlPanelEl = document.getElementById('phoneControlPanel');
 const connectionListEl = document.getElementById('connectionList');
+const connectionCountEl = document.getElementById('connectionCount');
 const currentPlayerChip = document.getElementById('currentPlayerChip');
 const roundSizeEl = document.getElementById('roundSize');
 const deckCountEl = document.getElementById('deckCount');
@@ -1019,6 +1020,7 @@ const demoPhoneTwoEl = document.getElementById('demoPhoneTwo');
 const demoPrevBtn = document.getElementById('demoPrevBtn');
 const demoPlayBtn = document.getElementById('demoPlayBtn');
 const demoNextBtn = document.getElementById('demoNextBtn');
+const hostPanelTabsEl = document.getElementById('hostPanelTabs');
 
 const phoneTitleEl = document.getElementById('phoneTitle');
 const phoneStatusTextEl = document.getElementById('phoneStatusText');
@@ -1042,6 +1044,7 @@ let state = createInitialState();
 let demoStepIndex = 0;
 let demoTimer = null;
 let currentBoardView = 'start';
+let currentHostPanel = 'zug';
 
 const hostConnections = new Map();
 const phoneClient = {
@@ -1066,7 +1069,7 @@ const DEMO_STEPS = [
     hostTitle: 'Öffentliche Startübersicht',
     hostBoxes: [
       { title: 'Host-Brett', text: 'Spielendenzahl wählen, Handy-Modus einschalten, dann über "Spiel" direkt in die Partie springen.' },
-      { title: 'Verbindungen', text: 'Das Brett erzeugt pro Person einen Einladungslink mit QR-Code und wartet anschliessend auf den Antwort-Code.' }
+      { title: 'Host-Konsole', text: 'Im Tab "Handys" erzeugt das Brett pro Person einen Einladungslink mit QR-Code und wartet anschliessend auf den Antwort-Code.' }
     ],
     hostRow: [
       { label: 'Tab "Spiel" aktiv', tone: 'gelb' },
@@ -1163,7 +1166,7 @@ const DEMO_STEPS = [
   {
     kicker: 'Schritt 4',
     title: 'Die Bewegung läuft über das öffentliche, neu betonte Brett',
-    text: 'Die geheime Karte wird am Handy gewählt, aber die Figur selbst ziehst du weiterhin auf dem zentralen Brett. Gerade in der neuen Fassung ist dieser Moment stärker hervorgehoben: Das Host-Brett arbeitet mit klareren Feldern, Badges und Markierungen, damit Klasse oder Publikum den Zug sofort lesen können.',
+    text: 'Die geheime Karte wird am Handy gewählt, aber die Figur selbst ziehst du weiterhin auf dem zentralen Brett. Gerade in der neuen Fassung ist dieser Moment stärker hervorgehoben: Das Host-Brett arbeitet mit klareren Feldern, Badges und Markierungen, während Zusatzinfos platzsparend in der Host-Konsole unter dem Spielfeld liegen.',
     notes: [
       'Kartenwahl privat',
       'Figurenbewegung öffentlich',
@@ -1172,7 +1175,7 @@ const DEMO_STEPS = [
     hostTitle: 'Gemeinsamer Brettmoment',
     hostBoxes: [
       { title: 'Host-Brett', text: 'Nach der Handy-Auswahl leuchten die möglichen Figuren auf, und Spezialfelder springen optisch stärker ins Auge.' },
-      { title: 'Gemeinsame Beobachtung', text: 'Alle sehen die Zugfolge, niemand sieht die geheime Kartenhand.' }
+      { title: 'Host-Konsole', text: 'Spielstand, letzte Karte und Protokoll bleiben unter dem Brett erreichbar, ohne dem Spielfeld Raum zu nehmen.' }
     ],
     hostRow: [
       { label: 'Startfeld', tone: 'rot' },
@@ -1232,7 +1235,7 @@ const DEMO_STEPS = [
   {
     kicker: 'Schritt 6',
     title: 'So endet eine Runde und schliesslich die ganze Partie',
-    text: 'Nach dem ausgespielten Zug geht die Runde zur nächsten Person weiter. Sobald alle Hände leer sind, wird neu ausgeteilt. Gewonnen hat, wer alle vier Figuren in die Zielstation bringt. Für eine Einführung fasst dieser letzte Schritt noch einmal den ganzen Zyklus zusammen: Navigation, QR-Kopplung, geheime Kartenwahl, öffentlicher Brettzug und literarische Auswertung.',
+    text: 'Nach dem ausgespielten Zug geht die Runde zur nächsten Person weiter. Sobald alle Hände leer sind, wird neu ausgeteilt. Gewonnen hat, wer alle vier Figuren in die Zielstation bringt. Für eine Einführung fasst dieser letzte Schritt noch einmal den ganzen Zyklus zusammen: Navigation, QR-Kopplung, geheime Kartenwahl, öffentlicher Brettzug, Host-Konsole und literarische Auswertung.',
     notes: [
       'Rundenfolge 6-5-4-3-2-1 bleibt bestehen',
       'Neue Kartenrunde nach leerer Hand',
@@ -2077,6 +2080,7 @@ function startNewGame() {
   state.log = ['Neue Partie gestartet.'];
   dealNextRound();
   state.currentPlayer = 0;
+  setHostPanel('zug');
   setBoardView('spiel');
   ensureTurnReady();
 }
@@ -2407,6 +2411,12 @@ function renderPlayerList() {
   renderPlayerSummaryInto(playerListEl);
 }
 
+function renderHostSummary() {
+  const connectedCount = state.players.filter((_, index) => isPhoneConnected(index)).length;
+  const targetCount = state.players.length || selectedPlayerCount;
+  connectionCountEl.textContent = phoneModeEnabled ? `${connectedCount} / ${targetCount}` : 'aus';
+}
+
 function renderLog() {
   logListEl.innerHTML = '';
   state.log.forEach((entry) => {
@@ -2630,6 +2640,7 @@ function getQrCodeUrl(value) {
 
 function setBoardView(view) {
   currentBoardView = view;
+  if (boardAppEl) boardAppEl.dataset.view = view;
   const sections = [...document.querySelectorAll('.app-section')];
   sections.forEach((section) => {
     const name = section.dataset.section;
@@ -2642,6 +2653,22 @@ function setBoardView(view) {
       button.classList.toggle('active', button.dataset.view === view);
     });
   }
+}
+
+function setHostPanel(panel) {
+  currentHostPanel = panel;
+
+  if (hostPanelTabsEl) {
+    [...hostPanelTabsEl.querySelectorAll('.host-panel-tab')].forEach((button) => {
+      button.classList.toggle('active', button.dataset.panel === panel);
+    });
+  }
+
+  ['zug', 'spielstand', 'letzte', 'protokoll', 'handys'].forEach((name) => {
+    const pane = document.getElementById(`hostPane-${name}`);
+    if (!pane) return;
+    pane.classList.toggle('hidden', name !== panel);
+  });
 }
 
 function encodeSignalPayload(value) {
@@ -2742,7 +2769,7 @@ async function applyPhoneAnswer(playerIndex, answerText) {
 function buildPhoneView(playerIndex) {
   const player = state.players[playerIndex];
   const current = getCurrentPlayer();
-  const selectedCard = current?.playerIndex === playerIndex ? getSelectedCard() : null;
+  const selectedCard = playerIndex === state.currentPlayer ? getSelectedCard() : null;
   return {
     playerIndex,
     name: player.name,
@@ -2780,8 +2807,16 @@ function buildPhoneView(playerIndex) {
         label: `${amount} Feld${amount === 1 ? '' : 'er'}`
       }))
       : [],
+    roundSize: state.activeDealSize,
+    deckCount: state.deck.length,
     activeCard: selectedCard
       ? { label: selectedCard.label, summary: selectedCard.summary }
+      : null,
+    recentCard: state.recentCard
+      ? {
+        title: state.recentCard.title,
+        rewardText: state.recentCard.rewardText
+      }
       : null,
     influenceTargets: getInfluenceTargetOptions(playerIndex),
     publicPlayers: state.players.map((entry, index) => ({
@@ -2817,10 +2852,15 @@ function syncAllPhones() {
 
 function renderConnectionList() {
   if (appScreen !== 'board') return;
-  phoneControlPanelEl.classList.toggle('hidden', !phoneModeEnabled);
   connectionListEl.innerHTML = '';
 
-  if (!phoneModeEnabled) return;
+  if (!phoneModeEnabled) {
+    const info = document.createElement('div');
+    info.className = 'setup-note-card';
+    info.innerHTML = '<strong>Handy-Modus aus</strong><p>Aktiviere den Handy-Modus in der Vorbereitung, damit der Verbindungsassistent pro Spielperson QR-Code, Link und Antwort-Code anzeigen kann.</p>';
+    connectionListEl.appendChild(info);
+    return;
+  }
 
   const explainer = document.createElement('div');
   explainer.className = 'connect-explainer';
@@ -2868,6 +2908,36 @@ function renderConnectionList() {
 
     header.append(name, status);
     card.appendChild(header);
+
+    const hasInvite = Boolean(connection?.inviteLink);
+    const hasAnswer = Boolean(connection?.answerDraft);
+    const progress = [
+      {
+        title: '1. Einladung',
+        text: hasInvite ? 'Link und QR-Code bereit' : 'Noch nicht erzeugt',
+        state: hasInvite ? 'done' : connection?.status === 'building' ? 'current' : 'pending'
+      },
+      {
+        title: '2. Handy öffnen',
+        text: hasAnswer || connection?.status === 'connected' ? 'Auf dem Handy bestätigt' : hasInvite ? 'Link scannen oder öffnen' : 'Warte auf Einladung',
+        state: hasAnswer || connection?.status === 'connected' ? 'done' : hasInvite ? 'current' : 'pending'
+      },
+      {
+        title: '3. Live verbinden',
+        text: connection?.status === 'connected' ? 'Brett und Handy synchron' : hasAnswer ? 'Code liegt vor, Verbindung startet' : 'Antwort-Code fehlt noch',
+        state: connection?.status === 'connected' ? 'done' : hasAnswer ? 'current' : 'pending'
+      }
+    ];
+
+    const progressRow = document.createElement('div');
+    progressRow.className = 'connection-progress';
+    progress.forEach((step) => {
+      const item = document.createElement('div');
+      item.className = `connection-progress-card ${step.state}`;
+      item.innerHTML = `<strong>${step.title}</strong><span>${step.text}</span>`;
+      progressRow.appendChild(item);
+    });
+    card.appendChild(progressRow);
 
     const buttons = document.createElement('div');
     buttons.className = 'button-row';
@@ -3056,6 +3126,15 @@ function renderPhoneView() {
   }
 
   phoneScoreListEl.innerHTML = '';
+  const summary = document.createElement('div');
+  summary.className = 'recent-card';
+  summary.innerHTML = `
+    <h3>Öffentliche Runde</h3>
+    <p>Runde ${view.roundSize} · Deck ${view.deckCount} Karten · ${view.turnOwner} ist am Zug.</p>
+    <p>${view.recentCard ? `Letzte Karte: ${view.recentCard.title} · ${view.recentCard.rewardText}` : 'Noch keine Literaturkarte aufgedeckt.'}</p>
+  `;
+  phoneScoreListEl.appendChild(summary);
+
   view.publicPlayers.forEach((player) => {
     const card = document.createElement('div');
     card.className = `player-card${player.current ? ' current' : ''}`;
@@ -3228,6 +3307,7 @@ function initDemo() {
 function render() {
   if (appScreen !== 'board') return;
   renderTurnPanel();
+  renderHostSummary();
   renderPlayerList();
   renderBoard();
   renderLog();
@@ -3332,6 +3412,12 @@ function initBoardApp() {
     setBoardView(button.dataset.view);
   });
 
+  hostPanelTabsEl?.addEventListener('click', (event) => {
+    const button = event.target.closest('.host-panel-tab');
+    if (!button) return;
+    setHostPanel(button.dataset.panel);
+  });
+
   playerCountPicker.addEventListener('click', (event) => {
     const button = event.target.closest('.count-btn');
     if (!button) return;
@@ -3388,6 +3474,7 @@ function initBoardApp() {
 
   renderPlayerInputs();
   setBoardView(currentBoardView);
+  setHostPanel(currentHostPanel);
   renderConnectionList();
   initDemo();
   startNewGame();
