@@ -925,6 +925,8 @@ const RTC_CONFIG = {
   iceServers: [{ urls: ['stun:stun.l.google.com:19302'] }]
 };
 const MAX_INFLUENCE_HAND = 2;
+const SIGNAL_BLOB_API = 'https://jsonblob.com/api/jsonBlob';
+const SIGNAL_POLL_MS = 1600;
 const GAME_MODES = {
   normal: {
     key: 'normal',
@@ -1050,6 +1052,7 @@ const hostPanelTabsEl = document.getElementById('hostPanelTabs');
 const phoneTitleEl = document.getElementById('phoneTitle');
 const phoneStatusTextEl = document.getElementById('phoneStatusText');
 const phoneConnectPanelEl = document.getElementById('phoneConnectPanel');
+const phoneConnectIntroEl = phoneConnectPanelEl?.querySelector('.panel-head p');
 const phoneAnswerOutputEl = document.getElementById('phoneAnswerOutput');
 const copyPhoneAnswerBtn = document.getElementById('copyPhoneAnswerBtn');
 const phoneGamePanelEl = document.getElementById('phoneGamePanel');
@@ -2765,6 +2768,10 @@ function getQrCodeUrl(value) {
   return `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(value)}`;
 }
 
+function formatSessionCode(value) {
+  return value.match(/.{1,4}/g)?.join('-') || value;
+}
+
 function setBoardView(view) {
   currentBoardView = view;
   if (boardAppEl) boardAppEl.dataset.view = view;
@@ -2853,6 +2860,54 @@ async function decodeSignalPayload(value) {
   return JSON.parse(new TextDecoder().decode(decodedBytes));
 }
 
+async function createSignalSession(payload) {
+  const response = await fetch(SIGNAL_BLOB_API, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+  if (!response.ok) {
+    throw new Error(`Signalspeicher antwortet mit ${response.status}`);
+  }
+
+  const location = response.headers.get('Location')
+    || response.headers.get('location')
+    || response.headers.get('X-JsonBlob')
+    || response.headers.get('x-jsonblob');
+
+  if (!location) {
+    throw new Error('Keine Sitzungsadresse vom Signalspeicher erhalten.');
+  }
+
+  const sessionId = location.split('/').filter(Boolean).pop();
+  if (!sessionId) {
+    throw new Error('Sitzungscode konnte nicht gelesen werden.');
+  }
+
+  return sessionId;
+}
+
+async function fetchSignalSession(sessionId) {
+  const response = await fetch(`${SIGNAL_BLOB_API}/${sessionId}`, {
+    headers: { Accept: 'application/json' }
+  });
+  if (!response.ok) {
+    throw new Error(`Sitzung ${sessionId} konnte nicht geladen werden (${response.status}).`);
+  }
+  return response.json();
+}
+
+async function updateSignalSession(sessionId, payload) {
+  const response = await fetch(`${SIGNAL_BLOB_API}/${sessionId}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+  if (!response.ok) {
+    throw new Error(`Sitzung ${sessionId} konnte nicht aktualisiert werden (${response.status}).`);
+  }
+}
+
 function waitForIceComplete(pc) {
   if (pc.iceGatheringState === 'complete') return Promise.resolve();
 
@@ -2878,6 +2933,7 @@ async function copyText(value) {
 function closeHostConnection(playerIndex) {
   const existing = hostConnections.get(playerIndex);
   if (!existing) return;
+  if (existing.pollTimer) window.clearInterval(existing.pollTimer);
   existing.channel?.close();
   existing.pc?.close();
   hostConnections.delete(playerIndex);
@@ -2907,6 +2963,52 @@ function createHostChannelHandlers(playerIndex, channel) {
   });
 }
 
+async function applyRemoteAnswerDescription(playerIndex, answerDescription, extra = {}) {
+  const connection = hostConnections.get(playerIndex);
+  if (!connection?.pc || connection.answerApplied) return;
+  await connection.pc.setRemoteDescription(answerDescription);
+  updateConnectionStatus(playerIndex, 'awaiting-open', {
+    ...extra,
+    answerApplied: true
+  });
+}
+
+function startSignalPolling(playerIndex) {
+  const connection = hostConnections.get(playerIndex);
+  if (!connection?.sessionId || connection.pollTimer) return;
+
+  const pollTimer = window.setInterval(async () => {
+    const current = hostConnections.get(playerIndex);
+    if (!current?.sessionId) {
+      window.clearInterval(pollTimer);
+      return;
+    }
+
+    if (current.status === 'connected' || current.answerApplied) {
+      window.clearInterval(pollTimer);
+      updateConnectionStatus(playerIndex, current.status, { pollTimer: null });
+      return;
+    }
+
+    try {
+      const session = await fetchSignalSession(current.sessionId);
+      if (session.answer) {
+        window.clearInterval(pollTimer);
+        await applyRemoteAnswerDescription(playerIndex, session.answer, {
+          sessionData: session,
+          pollTimer: null
+        });
+      }
+    } catch (error) {
+      addLog(`Sitzungscode für ${getConnectionDisplayName(playerIndex)} konnte nicht geprüft werden: ${error.message}`);
+      window.clearInterval(pollTimer);
+      updateConnectionStatus(playerIndex, 'offer-ready', { pollTimer: null });
+    }
+  }, SIGNAL_POLL_MS);
+
+  updateConnectionStatus(playerIndex, connection.status, { pollTimer });
+}
+
 async function createPhoneInvite(playerIndex) {
   closeHostConnection(playerIndex);
   const pc = new RTCPeerConnection(RTC_CONFIG);
@@ -2920,15 +3022,42 @@ async function createPhoneInvite(playerIndex) {
   await waitForIceComplete(pc);
 
   const localDescription = pc.localDescription?.toJSON?.() || pc.localDescription;
-  const offerCode = await encodeSignalPayload(localDescription);
-  const inviteLink = `${getBaseBoardUrl()}?screen=phone&player=${playerIndex}&offer=${encodeURIComponent(offerCode)}`;
+  try {
+    const sessionPayload = {
+      kind: 'bahnwaerter-thiel-pairing',
+      version: 1,
+      createdAt: new Date().toISOString(),
+      playerIndex,
+      offer: localDescription,
+      answer: null
+    };
+    const sessionId = await createSignalSession(sessionPayload);
+    const inviteLink = `${getBaseBoardUrl()}?screen=phone&player=${playerIndex}&session=${encodeURIComponent(sessionId)}`;
 
-  updateConnectionStatus(playerIndex, 'offer-ready', {
-    pc,
-    channel,
-    offerCode,
-    inviteLink
-  });
+    updateConnectionStatus(playerIndex, 'offer-ready', {
+      pc,
+      channel,
+      pairingMode: 'session',
+      sessionId,
+      sessionCode: formatSessionCode(sessionId),
+      sessionData: sessionPayload,
+      inviteLink,
+      answerDraft: ''
+    });
+    startSignalPolling(playerIndex);
+  } catch (error) {
+    const offerCode = await encodeSignalPayload(localDescription);
+    const inviteLink = `${getBaseBoardUrl()}?screen=phone&player=${playerIndex}&offer=${encodeURIComponent(offerCode)}`;
+
+    updateConnectionStatus(playerIndex, 'offer-ready', {
+      pc,
+      channel,
+      pairingMode: 'manual',
+      offerCode,
+      inviteLink,
+      sessionError: error.message
+    });
+  }
 }
 
 async function applyPhoneAnswer(playerIndex, answerText) {
@@ -2936,8 +3065,7 @@ async function applyPhoneAnswer(playerIndex, answerText) {
   if (!connection?.pc) return;
 
   const answer = await decodeSignalPayload(answerText.trim());
-  await connection.pc.setRemoteDescription(answer);
-  updateConnectionStatus(playerIndex, 'awaiting-open', { answerDraft: answerText.trim() });
+  await applyRemoteAnswerDescription(playerIndex, answer, { answerDraft: answerText.trim() });
 }
 
 function buildPhoneView(playerIndex) {
@@ -3044,15 +3172,15 @@ function renderConnectionList() {
   explainer.innerHTML = `
     <div class="connect-step">
       <strong>1. Einladung erzeugen</strong>
-      <span>Das Brett erstellt pro Spielperson einen privaten Handy-Link.</span>
+      <span>Das Brett erstellt pro Spielperson einen privaten Handy-Link oder einen Sitzungs-Code.</span>
     </div>
     <div class="connect-step">
       <strong>2. QR scannen</strong>
       <span>Am einfachsten den QR-Code mit der Handy-Kamera öffnen oder den Link kopieren.</span>
     </div>
     <div class="connect-step">
-      <strong>3. Antwort-Code zurück</strong>
-      <span>Das Handy zeigt danach einen Antwort-Code, den du hier am Brett einfügst, damit die Verbindung live startet.</span>
+      <strong>3. Verbindung abschliessen</strong>
+      <span>Im Sitzungsmodus verbindet sich das Brett automatisch. Nur im Rückfall-Modus musst du den Antwort-Code noch manuell einfügen.</span>
     </div>
   `;
   connectionListEl.appendChild(explainer);
@@ -3074,7 +3202,9 @@ function renderConnectionList() {
     status.textContent = connection?.status === 'connected'
       ? 'Verbunden'
       : connection?.status === 'awaiting-open'
-        ? 'Handy geöffnet, warte auf Antwort'
+        ? connection?.answerApplied
+          ? 'Antwort übernommen'
+          : 'Handy geöffnet, warte auf Antwort'
         : connection?.status === 'offer-ready'
           ? 'Bereit zum Scannen'
           : connection?.status === 'building'
@@ -3101,8 +3231,18 @@ function renderConnectionList() {
       },
       {
         title: '3. Live verbinden',
-        text: connection?.status === 'connected' ? 'Brett und Handy synchron' : hasAnswer ? 'Code liegt vor, Verbindung startet' : 'Antwort-Code fehlt noch',
-        state: connection?.status === 'connected' ? 'done' : hasAnswer ? 'current' : 'pending'
+        text: connection?.status === 'connected'
+          ? 'Brett und Handy synchron'
+          : connection?.pairingMode === 'session'
+            ? 'Host wartet auf automatische Antwort'
+            : hasAnswer
+              ? 'Code liegt vor, Verbindung startet'
+              : 'Antwort-Code fehlt noch',
+        state: connection?.status === 'connected'
+          ? 'done'
+          : connection?.pairingMode === 'session' || hasAnswer
+            ? 'current'
+            : 'pending'
       }
     ];
 
@@ -3144,6 +3284,28 @@ function renderConnectionList() {
       grid.className = 'connection-grid';
 
       const left = document.createElement('div');
+      if (connection.pairingMode === 'manual' && connection.sessionError) {
+        const fallbackField = document.createElement('div');
+        fallbackField.className = 'signal-field';
+        fallbackField.innerHTML = '<label>Rückfall-Modus</label>';
+        const fallbackNote = document.createElement('div');
+        fallbackNote.className = 'session-auto-note';
+        fallbackNote.textContent = `Kurzer Sitzungs-Code war gerade nicht verfügbar. Deshalb läuft diese Einladung über den längeren Antwort-Code. Ursache: ${connection.sessionError}`;
+        fallbackField.appendChild(fallbackNote);
+        left.appendChild(fallbackField);
+      }
+
+      if (connection.pairingMode === 'session' && connection.sessionCode) {
+        const sessionField = document.createElement('div');
+        sessionField.className = 'signal-field';
+        sessionField.innerHTML = '<label>Sitzungs-Code</label>';
+        const sessionCodeCard = document.createElement('div');
+        sessionCodeCard.className = 'session-code-card';
+        sessionCodeCard.textContent = connection.sessionCode;
+        sessionField.appendChild(sessionCodeCard);
+        left.appendChild(sessionField);
+      }
+
       const inviteField = document.createElement('div');
       inviteField.className = 'signal-field';
       inviteField.innerHTML = '<label>1. Diesen Link am Handy öffnen</label>';
@@ -3155,28 +3317,39 @@ function renderConnectionList() {
       inviteField.appendChild(textarea);
       left.appendChild(inviteField);
 
-      const answerField = document.createElement('div');
-      answerField.className = 'signal-field';
-      answerField.innerHTML = '<label>3. Antwort-Code vom Handy hier einfügen</label>';
-      const input = document.createElement('textarea');
-      input.className = 'signal-textarea';
-      input.rows = 5;
-      input.value = connection.answerDraft || '';
-      input.dataset.role = 'answer-input';
-      input.dataset.playerIndex = String(playerIndex);
-      answerField.appendChild(input);
-      left.appendChild(answerField);
+      if (connection.pairingMode === 'manual') {
+        const answerField = document.createElement('div');
+        answerField.className = 'signal-field';
+        answerField.innerHTML = '<label>3. Antwort-Code vom Handy hier einfügen</label>';
+        const input = document.createElement('textarea');
+        input.className = 'signal-textarea';
+        input.rows = 5;
+        input.value = connection.answerDraft || '';
+        input.dataset.role = 'answer-input';
+        input.dataset.playerIndex = String(playerIndex);
+        answerField.appendChild(input);
+        left.appendChild(answerField);
 
-      const answerButtons = document.createElement('div');
-      answerButtons.className = 'button-row';
-      const applyBtn = document.createElement('button');
-      applyBtn.type = 'button';
-      applyBtn.className = 'count-btn';
-      applyBtn.dataset.action = 'apply-answer';
-      applyBtn.dataset.playerIndex = String(playerIndex);
-      applyBtn.textContent = 'Code übernehmen und verbinden';
-      answerButtons.appendChild(applyBtn);
-      left.appendChild(answerButtons);
+        const answerButtons = document.createElement('div');
+        answerButtons.className = 'button-row';
+        const applyBtn = document.createElement('button');
+        applyBtn.type = 'button';
+        applyBtn.className = 'count-btn';
+        applyBtn.dataset.action = 'apply-answer';
+        applyBtn.dataset.playerIndex = String(playerIndex);
+        applyBtn.textContent = 'Code übernehmen und verbinden';
+        answerButtons.appendChild(applyBtn);
+        left.appendChild(answerButtons);
+      } else {
+        const autoField = document.createElement('div');
+        autoField.className = 'signal-field';
+        autoField.innerHTML = '<label>3. Automatische Antwort</label>';
+        const autoCard = document.createElement('div');
+        autoCard.className = 'session-auto-note';
+        autoCard.textContent = 'Kein manuelles Einfügen nötig. Das Handy überträgt die Antwort direkt an das Brett.';
+        autoField.appendChild(autoCard);
+        left.appendChild(autoField);
+      }
 
       const qrBox = document.createElement('div');
       qrBox.className = 'qr-box';
@@ -3190,7 +3363,9 @@ function renderConnectionList() {
       });
 
       const qrHint = document.createElement('p');
-      qrHint.textContent = 'Mit der Handy-Kamera scannen oder alternativ den Link kopieren. Danach den Antwort-Code vom Handy wieder links einfügen.';
+      qrHint.textContent = connection.pairingMode === 'session'
+        ? 'Mit der Handy-Kamera scannen oder alternativ den Link kopieren. Die Antwort läuft danach automatisch zurück ans Brett.'
+        : 'Mit der Handy-Kamera scannen oder alternativ den Link kopieren. Danach den Antwort-Code vom Handy wieder links einfügen.';
 
       qrBox.append(qrImage, qrHint);
 
@@ -3574,13 +3749,21 @@ async function initPhoneClient() {
 
   const playerIndex = Number(query.get('player'));
   const offerCode = query.get('offer');
+  const sessionId = query.get('session');
   phoneClient.playerIndex = Number.isNaN(playerIndex) ? null : playerIndex;
 
-  if (phoneClient.playerIndex === null || !offerCode) {
+  if (phoneClient.playerIndex === null || (!offerCode && !sessionId)) {
     phoneStatusTextEl.textContent = 'Diese private Handy-Ansicht braucht einen vollständigen Einladungslink oder QR-Code vom Brett.';
     phoneConnectPanelEl.classList.add('hidden');
     return;
   }
+
+  if (phoneConnectIntroEl) {
+    phoneConnectIntroEl.textContent = sessionId
+      ? '1. QR-Code oder Link vom Brett öffnen. 2. Dieses Handy sendet seine Antwort automatisch zurück. 3. Danach öffnet sich die Live-Verbindung von selbst.'
+      : '1. Link oder QR-Code vom Brett auf diesem Handy öffnen. 2. Den hier angezeigten Antwort-Code kopieren. 3. Den Code zurück am Brett einfügen.';
+  }
+  copyPhoneAnswerBtn.hidden = false;
 
   const pc = new RTCPeerConnection(RTC_CONFIG);
   phoneClient.pc = pc;
@@ -3607,16 +3790,30 @@ async function initPhoneClient() {
     });
   });
 
-  const offer = await decodeSignalPayload(offerCode);
+  const offer = sessionId
+    ? (await fetchSignalSession(sessionId)).offer
+    : await decodeSignalPayload(offerCode);
   await pc.setRemoteDescription(offer);
   const answer = await pc.createAnswer();
   await pc.setLocalDescription(answer);
   await waitForIceComplete(pc);
 
   const localDescription = pc.localDescription?.toJSON?.() || pc.localDescription;
-  phoneClient.answerCode = await encodeSignalPayload(localDescription);
-  phoneAnswerOutputEl.value = phoneClient.answerCode;
-  phoneStatusTextEl.textContent = 'Jetzt diesen Code kopieren, am Brett einfügen und dort bestätigen. Danach verbindet sich dieses Handy automatisch.';
+  if (sessionId) {
+    const sessionData = await fetchSignalSession(sessionId);
+    sessionData.answer = localDescription;
+    sessionData.answerAt = new Date().toISOString();
+    await updateSignalSession(sessionId, sessionData);
+    phoneClient.answerCode = '';
+    phoneAnswerOutputEl.value = 'Automatisch an das Brett gesendet.';
+    copyPhoneAnswerBtn.hidden = true;
+    phoneStatusTextEl.textContent = 'Antwort wurde an das Brett gesendet. Die Verbindung öffnet sich automatisch, sobald der Host sie übernimmt.';
+  } else {
+    phoneClient.answerCode = await encodeSignalPayload(localDescription);
+    phoneAnswerOutputEl.value = phoneClient.answerCode;
+    copyPhoneAnswerBtn.hidden = false;
+    phoneStatusTextEl.textContent = 'Jetzt diesen Code kopieren, am Brett einfügen und dort bestätigen. Danach verbindet sich dieses Handy automatisch.';
+  }
 }
 
 function sendPhoneMessage(payload) {
