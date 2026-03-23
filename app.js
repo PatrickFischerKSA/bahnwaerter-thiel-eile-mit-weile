@@ -2676,6 +2676,22 @@ function createTokenButton(playerIndex, piece) {
   return button;
 }
 
+function getTrackSymbol(meta) {
+  if (meta.startTone) {
+    return { icon: '🚦', label: 'Startsignal', kind: 'start' };
+  }
+  if (meta.special === 'text') {
+    return { icon: '📖', label: 'Textkarte', kind: 'text' };
+  }
+  if (meta.special === 'deutung') {
+    return { icon: '👁', label: 'Deutungskarte', kind: 'deutung' };
+  }
+  if (meta.special === 'schicksal') {
+    return { icon: '⚡', label: 'Schicksalskarte', kind: 'schicksal' };
+  }
+  return null;
+}
+
 function renderBoard() {
   boardEl.innerHTML = '';
 
@@ -2692,18 +2708,23 @@ function renderBoard() {
         if (meta.startTone) cell.classList.add('start-field', `start-${meta.startTone}`);
         if (meta.special) cell.classList.add(`special-${meta.special}`);
 
-        const badge = document.createElement('div');
-        badge.className = 'cell-badge';
-        badge.textContent = meta.startTone
-          ? 'S'
-          : meta.special === 'text'
-            ? 'T'
-            : meta.special === 'deutung'
-              ? 'D'
-              : meta.special === 'schicksal'
-                ? 'S'
-                : '';
-        if (badge.textContent) cell.appendChild(badge);
+        const symbolMeta = getTrackSymbol(meta);
+        if (symbolMeta) {
+          const symbol = document.createElement('div');
+          symbol.className = `cell-symbol symbol-${symbolMeta.kind}`;
+          symbol.setAttribute('aria-hidden', 'true');
+
+          const icon = document.createElement('span');
+          icon.className = 'cell-symbol-icon';
+          icon.textContent = symbolMeta.icon;
+
+          const label = document.createElement('span');
+          label.className = 'cell-symbol-label';
+          label.textContent = symbolMeta.label;
+
+          symbol.append(icon, label);
+          cell.appendChild(symbol);
+        }
 
         const occupant = getTrackOccupant(meta.index);
         if (occupant) {
@@ -2740,19 +2761,34 @@ function renderBoard() {
           }
         }
       } else if (meta.type === 'center') {
-        cell.classList.add('center');
-        const centerTitle = document.createElement('div');
-        centerTitle.className = 'center-title';
-        centerTitle.textContent = 'Zielstation';
-        const centerSub = document.createElement('div');
-        centerSub.className = 'center-sub';
-        centerSub.textContent = `${state.players.reduce((sum, player) => sum + player.pieces.filter((piece) => piece.steps === 44).length, 0)} Figuren im Ziel · ${getModeConfig(state.modeKey).label}`;
-        cell.append(centerTitle, centerSub);
+        cell.classList.add('center', 'center-anchor');
       }
 
       boardEl.appendChild(cell);
     }
   }
+
+  const centerEmblem = document.createElement('div');
+  centerEmblem.className = 'board-center-emblem';
+
+  const centerIcon = document.createElement('div');
+  centerIcon.className = 'board-center-icon';
+  centerIcon.textContent = '🚂';
+
+  const centerTitle = document.createElement('div');
+  centerTitle.className = 'board-center-title';
+  centerTitle.textContent = 'Endstation';
+
+  const centerSub = document.createElement('div');
+  centerSub.className = 'board-center-sub';
+  centerSub.textContent = `${state.players.reduce((sum, player) => sum + player.pieces.filter((piece) => piece.steps === 44).length, 0)} Figuren im Ziel`;
+
+  const centerMode = document.createElement('div');
+  centerMode.className = 'board-center-mode';
+  centerMode.textContent = getModeConfig(state.modeKey).label;
+
+  centerEmblem.append(centerIcon, centerTitle, centerSub, centerMode);
+  boardEl.appendChild(centerEmblem);
 }
 
 function getConnectionDisplayName(playerIndex) {
