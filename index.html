@@ -104,8 +104,22 @@
       </div>
     </header>
 
+    <nav class="page-nav panel" aria-label="Schnellnavigation">
+      <div class="panel-head compact">
+        <h2>Schnellnavigation</h2>
+        <p>Wähle eine Fokusansicht, damit du nicht durch alle Bereiche scrollen musst.</p>
+      </div>
+      <div id="pageNavButtons" class="page-nav-buttons">
+        <button class="page-nav-btn active" type="button" data-view="start">Start</button>
+        <button class="page-nav-btn" type="button" data-view="spiel">Spiel</button>
+        <button class="page-nav-btn" type="button" data-view="demo">Demo</button>
+        <button class="page-nav-btn" type="button" data-view="kompass">Kompass</button>
+        <button class="page-nav-btn" type="button" data-view="alles">Alles</button>
+      </div>
+    </nav>
+
     <main class="layout">
-      <section class="setup-card panel">
+      <section id="setupSection" class="setup-card panel app-section" data-section="start">
         <div class="panel-head">
           <h2>Partie vorbereiten</h2>
           <p>Wähle 2 bis 4 lokale Spielende. Namen können direkt angepasst werden.</p>
@@ -148,7 +162,7 @@
         </div>
       </section>
 
-      <section class="game-stage">
+      <section id="gameSection" class="game-stage app-section" data-section="spiel">
         <section class="board-panel panel">
           <div class="panel-head board-head">
             <div>
@@ -235,7 +249,7 @@
         </aside>
       </section>
 
-      <section class="demo panel">
+      <section id="demoSection" class="demo panel app-section" data-section="demo">
         <div class="panel-head">
           <h2>Demoablauf</h2>
           <p>Eine kompakte Schritt-für-Schritt-Erklärung für Unterricht, Präsentation und Einführung mit eingeblendeten Mini-Handys für den ganzen Spielrhythmus.</p>
@@ -292,7 +306,7 @@
         </div>
       </section>
 
-      <section class="compass panel">
+      <section id="compassSection" class="compass panel app-section" data-section="kompass">
         <div class="panel-head">
           <h2>Literatur-Kompass</h2>
           <p>Kompakte Orientierung zum Text, direkt im Spiel eingebettet.</p>

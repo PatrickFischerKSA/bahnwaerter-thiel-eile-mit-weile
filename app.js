@@ -978,6 +978,7 @@ const INFLUENCE_LIBRARY = [
 
 const boardAppEl = document.getElementById('boardApp');
 const phoneAppEl = document.getElementById('phoneApp');
+const pageNavButtonsEl = document.getElementById('pageNavButtons');
 const boardEl = document.getElementById('board');
 const playerInputsEl = document.getElementById('playerInputs');
 const playerCountPicker = document.getElementById('playerCountPicker');
@@ -1040,6 +1041,7 @@ let uniqueCardId = 0;
 let state = createInitialState();
 let demoStepIndex = 0;
 let demoTimer = null;
+let currentBoardView = 'start';
 
 const hostConnections = new Map();
 const phoneClient = {
@@ -2072,6 +2074,7 @@ function startNewGame() {
   state.log = ['Neue Partie gestartet.'];
   dealNextRound();
   state.currentPlayer = 0;
+  setBoardView('spiel');
   ensureTurnReady();
 }
 
@@ -2618,6 +2621,26 @@ function getBaseBoardUrl() {
   return `${window.location.origin}${window.location.pathname}`;
 }
 
+function getQrCodeUrl(value) {
+  return `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(value)}`;
+}
+
+function setBoardView(view) {
+  currentBoardView = view;
+  const sections = [...document.querySelectorAll('.app-section')];
+  sections.forEach((section) => {
+    const name = section.dataset.section;
+    const visible = view === 'alles' || view === name || (view === 'spiel' && name === 'spiel');
+    section.classList.toggle('section-hidden', !visible);
+  });
+
+  if (pageNavButtonsEl) {
+    [...pageNavButtonsEl.querySelectorAll('.page-nav-btn')].forEach((button) => {
+      button.classList.toggle('active', button.dataset.view === view);
+    });
+  }
+}
+
 function encodeSignalPayload(value) {
   return btoa(unescape(encodeURIComponent(JSON.stringify(value))));
 }
@@ -2794,6 +2817,26 @@ function renderConnectionList() {
   phoneControlPanelEl.classList.toggle('hidden', !phoneModeEnabled);
   connectionListEl.innerHTML = '';
 
+  if (!phoneModeEnabled) return;
+
+  const explainer = document.createElement('div');
+  explainer.className = 'connect-explainer';
+  explainer.innerHTML = `
+    <div class="connect-step">
+      <strong>1. Einladung erzeugen</strong>
+      <span>Das Brett erstellt pro Spielperson einen Link.</span>
+    </div>
+    <div class="connect-step">
+      <strong>2. QR scannen</strong>
+      <span>Am einfachsten mit der Handy-Kamera direkt den kleinen QR-Code öffnen.</span>
+    </div>
+    <div class="connect-step">
+      <strong>3. Antwort-Code zurück</strong>
+      <span>Das Handy zeigt danach einen Code, den du hier am Brett einfügst.</span>
+    </div>
+  `;
+  connectionListEl.appendChild(explainer);
+
   PLAYER_PRESETS.slice(0, selectedPlayerCount).forEach((preset, playerIndex) => {
     const connection = hostConnections.get(playerIndex);
     const card = document.createElement('div');
@@ -2847,6 +2890,10 @@ function renderConnectionList() {
     card.appendChild(buttons);
 
     if (connection?.inviteLink) {
+      const grid = document.createElement('div');
+      grid.className = 'connection-grid';
+
+      const left = document.createElement('div');
       const inviteField = document.createElement('div');
       inviteField.className = 'signal-field';
       inviteField.innerHTML = '<label>Einladungslink fürs Handy</label>';
@@ -2856,7 +2903,7 @@ function renderConnectionList() {
       textarea.readOnly = true;
       textarea.value = connection.inviteLink;
       inviteField.appendChild(textarea);
-      card.appendChild(inviteField);
+      left.appendChild(inviteField);
 
       const answerField = document.createElement('div');
       answerField.className = 'signal-field';
@@ -2868,7 +2915,7 @@ function renderConnectionList() {
       input.dataset.role = 'answer-input';
       input.dataset.playerIndex = String(playerIndex);
       answerField.appendChild(input);
-      card.appendChild(answerField);
+      left.appendChild(answerField);
 
       const answerButtons = document.createElement('div');
       answerButtons.className = 'button-row';
@@ -2879,7 +2926,17 @@ function renderConnectionList() {
       applyBtn.dataset.playerIndex = String(playerIndex);
       applyBtn.textContent = 'Antwort übernehmen';
       answerButtons.appendChild(applyBtn);
-      card.appendChild(answerButtons);
+      left.appendChild(answerButtons);
+
+      const qrBox = document.createElement('div');
+      qrBox.className = 'qr-box';
+      qrBox.innerHTML = `
+        <img src="${getQrCodeUrl(connection.inviteLink)}" alt="QR-Code für ${getConnectionDisplayName(playerIndex)}" />
+        <p>Mit der Handy-Kamera scannen oder alternativ den Link kopieren.</p>
+      `;
+
+      grid.append(left, qrBox);
+      card.appendChild(grid);
     }
 
     connectionListEl.appendChild(card);
@@ -3265,6 +3322,13 @@ function initBoardApp() {
   boardAppEl.classList.remove('hidden');
   phoneAppEl.classList.add('hidden');
 
+  pageNavButtonsEl?.addEventListener('click', (event) => {
+    const button = event.target.closest('.page-nav-btn');
+    if (!button) return;
+    stopDemoPlayback();
+    setBoardView(button.dataset.view);
+  });
+
   playerCountPicker.addEventListener('click', (event) => {
     const button = event.target.closest('.count-btn');
     if (!button) return;
@@ -3320,6 +3384,7 @@ function initBoardApp() {
   });
 
   renderPlayerInputs();
+  setBoardView(currentBoardView);
   renderConnectionList();
   initDemo();
   startNewGame();
