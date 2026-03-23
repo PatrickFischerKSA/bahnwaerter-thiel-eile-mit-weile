@@ -27,6 +27,7 @@ html {
 }
 
 body {
+  position: relative;
   margin: 0;
   min-height: 100vh;
   font-family: "Avenir Next", "Segoe UI", sans-serif;
@@ -35,6 +36,31 @@ body {
     radial-gradient(circle at top left, rgba(209, 176, 123, 0.35), transparent 24%),
     radial-gradient(circle at top right, rgba(49, 90, 130, 0.18), transparent 22%),
     linear-gradient(180deg, #f2ede1 0%, #e8e1d0 48%, #e1dac6 100%);
+  isolation: isolate;
+}
+
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+body::before {
+  z-index: -2;
+  background:
+    linear-gradient(rgba(18, 15, 12, 0.38), rgba(18, 15, 12, 0.44)),
+    url("assets/Thiel.jpg") center center / cover no-repeat;
+  filter: blur(18px) saturate(0.82);
+  transform: scale(1.08);
+}
+
+body::after {
+  z-index: -1;
+  background:
+    radial-gradient(circle at top, rgba(235, 230, 215, 0.5), transparent 34%),
+    linear-gradient(180deg, rgba(245, 239, 225, 0.74), rgba(232, 225, 207, 0.86));
 }
 
 a {
@@ -47,6 +73,8 @@ input {
 }
 
 .page-shell {
+  position: relative;
+  z-index: 1;
   width: min(1680px, calc(100vw - 24px));
   margin: 24px auto 40px;
 }
