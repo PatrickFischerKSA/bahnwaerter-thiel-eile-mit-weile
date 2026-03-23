@@ -187,7 +187,7 @@ const LITERATURE_CARDS = {
       title: 'Der abgelegene Posten',
       prompt: 'Was prägt Thiels Dienstort besonders stark?',
       options: [
-        'Lärm der Großstadt und dauernde Menschenmengen.',
+        'Lärm der Grossstadt und dauernde Menschenmengen.',
         'Die Nähe zu einem Hafen.',
         'Die Abgeschiedenheit im märkischen Kiefernforst.',
         'Ein Militärlager neben dem Übergang.'
@@ -213,7 +213,7 @@ const LITERATURE_CARDS = {
       title: 'Die Katastrophe',
       prompt: 'Welche Situation führt unmittelbar zu Tobias’ Tod?',
       options: [
-        'Thiel vergisst die Barriere zu schließen.',
+        'Thiel vergisst die Barriere zu schliessen.',
         'Lene nimmt Tobias zum Kartoffelsetzen mit an die Gleise.',
         'Tobias läuft nachts allein in den Wald.',
         'Ein Blitz schlägt in das Wärterhaus ein.'
@@ -257,7 +257,7 @@ const LITERATURE_CARDS = {
         'Die Natur bleibt völlig harmlos, nur Technik ist bedrohlich.',
         'Bahn und Wald bilden ein Spannungsfeld aus Ordnung, Isolation und Gefahr.',
         'Der Wald steht nur für Ferien und Erholung.',
-        'Die Bahn ist ausschließlich Symbol für Fortschritt.'
+        'Die Bahn ist ausschliesslich Symbol für Fortschritt.'
       ],
       correct: 1,
       explanation: 'Der Forst isoliert, die Bahn beschleunigt und bedroht; zusammen verdichten sie Thiels Situation.',
