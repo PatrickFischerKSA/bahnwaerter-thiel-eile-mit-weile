@@ -12,6 +12,77 @@
 </head>
 <body>
   <div class="page-shell">
+    <section id="phoneApp" class="phone-app hidden" aria-live="polite">
+      <div class="phone-shell">
+        <div class="phone-header">
+          <p class="eyebrow">Handy-Modus</p>
+          <h1 id="phoneTitle">Privater Spielschirm</h1>
+          <p id="phoneStatusText" class="lead compact">
+            Diese Ansicht verbindet sich mit dem Host-Brett und zeigt nur die geheimen Karten einer Spielperson.
+          </p>
+        </div>
+
+        <section id="phoneConnectPanel" class="panel phone-panel">
+          <div class="panel-head compact">
+            <h2>Verbindung herstellen</h2>
+            <p>Öffne den Einladungslink vom Brett auf diesem Handy. Danach den Antwort-Code zurück am Brett einfügen.</p>
+          </div>
+
+          <div class="phone-connect-box">
+            <label for="phoneAnswerOutput">Antwort-Code für das Brett</label>
+            <textarea id="phoneAnswerOutput" class="signal-textarea" rows="8" readonly></textarea>
+            <div class="button-row">
+              <button id="copyPhoneAnswerBtn" class="primary-btn" type="button">Antwort-Code kopieren</button>
+            </div>
+          </div>
+        </section>
+
+        <section id="phoneGamePanel" class="hidden">
+          <section class="panel phone-panel">
+            <div class="panel-head compact">
+              <h2>Dein Zugstatus</h2>
+              <p id="phoneTurnHint">Warte auf die erste Host-Synchronisation.</p>
+            </div>
+            <div id="phonePlayerChip" class="player-chip">Spielperson</div>
+          </section>
+
+          <section class="panel phone-panel">
+            <div class="panel-head compact">
+              <h2>Geheime Aktionskarten</h2>
+              <p>Nur auf diesem Gerät sichtbar. Das Brett zeigt sie im Handy-Modus nicht mehr offen an.</p>
+            </div>
+            <div id="phoneHandArea" class="phone-card-grid"></div>
+          </section>
+
+          <section class="panel phone-panel">
+            <div class="panel-head compact">
+              <h2>Einflusskarten</h2>
+              <p>Positive Effekte für dich oder gezielte Störungen gegen andere Spielende.</p>
+            </div>
+            <div id="phoneInfluenceArea" class="phone-card-grid"></div>
+          </section>
+
+          <section class="panel phone-panel">
+            <div class="panel-head compact">
+              <h2>Aktive Auswahl</h2>
+              <p id="phoneActionHint">Wenn mehrere Varianten möglich sind, wählst du sie hier auf dem Handy.</p>
+            </div>
+            <div id="phoneActiveCard" class="recent-card empty">Noch keine Karte gewählt.</div>
+            <div id="phoneActionOptions" class="action-options"></div>
+          </section>
+
+          <section class="panel phone-panel">
+            <div class="panel-head compact">
+              <h2>Öffentliche Runde</h2>
+              <p>Nur offene Informationen zur Partie.</p>
+            </div>
+            <div id="phoneScoreList" class="player-list"></div>
+          </section>
+        </section>
+      </div>
+    </section>
+
+    <div id="boardApp">
     <header class="hero">
       <div class="hero-copy">
         <p class="eyebrow">Volldigitales Literaturspiel</p>
@@ -48,9 +119,27 @@
 
         <div id="playerInputs" class="player-inputs"></div>
 
+        <div class="mode-toggle">
+          <label class="toggle-card" for="phoneModeToggle">
+            <input id="phoneModeToggle" type="checkbox" />
+            <span>
+              <strong>Handy-Modus aktivieren</strong>
+              <small>Das Brett bleibt öffentlich, geheime Aktions- und Einflusskarten laufen über private Handy-Ansichten.</small>
+            </span>
+          </label>
+        </div>
+
         <div class="button-row">
           <button id="newGameBtn" class="primary-btn" type="button">Neue Partie starten</button>
         </div>
+
+        <section id="phoneControlPanel" class="phone-control-panel hidden">
+          <div class="panel-head compact">
+            <h2>Handy-Verbindungen</h2>
+            <p>Erzeuge pro Spielperson einen Einladungslink, öffne ihn am Handy und füge den Antwort-Code hier wieder ein.</p>
+          </div>
+          <div id="connectionList" class="connection-list"></div>
+        </section>
 
         <div class="rule-strip">
           <span>Startkarten bringen Figuren aus dem Depot aufs Startfeld.</span>
@@ -100,6 +189,9 @@
             <div class="action-panel">
               <p class="mini-label">Handkarten</p>
               <div id="handArea" class="hand-area"></div>
+              <p id="phonePrivacyNotice" class="privacy-note hidden">
+                Im Handy-Modus bleibt die Aktionshand privat auf den verbundenen Telefonen.
+              </p>
             </div>
 
             <div class="action-panel">
@@ -141,6 +233,63 @@
             <ul id="logList" class="log-list"></ul>
           </section>
         </aside>
+      </section>
+
+      <section class="demo panel">
+        <div class="panel-head">
+          <h2>Demoablauf</h2>
+          <p>Eine kompakte Schritt-für-Schritt-Erklärung mit eingeblendeten Mini-Handys für den ganzen Spielrhythmus.</p>
+        </div>
+
+        <div class="demo-layout">
+          <aside class="demo-sidebar">
+            <div id="demoStepList" class="demo-step-list"></div>
+            <div id="demoProgress" class="recent-card"></div>
+          </aside>
+
+          <div class="demo-main">
+            <div class="demo-copy">
+              <p id="demoEyebrow" class="mini-label">Schritt 1</p>
+              <h3 id="demoTitle">Partie vorbereiten</h3>
+              <p id="demoText" class="demo-text"></p>
+              <div id="demoNotes" class="demo-notes"></div>
+            </div>
+
+            <div class="demo-visuals">
+              <article class="demo-host-card">
+                <div class="demo-visual-head">
+                  <span class="mini-label">Host-Brett</span>
+                  <strong id="demoHostTitle">Öffentliche Ansicht</strong>
+                </div>
+                <div id="demoHostCard" class="demo-host-content"></div>
+              </article>
+
+              <div class="demo-phone-stack">
+                <article class="demo-phone">
+                  <div class="demo-phone-top">
+                    <span class="mini-label">Handy A</span>
+                    <strong id="demoPhoneOneLabel">Signalrot</strong>
+                  </div>
+                  <div id="demoPhoneOne" class="demo-phone-screen"></div>
+                </article>
+
+                <article class="demo-phone">
+                  <div class="demo-phone-top">
+                    <span class="mini-label">Handy B</span>
+                    <strong id="demoPhoneTwoLabel">Nebelblau</strong>
+                  </div>
+                  <div id="demoPhoneTwo" class="demo-phone-screen"></div>
+                </article>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="button-row demo-controls">
+          <button id="demoPrevBtn" class="count-btn" type="button">Zurück</button>
+          <button id="demoPlayBtn" class="count-btn" type="button">Demo abspielen</button>
+          <button id="demoNextBtn" class="primary-btn" type="button">Weiter</button>
+        </div>
       </section>
 
       <section class="compass panel">
@@ -201,6 +350,7 @@
         </div>
       </section>
     </main>
+    </div>
   </div>
 
   <div id="cardModal" class="modal hidden" aria-hidden="true">

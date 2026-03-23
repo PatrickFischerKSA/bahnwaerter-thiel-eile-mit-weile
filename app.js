@@ -919,14 +919,77 @@ const LITERATURE_CARDS = {
   ]
 };
 
+const query = new URLSearchParams(window.location.search);
+const appScreen = query.get('screen') === 'phone' ? 'phone' : 'board';
+const RTC_CONFIG = {
+  iceServers: [{ urls: ['stun:stun.l.google.com:19302'] }]
+};
+const MAX_INFLUENCE_HAND = 2;
+const INFLUENCE_LIBRARY = [
+  {
+    key: 'rueckenwind',
+    label: 'Rückenwind',
+    summary: 'Du erhältst sofort 1 Schutzmarke.',
+    target: 'self',
+    copies: 4,
+    effect: { kind: 'gainShield', amount: 1 }
+  },
+  {
+    key: 'lektuereschub',
+    label: 'Lektüreschub',
+    summary: 'Du erhältst sofort 1 Erkenntnispunkt.',
+    target: 'self',
+    copies: 4,
+    effect: { kind: 'gainInsight', amount: 1 }
+  },
+  {
+    key: 'reservelaterne',
+    label: 'Reservelaterne',
+    summary: 'Du ziehst sofort 1 zusätzliche Aktionskarte.',
+    target: 'self',
+    copies: 4,
+    effect: { kind: 'drawAction', amount: 1 }
+  },
+  {
+    key: 'signalstoerung',
+    label: 'Signalstörung',
+    summary: 'Eine gewählte Spielperson verliert 1 Schutzmarke.',
+    target: 'opponent',
+    copies: 4,
+    effect: { kind: 'loseShield', amount: 1 }
+  },
+  {
+    key: 'streckensperre',
+    label: 'Streckensperre',
+    summary: 'Eine gewählte Spielperson verliert zufällig 1 Aktionskarte.',
+    target: 'opponent',
+    copies: 4,
+    effect: { kind: 'discardRandomAction', amount: 1 }
+  },
+  {
+    key: 'schattenwurf',
+    label: 'Schattenwurf',
+    summary: 'Eine gewählte Spielperson erhält beim nächsten Literaturbonus nichts.',
+    target: 'opponent',
+    copies: 4,
+    effect: { kind: 'blockLiterature', amount: 1 }
+  }
+];
+
+const boardAppEl = document.getElementById('boardApp');
+const phoneAppEl = document.getElementById('phoneApp');
 const boardEl = document.getElementById('board');
 const playerInputsEl = document.getElementById('playerInputs');
 const playerCountPicker = document.getElementById('playerCountPicker');
 const newGameBtn = document.getElementById('newGameBtn');
+const phoneModeToggleEl = document.getElementById('phoneModeToggle');
+const phoneControlPanelEl = document.getElementById('phoneControlPanel');
+const connectionListEl = document.getElementById('connectionList');
 const currentPlayerChip = document.getElementById('currentPlayerChip');
 const roundSizeEl = document.getElementById('roundSize');
 const deckCountEl = document.getElementById('deckCount');
 const handAreaEl = document.getElementById('handArea');
+const phonePrivacyNoticeEl = document.getElementById('phonePrivacyNotice');
 const activeCardSummaryEl = document.getElementById('activeCardSummary');
 const actionOptionsEl = document.getElementById('actionOptions');
 const turnHintEl = document.getElementById('turnHint');
@@ -940,10 +1003,261 @@ const cardPromptEl = document.getElementById('cardPrompt');
 const cardOptionsEl = document.getElementById('cardOptions');
 const cardFeedbackEl = document.getElementById('cardFeedback');
 const cardContinueBtn = document.getElementById('cardContinueBtn');
+const demoStepListEl = document.getElementById('demoStepList');
+const demoProgressEl = document.getElementById('demoProgress');
+const demoEyebrowEl = document.getElementById('demoEyebrow');
+const demoTitleEl = document.getElementById('demoTitle');
+const demoTextEl = document.getElementById('demoText');
+const demoNotesEl = document.getElementById('demoNotes');
+const demoHostTitleEl = document.getElementById('demoHostTitle');
+const demoHostCardEl = document.getElementById('demoHostCard');
+const demoPhoneOneLabelEl = document.getElementById('demoPhoneOneLabel');
+const demoPhoneOneEl = document.getElementById('demoPhoneOne');
+const demoPhoneTwoLabelEl = document.getElementById('demoPhoneTwoLabel');
+const demoPhoneTwoEl = document.getElementById('demoPhoneTwo');
+const demoPrevBtn = document.getElementById('demoPrevBtn');
+const demoPlayBtn = document.getElementById('demoPlayBtn');
+const demoNextBtn = document.getElementById('demoNextBtn');
+
+const phoneTitleEl = document.getElementById('phoneTitle');
+const phoneStatusTextEl = document.getElementById('phoneStatusText');
+const phoneConnectPanelEl = document.getElementById('phoneConnectPanel');
+const phoneAnswerOutputEl = document.getElementById('phoneAnswerOutput');
+const copyPhoneAnswerBtn = document.getElementById('copyPhoneAnswerBtn');
+const phoneGamePanelEl = document.getElementById('phoneGamePanel');
+const phonePlayerChipEl = document.getElementById('phonePlayerChip');
+const phoneTurnHintEl = document.getElementById('phoneTurnHint');
+const phoneHandAreaEl = document.getElementById('phoneHandArea');
+const phoneInfluenceAreaEl = document.getElementById('phoneInfluenceArea');
+const phoneActiveCardEl = document.getElementById('phoneActiveCard');
+const phoneActionHintEl = document.getElementById('phoneActionHint');
+const phoneActionOptionsEl = document.getElementById('phoneActionOptions');
+const phoneScoreListEl = document.getElementById('phoneScoreList');
 
 let selectedPlayerCount = 2;
+let phoneModeEnabled = false;
 let uniqueCardId = 0;
 let state = createInitialState();
+let demoStepIndex = 0;
+let demoTimer = null;
+
+const hostConnections = new Map();
+const phoneClient = {
+  pc: null,
+  channel: null,
+  playerIndex: null,
+  answerCode: '',
+  view: null,
+  pendingInfluenceCardId: null
+};
+
+const DEMO_STEPS = [
+  {
+    kicker: 'Schritt 1',
+    title: 'Partie vorbereiten und Rollen verteilen',
+    text: 'Zu Beginn legst du 2 bis 4 Spielende fest. Am Brett bleiben nur öffentliche Informationen sichtbar. Sobald der Handy-Modus aktiv ist, bekommt jede Spielperson einen privaten Spielschirm für geheime Aktions- und Einflusskarten.',
+    notes: [
+      'Host-Brett für alle sichtbar',
+      'Private Handy-Ansicht pro Spielperson',
+      'Namen und Farben bleiben öffentlich'
+    ],
+    hostTitle: 'Öffentliche Startübersicht',
+    hostBoxes: [
+      { title: 'Host-Brett', text: 'Spielendenzahl wählen, Handy-Modus einschalten und Partie starten.' },
+      { title: 'Verbindungen', text: 'Das Brett erzeugt pro Person einen Einladungslink und wartet auf den Antwort-Code.' }
+    ],
+    hostRow: [
+      { label: 'Signalrot bereit', tone: 'rot' },
+      { label: 'Nebelblau bereit', tone: 'blau' }
+    ],
+    phoneOne: {
+      label: 'Signalrot',
+      status: 'Noch keine Karten. Das Handy koppelt sich zuerst mit dem Brett.',
+      cards: [
+        { title: 'Einladungslink öffnen', text: 'Handy verbindet sich per Antwort-Code mit dem Host.', kind: 'quiz' }
+      ]
+    },
+    phoneTwo: {
+      label: 'Nebelblau',
+      status: 'Auch die zweite Person erhält eine eigene, geheime Ansicht.',
+      cards: [
+        { title: 'Privater Spielschirm', text: 'Nach der Kopplung erscheinen nur die eigenen Karten.', kind: 'buff' }
+      ]
+    }
+  },
+  {
+    kicker: 'Schritt 2',
+    title: 'Aktionskarten bleiben geheim auf dem Handy',
+    text: 'Zu Beginn einer Kartenrunde zieht jede Person ihre DOG-inspirierten Aktionskarten. Im Handy-Modus zeigt das Brett nur noch, dass eine geheime Hand existiert. Die konkrete Auswahl findet ausschliesslich auf dem jeweiligen Telefon statt.',
+    notes: [
+      'Handkarten sind privat',
+      'Das Brett zeigt nur Kartenanzahl und Zugperson',
+      'Start, 4 ±, Tausch, 7 und Joker bleiben erhalten'
+    ],
+    hostTitle: 'Brett mit verdeckter Hand',
+    hostBoxes: [
+      { title: 'Am Zug', text: 'Signalrot ist dran. Das Brett meldet nur: geheime Aktionshand auf dem Handy.' },
+      { title: 'Öffentliche Infos', text: 'Deckgrösse, Figurenstellung und Spielstand bleiben sichtbar.' }
+    ],
+    hostRow: [
+      { label: '4 geheime Karten', tone: 'rot' },
+      { label: 'Zug bei Signalrot', tone: 'rot' }
+    ],
+    phoneOne: {
+      label: 'Signalrot',
+      status: 'Nur dieses Handy sieht die Aktionshand.',
+      cards: [
+        { title: '1 / 11', text: 'Start oder 11 Felder vor', kind: 'buff' },
+        { title: '7', text: 'Auf mehrere Figuren aufteilen', kind: 'quiz' },
+        { title: 'Tausch', text: 'Eigene Figur mit gegnerischer tauschen', kind: 'impact' }
+      ]
+    },
+    phoneTwo: {
+      label: 'Nebelblau',
+      status: 'Nebelblau sieht nur die eigene Hand, nicht Signalrots Auswahl.',
+      cards: [
+        { title: '13', text: 'Start oder 13 Felder vor', kind: 'buff' },
+        { title: '4 ±', text: '4 vor oder 4 zurück', kind: 'quiz' }
+      ]
+    }
+  },
+  {
+    kicker: 'Schritt 3',
+    title: 'Einflusskarten greifen gezielt in die Partie ein',
+    text: 'Zusätzlich zu den normalen Aktionskarten besitzt jede Person eine kleine geheime Einfluss-Hand. Diese Karten verbessern den eigenen Verlauf oder stören gezielt andere Spielende. So bekommt jede Runde mehr Taktik und Interaktion.',
+    notes: [
+      'Positive Karten für dich selbst',
+      'Negative Karten gegen andere',
+      'Nur eine Einflusskarte pro eigenem Zug'
+    ],
+    hostTitle: 'Brett sieht nur die Folgen',
+    hostBoxes: [
+      { title: 'Öffentlicher Effekt', text: 'Das Host-Brett protokolliert Schutzverlust, Zusatzkarte oder blockierten Literaturbonus.' },
+      { title: 'Keine Kartenoffenlegung', text: 'Die konkrete Einflusskarte bleibt für die Gruppe unsichtbar, wenn du das möchtest.' }
+    ],
+    hostRow: [
+      { label: 'Signalrot: +1 Schutz', tone: 'rot' },
+      { label: 'Nebelblau: Literaturbonus blockiert', tone: 'blau' }
+    ],
+    phoneOne: {
+      label: 'Signalrot',
+      status: 'Positive Karten geben dir Polster oder Nachschub.',
+      cards: [
+        { title: 'Rückenwind', text: 'Sofort 1 Schutzmarke', kind: 'buff' },
+        { title: 'Reservelaterne', text: 'Ziehe 1 zusätzliche Aktionskarte', kind: 'buff' }
+      ]
+    },
+    phoneTwo: {
+      label: 'Nebelblau',
+      status: 'Negative Karten treffen eine Zielperson direkt.',
+      cards: [
+        { title: 'Signalstörung', text: 'Eine Person verliert 1 Schutzmarke', kind: 'impact' },
+        { title: 'Schattenwurf', text: 'Nächster Literaturbonus verfällt', kind: 'impact' }
+      ]
+    }
+  },
+  {
+    kicker: 'Schritt 4',
+    title: 'Die Bewegung läuft weiterhin über das öffentliche Brett',
+    text: 'Die geheime Karte wird am Handy gewählt, aber die Figur selbst ziehst du weiterhin auf dem zentralen Brett. So bleibt für alle sichtbar, wie die Partie voranschreitet. Das passt besonders gut für Unterricht, Gruppenrunden und gemeinsames Mitdenken.',
+    notes: [
+      'Kartenwahl privat',
+      'Figurenbewegung öffentlich',
+      'Das Brett markiert legal wählbare Figuren'
+    ],
+    hostTitle: 'Gemeinsamer Brettmoment',
+    hostBoxes: [
+      { title: 'Host-Brett', text: 'Nach der Handy-Auswahl leuchten die möglichen Figuren auf.' },
+      { title: 'Gemeinsame Beobachtung', text: 'Alle sehen die Zugfolge, niemand sieht die geheime Kartenhand.' }
+    ],
+    hostRow: [
+      { label: 'Startfeld', tone: 'rot' },
+      { label: 'Literaturfeld in Reichweite', tone: 'gelb' },
+      { label: 'Gegnerfigur bedroht', tone: 'blau' }
+    ],
+    phoneOne: {
+      label: 'Signalrot',
+      status: 'Das Handy bestätigt nur die gewählte Karte oder Variante.',
+      cards: [
+        { title: 'Aktive Karte: 1 / 11', text: 'Variante 11 vor ausgewählt', kind: 'quiz' }
+      ]
+    },
+    phoneTwo: {
+      label: 'Nebelblau',
+      status: 'Die andere Person wartet und sieht nur den öffentlichen Brettzug.',
+      cards: [
+        { title: 'Warte auf Brettzug', text: 'Keine geheime Info über Signalrots Karte.', kind: 'buff' }
+      ]
+    }
+  },
+  {
+    kicker: 'Schritt 5',
+    title: 'Literaturfelder unterbrechen den Zug mit einer inhaltlichen Karte',
+    text: 'Landet eine Figur auf einem Text-, Deutungs- oder Schicksalsfeld, öffnet sich eine Literaturkarte. Text- und Deutungskarten fragen vier Antwortoptionen ab. Nur richtige Antworten geben Bonus, Schicksalskarten wirken sofort. Einflusskarten können diesen Bonus sogar vorher blockieren.',
+    notes: [
+      'Text- und Deutungskarten als Quiz',
+      'Schicksalskarten sofort wirksam',
+      'Richtige Antwort gibt Bonus'
+    ],
+    hostTitle: 'Literaturmoment im Zentrum',
+    hostBoxes: [
+      { title: 'Öffentliche Karte', text: 'Die Gruppe sieht die Frage und die Erklärung gemeinsam am Host.' },
+      { title: 'Belohnung oder Blockade', text: 'Schutz, Erkenntnis oder Bonusfeld werden sofort sichtbar verbucht.' }
+    ],
+    hostRow: [
+      { label: 'Textkarte', tone: 'gelb' },
+      { label: 'Erklärung eingeblendet', tone: 'gruen' },
+      { label: 'Bonus sichtbar', tone: 'rot' }
+    ],
+    phoneOne: {
+      label: 'Signalrot',
+      status: 'Die Spielfigur erreicht ein Literaturfeld.',
+      cards: [
+        { title: 'Textkarte', text: 'Warum heiratet Thiel nach Minnas Tod erneut?', kind: 'quiz' }
+      ]
+    },
+    phoneTwo: {
+      label: 'Nebelblau',
+      status: 'Negative Einflusskarte kann den kommenden Bonus abschwächen.',
+      cards: [
+        { title: 'Schattenwurf aktiv', text: 'Nächster Literaturbonus wird aufgehoben', kind: 'impact' }
+      ]
+    }
+  },
+  {
+    kicker: 'Schritt 6',
+    title: 'So endet eine Runde und schliesslich die ganze Partie',
+    text: 'Nach dem ausgespielten Zug geht die Runde zur nächsten Person weiter. Sobald alle Hände leer sind, wird neu ausgeteilt. Gewonnen hat, wer alle vier Figuren in die Zielstation bringt. Das Demo zeigt also den ganzen Zyklus: koppeln, geheim wählen, öffentlich ziehen, Literatur lösen, Einfluss nutzen und erneut austeilen.',
+    notes: [
+      'Rundenfolge 6-5-4-3-2-1 bleibt bestehen',
+      'Neue Kartenrunde nach leerer Hand',
+      'Sieg mit vier Figuren im Ziel'
+    ],
+    hostTitle: 'Kompletter Spielzyklus',
+    hostBoxes: [
+      { title: 'Rundenwechsel', text: 'Nächste Person wird aktiv, neue geheime Auswahl beginnt.' },
+      { title: 'Siegbedingung', text: 'Vier eigene Figuren in der Zielstation beenden die Partie.' }
+    ],
+    hostRow: [
+      { label: 'Neue Runde 5 Karten', tone: 'gelb' },
+      { label: 'Zielstation 4/4', tone: 'rot' }
+    ],
+    phoneOne: {
+      label: 'Signalrot',
+      status: 'Neue Kartenrunde beginnt automatisch.',
+      cards: [
+        { title: 'Neue Hand', text: 'Frische Aktions- und Einflusskarten', kind: 'buff' }
+      ]
+    },
+    phoneTwo: {
+      label: 'Nebelblau',
+      status: 'Alle starten wieder mit verdeckten Optionen in den nächsten Zug.',
+      cards: [
+        { title: 'Geheimer Neustart', text: 'Jede Person plant wieder privat weiter', kind: 'quiz' }
+      ]
+    }
+  }
+];
 
 function createInitialState() {
   return {
@@ -955,12 +1269,15 @@ function createInitialState() {
     nextDealSize: 5,
     deck: [],
     discard: [],
+    influenceDeck: [],
+    influenceDiscard: [],
     playableCardIds: [],
     selectedCardId: null,
     actionContext: null,
     pendingLiterature: null,
     recentCard: null,
     log: [],
+    phoneMode: phoneModeEnabled,
     gameOver: false
   };
 }
@@ -998,6 +1315,36 @@ function buildActionDeck() {
   return shuffle(deck);
 }
 
+function buildInfluenceDeck() {
+  const deck = [];
+  INFLUENCE_LIBRARY.forEach((template) => {
+    for (let count = 0; count < template.copies; count += 1) {
+      uniqueCardId += 1;
+      deck.push({
+        ...template,
+        uid: `${template.key}-${uniqueCardId}`
+      });
+    }
+  });
+  return shuffle(deck);
+}
+
+function drawActionCard() {
+  if (state.deck.length === 0) {
+    state.deck = shuffle(state.discard);
+    state.discard = [];
+  }
+  return state.deck.pop() || null;
+}
+
+function drawInfluenceCard() {
+  if (state.influenceDeck.length === 0) {
+    state.influenceDeck = shuffle(state.influenceDiscard);
+    state.influenceDiscard = [];
+  }
+  return state.influenceDeck.pop() || null;
+}
+
 function getConfiguredName(playerIndex, fallback) {
   const input = document.querySelector(`[data-player-name="${playerIndex}"]`);
   const raw = input ? input.value.trim() : '';
@@ -1016,13 +1363,16 @@ function setupPlayers(count) {
     shields: 0,
     insights: 0,
     outForRound: false,
+    influenceUsedThisTurn: false,
     deckIndices: { text: 0, deutung: 0, schicksal: 0 },
+    effects: { blockedLiteratureRewards: 0 },
     literatureDecks: {
       text: cloneLiteratureDeck('text'),
       deutung: cloneLiteratureDeck('deutung'),
       schicksal: cloneLiteratureDeck('schicksal')
     },
     hand: [],
+    influenceHand: [],
     pieces: Array.from({ length: 4 }, (_, pieceIndex) => ({
       id: `${preset.tone}-${pieceIndex + 1}`,
       pieceIndex,
@@ -1097,7 +1447,7 @@ function getCurrentPlayer() {
 
 function addLog(message) {
   state.log.unshift(message);
-  state.log = state.log.slice(0, 10);
+  state.log = state.log.slice(0, 12);
 }
 
 function getPieceState(player, piece) {
@@ -1183,8 +1533,6 @@ function simulateMove(playerIndex, pieceId, amount) {
   for (let step = 1; step <= Math.abs(amount); step += 1) {
     const next = direction > 0 ? nextForwardStep(current) : nextBackwardStep(current);
     if (next === null) return { valid: false };
-    if (direction > 0 && next > 44) return { valid: false };
-    if (direction > 0 && current >= 40 && next > 44) return { valid: false };
 
     if (next >= 0 && next < 40) {
       const absoluteIndex = (player.startIndex + next) % 40;
@@ -1204,7 +1552,6 @@ function simulateMove(playerIndex, pieceId, amount) {
     current = next;
   }
 
-  if (amount > 0 && current > 44) return { valid: false };
   return { valid: true, destination: current };
 }
 
@@ -1290,9 +1637,8 @@ function enterPiece(playerIndex, pieceId) {
 }
 
 function getSwapSources(playerIndex) {
-  const player = state.players[playerIndex];
-  return player.pieces.filter((piece) => {
-    const pieceState = getPieceState(player, piece);
+  return state.players[playerIndex].pieces.filter((piece) => {
+    const pieceState = getPieceState(state.players[playerIndex], piece);
     return pieceState.zone === 'track' && piece.steps !== 0;
   });
 }
@@ -1303,8 +1649,7 @@ function getSwapTargets(playerIndex) {
     if (otherIndex === playerIndex) return;
     player.pieces.forEach((piece) => {
       const pieceState = getPieceState(player, piece);
-      if (pieceState.zone !== 'track') return;
-      if (piece.steps === 0) return;
+      if (pieceState.zone !== 'track' || piece.steps === 0) return;
       result.push({ playerIndex: otherIndex, piece });
     });
   });
@@ -1331,123 +1676,40 @@ function executeSwap(playerIndex, sourcePieceId, targetPlayerIndex, targetPieceI
 }
 
 function buildChoiceVariantsForCard(playerIndex, card) {
-  const player = state.players[playerIndex];
-
   if (card.key === '1-11') {
     return [
-      {
-        id: 'start',
-        label: 'Start',
-        description: 'Figur aus dem Depot aufs Startfeld',
-        action: { kind: 'start' }
-      },
-      {
-        id: 'move-1',
-        label: '1 vor',
-        description: 'Eine Figur 1 Feld vor',
-        action: { kind: 'move', steps: 1 }
-      },
-      {
-        id: 'move-11',
-        label: '11 vor',
-        description: 'Eine Figur 11 Felder vor',
-        action: { kind: 'move', steps: 11 }
-      }
+      { label: 'Start', description: 'Figur aufs Startfeld', action: { kind: 'start' } },
+      { label: '1 vor', description: 'Eine Figur 1 Feld vor', action: { kind: 'move', steps: 1 } },
+      { label: '11 vor', description: 'Eine Figur 11 Felder vor', action: { kind: 'move', steps: 11 } }
     ].filter((option) => isVariantPlayable(playerIndex, option.action));
   }
 
   if (card.key === '13') {
     return [
-      {
-        id: 'start',
-        label: 'Start',
-        description: 'Figur aus dem Depot aufs Startfeld',
-        action: { kind: 'start' }
-      },
-      {
-        id: 'move-13',
-        label: '13 vor',
-        description: 'Eine Figur 13 Felder vor',
-        action: { kind: 'move', steps: 13 }
-      }
+      { label: 'Start', description: 'Figur aufs Startfeld', action: { kind: 'start' } },
+      { label: '13 vor', description: 'Eine Figur 13 Felder vor', action: { kind: 'move', steps: 13 } }
     ].filter((option) => isVariantPlayable(playerIndex, option.action));
   }
 
   if (card.key === '4pm') {
     return [
-      {
-        id: 'move-4',
-        label: '4 vor',
-        description: 'Eine Figur 4 Felder vor',
-        action: { kind: 'move', steps: 4 }
-      },
-      {
-        id: 'move-back-4',
-        label: '4 zurück',
-        description: 'Eine Figur 4 Felder rückwärts',
-        action: { kind: 'move', steps: -4 }
-      }
+      { label: '4 vor', description: 'Eine Figur 4 Felder vor', action: { kind: 'move', steps: 4 } },
+      { label: '4 zurück', description: 'Eine Figur 4 Felder zurück', action: { kind: 'move', steps: -4 } }
     ].filter((option) => isVariantPlayable(playerIndex, option.action));
   }
 
   if (card.kind === 'joker') {
-    const jokerOptions = [
-      {
-        id: 'joker-start',
-        label: 'Joker: Start',
-        description: 'wie Startkarte',
-        action: { kind: 'start' }
-      },
-      {
-        id: 'joker-1',
-        label: 'Joker: 1',
-        description: '1 Feld vor',
-        action: { kind: 'move', steps: 1 }
-      },
-      {
-        id: 'joker-11',
-        label: 'Joker: 11',
-        description: '11 Felder vor',
-        action: { kind: 'move', steps: 11 }
-      },
-      {
-        id: 'joker-13',
-        label: 'Joker: 13',
-        description: '13 Felder vor',
-        action: { kind: 'move', steps: 13 }
-      },
-      {
-        id: 'joker-forward-4',
-        label: 'Joker: 4 vor',
-        description: '4 Felder vor',
-        action: { kind: 'move', steps: 4 }
-      },
-      {
-        id: 'joker-back-4',
-        label: 'Joker: 4 zurück',
-        description: '4 Felder rückwärts',
-        action: { kind: 'move', steps: -4 }
-      },
-      {
-        id: 'joker-7',
-        label: 'Joker: 7',
-        description: '7 aufteilen',
-        action: { kind: 'split' }
-      },
-      {
-        id: 'joker-swap',
-        label: 'Joker: Tausch',
-        description: 'Positionen tauschen',
-        action: { kind: 'swap' }
-      },
-      {
-        id: 'joker-12',
-        label: 'Joker: 12',
-        description: '12 Felder vor',
-        action: { kind: 'move', steps: 12 }
-      }
-    ];
-    return jokerOptions.filter((option) => isVariantPlayable(playerIndex, option.action));
+    return [
+      { label: 'Joker: Start', description: 'wie Startkarte', action: { kind: 'start' } },
+      { label: 'Joker: 1', description: '1 Feld vor', action: { kind: 'move', steps: 1 } },
+      { label: 'Joker: 11', description: '11 Felder vor', action: { kind: 'move', steps: 11 } },
+      { label: 'Joker: 13', description: '13 Felder vor', action: { kind: 'move', steps: 13 } },
+      { label: 'Joker: 4 vor', description: '4 Felder vor', action: { kind: 'move', steps: 4 } },
+      { label: 'Joker: 4 zurück', description: '4 Felder zurück', action: { kind: 'move', steps: -4 } },
+      { label: 'Joker: 7', description: '7 aufteilen', action: { kind: 'split' } },
+      { label: 'Joker: Tausch', description: 'Positionen tauschen', action: { kind: 'swap' } },
+      { label: 'Joker: 12', description: '12 Felder vor', action: { kind: 'move', steps: 12 } }
+    ].filter((option) => isVariantPlayable(playerIndex, option.action));
   }
 
   return [];
@@ -1455,6 +1717,7 @@ function buildChoiceVariantsForCard(playerIndex, card) {
 
 function isVariantPlayable(playerIndex, action) {
   const player = state.players[playerIndex];
+  if (!player) return false;
 
   if (action.kind === 'start') {
     return getStartablePieces(playerIndex).length > 0;
@@ -1485,13 +1748,6 @@ function getLegalSplitAmounts(playerIndex, pieceId, remaining) {
   return legal;
 }
 
-function computePlayableCardIds(playerIndex) {
-  const player = state.players[playerIndex];
-  return player.hand
-    .filter((card) => getResolvedVariantsForCard(playerIndex, card).length > 0)
-    .map((card) => card.uid);
-}
-
 function getResolvedVariantsForCard(playerIndex, card) {
   if (card.kind === 'move') {
     return isVariantPlayable(playerIndex, { kind: 'move', steps: card.steps })
@@ -1514,12 +1770,21 @@ function getResolvedVariantsForCard(playerIndex, card) {
   return buildChoiceVariantsForCard(playerIndex, card);
 }
 
-function drawActionCard() {
-  if (state.deck.length === 0) {
-    state.deck = shuffle(state.discard);
-    state.discard = [];
-  }
-  return state.deck.pop() || null;
+function computePlayableCardIds(playerIndex) {
+  const player = state.players[playerIndex];
+  return player.hand
+    .filter((card) => getResolvedVariantsForCard(playerIndex, card).length > 0)
+    .map((card) => card.uid);
+}
+
+function refillInfluenceHands() {
+  state.players.forEach((player) => {
+    while (player.influenceHand.length < MAX_INFLUENCE_HAND) {
+      const card = drawInfluenceCard();
+      if (!card) break;
+      player.influenceHand.push(card);
+    }
+  });
 }
 
 function dealNextRound() {
@@ -1527,6 +1792,7 @@ function dealNextRound() {
   state.players.forEach((player) => {
     player.outForRound = false;
     player.hand = [];
+    player.influenceUsedThisTurn = false;
   });
 
   for (let draw = 0; draw < dealSize; draw += 1) {
@@ -1536,6 +1802,7 @@ function dealNextRound() {
     });
   }
 
+  refillInfluenceHands();
   state.currentRound += 1;
   state.activeDealSize = dealSize;
   addLog(`Neue Kartenrunde ${state.currentRound}: ${dealSize} Aktionskarten pro Person.`);
@@ -1545,7 +1812,7 @@ function dealNextRound() {
 
 function getSelectedCard() {
   const player = getCurrentPlayer();
-  return player.hand.find((card) => card.uid === state.selectedCardId) || null;
+  return player ? player.hand.find((card) => card.uid === state.selectedCardId) || null : null;
 }
 
 function clearActionSelection() {
@@ -1561,6 +1828,164 @@ function discardSelectedCard() {
     state.discard.push(card);
   }
   clearActionSelection();
+}
+
+function isLiteratureRewardBlocked(player) {
+  return player.effects.blockedLiteratureRewards > 0;
+}
+
+function applyRawReward(playerIndex, pieceId, reward) {
+  const player = state.players[playerIndex];
+  if (!reward || reward.kind === 'none') return reward ? reward.text : '';
+
+  if (reward.kind === 'shield') {
+    player.shields += reward.amount;
+    return reward.text;
+  }
+
+  if (reward.kind === 'insight') {
+    player.insights += reward.amount;
+    return reward.text;
+  }
+
+  if (reward.kind === 'loseShield') {
+    const loss = Math.min(player.shields, reward.amount);
+    player.shields -= loss;
+    return loss > 0 ? reward.text : 'Keine Schutzmarke vorhanden.';
+  }
+
+  if (reward.kind === 'advance') {
+    if (canMovePiece(playerIndex, pieceId, reward.amount)) {
+      movePieceByAmount(playerIndex, pieceId, reward.amount, false);
+      return reward.text;
+    }
+    return 'Kein freies Bonusfeld verfügbar.';
+  }
+
+  return '';
+}
+
+function applyLiteratureRewardConsideringBlock(playerIndex, pieceId, reward, includeQuizInsight = false) {
+  const player = state.players[playerIndex];
+  if (isLiteratureRewardBlocked(player)) {
+    player.effects.blockedLiteratureRewards -= 1;
+    return 'Der Literaturbonus wurde durch Schattenwurf blockiert.';
+  }
+
+  const rewardText = applyRawReward(playerIndex, pieceId, reward);
+  if (includeQuizInsight) {
+    player.insights += 1;
+  }
+  return rewardText;
+}
+
+function getInfluenceTargetOptions(playerIndex) {
+  return state.players
+    .map((player, index) => (index === playerIndex
+      ? null
+      : {
+        playerIndex: index,
+        name: player.name,
+        tone: player.tone
+      }))
+    .filter(Boolean);
+}
+
+function canUseInfluenceCard(playerIndex, card) {
+  if (!card) return false;
+  if (state.gameOver || state.pendingLiterature) return false;
+  if (playerIndex !== state.currentPlayer) return false;
+  const player = state.players[playerIndex];
+  if (!player || player.influenceUsedThisTurn) return false;
+  if (state.selectedCardId || state.actionContext) return false;
+  if (card.target === 'opponent') {
+    return getInfluenceTargetOptions(playerIndex).length > 0;
+  }
+  return true;
+}
+
+function removeInfluenceCard(playerIndex, cardId) {
+  const player = state.players[playerIndex];
+  const index = player.influenceHand.findIndex((card) => card.uid === cardId);
+  if (index < 0) return null;
+  const [card] = player.influenceHand.splice(index, 1);
+  state.influenceDiscard.push(card);
+  return card;
+}
+
+function applyInfluenceEffect(actorIndex, card, targetPlayerIndex) {
+  const actor = state.players[actorIndex];
+  const target = typeof targetPlayerIndex === 'number' ? state.players[targetPlayerIndex] : null;
+
+  if (card.effect.kind === 'gainShield') {
+    actor.shields += card.effect.amount;
+    return `${actor.name} erhält ${card.effect.amount} Schutzmarke.`;
+  }
+
+  if (card.effect.kind === 'gainInsight') {
+    actor.insights += card.effect.amount;
+    return `${actor.name} erhält ${card.effect.amount} Erkenntnispunkt.`;
+  }
+
+  if (card.effect.kind === 'drawAction') {
+    const drawn = drawActionCard();
+    if (drawn) {
+      actor.hand.push(drawn);
+      return `${actor.name} zieht 1 zusätzliche Aktionskarte.`;
+    }
+    return 'Kein Aktionsnachschub mehr im Deck verfügbar.';
+  }
+
+  if (!target) return 'Kein gültiges Ziel ausgewählt.';
+
+  if (card.effect.kind === 'loseShield') {
+    const before = target.shields;
+    target.shields = Math.max(0, target.shields - card.effect.amount);
+    return before > target.shields
+      ? `${target.name} verliert 1 Schutzmarke.`
+      : `${target.name} hatte keine Schutzmarke mehr.`;
+  }
+
+  if (card.effect.kind === 'discardRandomAction') {
+    if (target.hand.length === 0) {
+      return `${target.name} hatte keine Aktionskarte zum Abwerfen.`;
+    }
+    const randomIndex = Math.floor(Math.random() * target.hand.length);
+    const [discarded] = target.hand.splice(randomIndex, 1);
+    state.discard.push(discarded);
+    if (targetPlayerIndex === state.currentPlayer && state.selectedCardId === discarded.uid) {
+      clearActionSelection();
+    }
+    return `${target.name} verliert zufällig ${discarded.label}.`;
+  }
+
+  if (card.effect.kind === 'blockLiterature') {
+    target.effects.blockedLiteratureRewards += card.effect.amount;
+    return `${target.name}s nächster Literaturbonus wird blockiert.`;
+  }
+
+  return 'Keine Wirkung ausgelöst.';
+}
+
+function playInfluenceCard(playerIndex, cardId, targetPlayerIndex = null) {
+  const player = state.players[playerIndex];
+  const card = player ? player.influenceHand.find((entry) => entry.uid === cardId) : null;
+  if (!canUseInfluenceCard(playerIndex, card)) return false;
+  if (card.target === 'opponent' && typeof targetPlayerIndex !== 'number') return false;
+
+  const removedCard = removeInfluenceCard(playerIndex, cardId);
+  if (!removedCard) return false;
+
+  const resultText = applyInfluenceEffect(playerIndex, removedCard, targetPlayerIndex);
+  player.influenceUsedThisTurn = true;
+  addLog(`${player.name} spielt Einflusskarte ${removedCard.label}. ${resultText}`);
+
+  if (playerIndex === state.currentPlayer) {
+    state.playableCardIds = computePlayableCardIds(playerIndex);
+  }
+
+  render();
+  return true;
 }
 
 function finishPlayedCard() {
@@ -1608,6 +2033,8 @@ function ensureTurnReady() {
     }
 
     const player = getCurrentPlayer();
+    player.influenceUsedThisTurn = false;
+
     if (player.hand.length === 0 || player.outForRound) {
       state.currentPlayer = (state.currentPlayer + 1) % state.players.length;
       loops += 1;
@@ -1625,7 +2052,9 @@ function ensureTurnReady() {
       continue;
     }
 
-    turnHintEl.textContent = `${player.name} wählt eine DOG-Aktionskarte.`;
+    turnHintEl.textContent = state.phoneMode && isPhoneConnected(state.currentPlayer)
+      ? `${player.name} wählt die geheime Aktionskarte auf dem Handy.`
+      : `${player.name} wählt eine DOG-Aktionskarte.`;
     render();
     return;
   }
@@ -1636,8 +2065,10 @@ function ensureTurnReady() {
 function startNewGame() {
   uniqueCardId = 0;
   state = createInitialState();
+  state.phoneMode = phoneModeEnabled;
   state.players = setupPlayers(selectedPlayerCount);
   state.deck = buildActionDeck();
+  state.influenceDeck = buildInfluenceDeck();
   state.log = ['Neue Partie gestartet.'];
   dealNextRound();
   state.currentPlayer = 0;
@@ -1779,16 +2210,12 @@ function handleTokenSelection(playerIndex, pieceId) {
 
   if (state.actionContext.stage === 'pick-piece') {
     if (state.actionContext.actionKind === 'start') {
-      if (enterPiece(playerIndex, pieceId)) {
-        finishPlayedCard();
-      }
+      if (enterPiece(playerIndex, pieceId)) finishPlayedCard();
       return;
     }
 
     if (state.actionContext.actionKind === 'move') {
-      if (movePieceByAmount(playerIndex, pieceId, state.actionContext.steps, true)) {
-        finishPlayedCard();
-      }
+      if (movePieceByAmount(playerIndex, pieceId, state.actionContext.steps, true)) finishPlayedCard();
       return;
     }
   }
@@ -1820,41 +2247,8 @@ function handleTokenSelection(playerIndex, pieceId) {
 
   if (state.actionContext.stage === 'pick-swap-target') {
     const success = executeSwap(state.currentPlayer, state.actionContext.sourcePieceId, playerIndex, pieceId);
-    if (success) {
-      finishPlayedCard();
-    }
+    if (success) finishPlayedCard();
   }
-}
-
-function applyLiteratureReward(playerIndex, pieceId, reward) {
-  const player = state.players[playerIndex];
-  if (!reward || reward.kind === 'none') return reward ? reward.text : '';
-
-  if (reward.kind === 'shield') {
-    player.shields += reward.amount;
-    return reward.text;
-  }
-
-  if (reward.kind === 'insight') {
-    player.insights += reward.amount;
-    return reward.text;
-  }
-
-  if (reward.kind === 'loseShield') {
-    const loss = Math.min(player.shields, reward.amount);
-    player.shields -= loss;
-    return loss > 0 ? reward.text : 'Keine Schutzmarke vorhanden.';
-  }
-
-  if (reward.kind === 'advance') {
-    if (canMovePiece(playerIndex, pieceId, reward.amount)) {
-      movePieceByAmount(playerIndex, pieceId, reward.amount, false);
-      return reward.text;
-    }
-    return 'Kein freies Bonusfeld verfügbar.';
-  }
-
-  return '';
 }
 
 function openLiteratureModal() {
@@ -1872,7 +2266,7 @@ function openLiteratureModal() {
   cardContinueBtn.classList.add('hidden');
 
   if (type === 'schicksal') {
-    const rewardText = applyLiteratureReward(pending.playerIndex, pending.pieceId, card.reward);
+    const rewardText = applyLiteratureRewardConsideringBlock(pending.playerIndex, pending.pieceId, card.reward, false);
     cardFeedbackEl.textContent = `${card.explanation} ${rewardText}`.trim();
     updateRecentCard(type, card.title, `${card.prompt} ${card.explanation}`, rewardText);
     cardContinueBtn.classList.remove('hidden');
@@ -1905,8 +2299,7 @@ function resolveLiteratureAnswer(optionIndex) {
 
   let rewardText = 'Kein Bonus.';
   if (correct) {
-    rewardText = applyLiteratureReward(pending.playerIndex, pending.pieceId, card.reward);
-    state.players[pending.playerIndex].insights += 1;
+    rewardText = applyLiteratureRewardConsideringBlock(pending.playerIndex, pending.pieceId, card.reward, true);
   }
 
   cardFeedbackEl.textContent = `${correct ? 'Richtig.' : 'Noch nicht.'} ${card.explanation} ${correct ? rewardText : ''}`.trim();
@@ -1961,12 +2354,11 @@ function renderRecentCard() {
   recentCardEl.append(kicker, title, body, reward);
 }
 
-function renderPlayerList() {
-  playerListEl.innerHTML = '';
+function renderPlayerSummaryInto(container) {
+  container.innerHTML = '';
   state.players.forEach((player, index) => {
     const finished = player.pieces.filter((piece) => piece.steps === 44).length;
     const active = player.pieces.filter((piece) => piece.steps >= 0 && piece.steps < 44).length;
-
     const card = document.createElement('div');
     card.className = `player-card${index === state.currentPlayer ? ' current' : ''}`;
 
@@ -1988,6 +2380,7 @@ function renderPlayerList() {
     meta.className = 'player-card-meta';
     [
       `Hand ${player.hand.length}`,
+      `Einfluss ${player.influenceHand.length}`,
       `Unterwegs ${active}`,
       `Im Ziel ${finished}`,
       `Schutz ${player.shields}`,
@@ -2000,8 +2393,12 @@ function renderPlayerList() {
     });
 
     card.append(header, meta);
-    playerListEl.appendChild(card);
+    container.appendChild(card);
   });
+}
+
+function renderPlayerList() {
+  renderPlayerSummaryInto(playerListEl);
 }
 
 function renderLog() {
@@ -2013,10 +2410,31 @@ function renderLog() {
   });
 }
 
+function isPhoneConnected(playerIndex) {
+  const connection = hostConnections.get(playerIndex);
+  return connection?.status === 'connected' && connection.channel?.readyState === 'open';
+}
+
+function renderHiddenHandMessage(player) {
+  handAreaEl.innerHTML = '';
+  const info = document.createElement('div');
+  info.className = 'recent-card';
+  info.innerHTML = `<h3>${player.hand.length} geheime Karten</h3><p>Diese Aktionshand ist nur auf ${player.name}s Handy sichtbar.</p>`;
+  handAreaEl.appendChild(info);
+}
+
 function renderHand() {
   const player = getCurrentPlayer();
-  const playableSet = new Set(state.playableCardIds);
   handAreaEl.innerHTML = '';
+
+  if (state.phoneMode && isPhoneConnected(state.currentPlayer)) {
+    renderHiddenHandMessage(player);
+    phonePrivacyNoticeEl.classList.remove('hidden');
+    return;
+  }
+
+  phonePrivacyNoticeEl.classList.add('hidden');
+  const playableSet = new Set(state.playableCardIds);
 
   player.hand.forEach((card) => {
     const button = document.createElement('button');
@@ -2039,7 +2457,9 @@ function renderActiveCard() {
   const selectedCard = getSelectedCard();
   if (!selectedCard) {
     activeCardSummaryEl.className = 'recent-card empty';
-    activeCardSummaryEl.textContent = 'Wähle eine spielbare Aktionskarte aus deiner Hand.';
+    activeCardSummaryEl.textContent = state.phoneMode && isPhoneConnected(state.currentPlayer)
+      ? 'Die geheime Aktionskarte wird auf dem Handy gewählt.'
+      : 'Wähle eine spielbare Aktionskarte aus deiner Hand.';
     return;
   }
 
@@ -2063,7 +2483,7 @@ function renderActionOptions() {
       button.type = 'button';
       button.className = 'action-option-btn';
       button.dataset.optionId = option.label;
-      button.textContent = `${option.label} · ${option.action.kind === 'move' ? 'Zug' : option.description || 'Option'}`;
+      button.textContent = `${option.label} · ${option.description || 'Option'}`;
       actionOptionsEl.appendChild(button);
     });
     return;
@@ -2190,58 +2610,778 @@ function renderBoard() {
   }
 }
 
+function getConnectionDisplayName(playerIndex) {
+  return state.players[playerIndex]?.name || getConfiguredName(playerIndex, PLAYER_PRESETS[playerIndex].defaultName);
+}
+
+function getBaseBoardUrl() {
+  return `${window.location.origin}${window.location.pathname}`;
+}
+
+function encodeSignalPayload(value) {
+  return btoa(unescape(encodeURIComponent(JSON.stringify(value))));
+}
+
+function decodeSignalPayload(value) {
+  return JSON.parse(decodeURIComponent(escape(atob(value))));
+}
+
+function waitForIceComplete(pc) {
+  if (pc.iceGatheringState === 'complete') return Promise.resolve();
+
+  return new Promise((resolve) => {
+    function handleChange() {
+      if (pc.iceGatheringState === 'complete') {
+        pc.removeEventListener('icegatheringstatechange', handleChange);
+        resolve();
+      }
+    }
+    pc.addEventListener('icegatheringstatechange', handleChange);
+  });
+}
+
+async function copyText(value) {
+  if (navigator.clipboard?.writeText) {
+    await navigator.clipboard.writeText(value);
+    return true;
+  }
+  return false;
+}
+
+function closeHostConnection(playerIndex) {
+  const existing = hostConnections.get(playerIndex);
+  if (!existing) return;
+  existing.channel?.close();
+  existing.pc?.close();
+  hostConnections.delete(playerIndex);
+}
+
+function updateConnectionStatus(playerIndex, status, extra = {}) {
+  const entry = hostConnections.get(playerIndex) || { playerIndex };
+  Object.assign(entry, extra, { status });
+  hostConnections.set(playerIndex, entry);
+  renderConnectionList();
+}
+
+function createHostChannelHandlers(playerIndex, channel) {
+  channel.addEventListener('open', () => {
+    updateConnectionStatus(playerIndex, 'connected', { channel });
+    syncPhoneForPlayer(playerIndex);
+    render();
+  });
+
+  channel.addEventListener('close', () => {
+    updateConnectionStatus(playerIndex, 'closed', { channel: null });
+    render();
+  });
+
+  channel.addEventListener('message', (event) => {
+    handlePhoneMessage(playerIndex, event.data);
+  });
+}
+
+async function createPhoneInvite(playerIndex) {
+  closeHostConnection(playerIndex);
+  const pc = new RTCPeerConnection(RTC_CONFIG);
+  const channel = pc.createDataChannel('bahnwaerter-thiel');
+
+  createHostChannelHandlers(playerIndex, channel);
+  updateConnectionStatus(playerIndex, 'building', { pc, channel, inviteLink: '', answerDraft: '' });
+
+  const offer = await pc.createOffer();
+  await pc.setLocalDescription(offer);
+  await waitForIceComplete(pc);
+
+  const localDescription = pc.localDescription?.toJSON?.() || pc.localDescription;
+  const offerCode = encodeSignalPayload(localDescription);
+  const inviteLink = `${getBaseBoardUrl()}?screen=phone&player=${playerIndex}&offer=${encodeURIComponent(offerCode)}`;
+
+  updateConnectionStatus(playerIndex, 'offer-ready', {
+    pc,
+    channel,
+    offerCode,
+    inviteLink
+  });
+}
+
+async function applyPhoneAnswer(playerIndex, answerText) {
+  const connection = hostConnections.get(playerIndex);
+  if (!connection?.pc) return;
+
+  const answer = decodeSignalPayload(answerText.trim());
+  await connection.pc.setRemoteDescription(answer);
+  updateConnectionStatus(playerIndex, 'awaiting-open', { answerDraft: answerText.trim() });
+}
+
+function buildPhoneView(playerIndex) {
+  const player = state.players[playerIndex];
+  const current = getCurrentPlayer();
+  const selectedCard = current?.playerIndex === playerIndex ? getSelectedCard() : null;
+  return {
+    playerIndex,
+    name: player.name,
+    tone: player.tone,
+    isCurrentTurn: playerIndex === state.currentPlayer,
+    gameOver: state.gameOver,
+    turnOwner: current?.name || '',
+    turnHint: turnHintEl.textContent,
+    playableCardIds: playerIndex === state.currentPlayer ? state.playableCardIds : [],
+    hand: player.hand.map((card) => ({
+      uid: card.uid,
+      label: card.label,
+      summary: card.summary,
+      selected: state.selectedCardId === card.uid,
+      playable: state.playableCardIds.includes(card.uid)
+    })),
+    influenceHand: player.influenceHand.map((card) => ({
+      uid: card.uid,
+      label: card.label,
+      summary: card.summary,
+      target: card.target,
+      usable: canUseInfluenceCard(playerIndex, card)
+    })),
+    canUseInfluence: !player.influenceUsedThisTurn,
+    actionOptions: state.actionContext?.stage === 'choose-variant' && playerIndex === state.currentPlayer
+      ? state.actionContext.options.map((option) => ({
+        id: option.label,
+        label: option.label,
+        description: option.description || ''
+      }))
+      : [],
+    splitOptions: state.actionContext?.stage === 'pick-split-amount' && playerIndex === state.currentPlayer
+      ? state.actionContext.legalAmounts.map((amount) => ({
+        id: String(amount),
+        label: `${amount} Feld${amount === 1 ? '' : 'er'}`
+      }))
+      : [],
+    activeCard: selectedCard
+      ? { label: selectedCard.label, summary: selectedCard.summary }
+      : null,
+    influenceTargets: getInfluenceTargetOptions(playerIndex),
+    publicPlayers: state.players.map((entry, index) => ({
+      name: entry.name,
+      tone: entry.tone,
+      current: index === state.currentPlayer,
+      handCount: entry.hand.length,
+      influenceCount: entry.influenceHand.length,
+      shields: entry.shields,
+      insights: entry.insights
+    }))
+  };
+}
+
+function sendToPhone(playerIndex, payload) {
+  const connection = hostConnections.get(playerIndex);
+  if (!connection?.channel || connection.channel.readyState !== 'open') return;
+  connection.channel.send(JSON.stringify(payload));
+}
+
+function syncPhoneForPlayer(playerIndex) {
+  if (appScreen !== 'board' || !state.players[playerIndex]) return;
+  sendToPhone(playerIndex, {
+    type: 'sync',
+    view: buildPhoneView(playerIndex)
+  });
+}
+
+function syncAllPhones() {
+  if (appScreen !== 'board') return;
+  state.players.forEach((_, index) => syncPhoneForPlayer(index));
+}
+
+function renderConnectionList() {
+  if (appScreen !== 'board') return;
+  phoneControlPanelEl.classList.toggle('hidden', !phoneModeEnabled);
+  connectionListEl.innerHTML = '';
+
+  PLAYER_PRESETS.slice(0, selectedPlayerCount).forEach((preset, playerIndex) => {
+    const connection = hostConnections.get(playerIndex);
+    const card = document.createElement('div');
+    card.className = 'connection-card';
+
+    const header = document.createElement('div');
+    header.className = 'connection-card-header';
+
+    const name = document.createElement('div');
+    name.innerHTML = `<strong>${getConnectionDisplayName(playerIndex)}</strong><div class="mini-label">Handy ${playerIndex + 1}</div>`;
+
+    const status = document.createElement('div');
+    status.className = 'connection-status';
+    status.dataset.state = connection?.status || 'idle';
+    status.textContent = connection?.status === 'connected'
+      ? 'Verbunden'
+      : connection?.status === 'awaiting-open'
+        ? 'Warte auf Datenkanal'
+        : connection?.status === 'offer-ready'
+          ? 'Einladungslink bereit'
+          : connection?.status === 'building'
+            ? 'Erzeuge Einladung'
+            : connection?.status === 'closed'
+              ? 'Verbindung geschlossen'
+              : 'Noch nicht gekoppelt';
+
+    header.append(name, status);
+    card.appendChild(header);
+
+    const buttons = document.createElement('div');
+    buttons.className = 'button-row';
+
+    const inviteBtn = document.createElement('button');
+    inviteBtn.type = 'button';
+    inviteBtn.className = 'primary-btn';
+    inviteBtn.dataset.action = 'create-invite';
+    inviteBtn.dataset.playerIndex = String(playerIndex);
+    inviteBtn.textContent = connection?.inviteLink ? 'Einladung neu erzeugen' : 'Einladung erzeugen';
+    buttons.appendChild(inviteBtn);
+
+    if (connection?.inviteLink) {
+      const copyBtn = document.createElement('button');
+      copyBtn.type = 'button';
+      copyBtn.className = 'count-btn';
+      copyBtn.dataset.action = 'copy-link';
+      copyBtn.dataset.playerIndex = String(playerIndex);
+      copyBtn.textContent = 'Link kopieren';
+      buttons.appendChild(copyBtn);
+    }
+
+    card.appendChild(buttons);
+
+    if (connection?.inviteLink) {
+      const inviteField = document.createElement('div');
+      inviteField.className = 'signal-field';
+      inviteField.innerHTML = '<label>Einladungslink fürs Handy</label>';
+      const textarea = document.createElement('textarea');
+      textarea.className = 'signal-textarea';
+      textarea.rows = 5;
+      textarea.readOnly = true;
+      textarea.value = connection.inviteLink;
+      inviteField.appendChild(textarea);
+      card.appendChild(inviteField);
+
+      const answerField = document.createElement('div');
+      answerField.className = 'signal-field';
+      answerField.innerHTML = '<label>Antwort-Code vom Handy</label>';
+      const input = document.createElement('textarea');
+      input.className = 'signal-textarea';
+      input.rows = 5;
+      input.value = connection.answerDraft || '';
+      input.dataset.role = 'answer-input';
+      input.dataset.playerIndex = String(playerIndex);
+      answerField.appendChild(input);
+      card.appendChild(answerField);
+
+      const answerButtons = document.createElement('div');
+      answerButtons.className = 'button-row';
+      const applyBtn = document.createElement('button');
+      applyBtn.type = 'button';
+      applyBtn.className = 'count-btn';
+      applyBtn.dataset.action = 'apply-answer';
+      applyBtn.dataset.playerIndex = String(playerIndex);
+      applyBtn.textContent = 'Antwort übernehmen';
+      answerButtons.appendChild(applyBtn);
+      card.appendChild(answerButtons);
+    }
+
+    connectionListEl.appendChild(card);
+  });
+}
+
+function handlePhoneMessage(playerIndex, rawData) {
+  let payload;
+  try {
+    payload = JSON.parse(rawData);
+  } catch {
+    return;
+  }
+
+  if (!state.players[playerIndex]) return;
+  if (payload.type === 'select-card' && playerIndex === state.currentPlayer) {
+    selectCard(payload.cardId);
+  }
+
+  if (payload.type === 'select-option' && playerIndex === state.currentPlayer) {
+    handleActionOption(payload.optionId);
+  }
+
+  if (payload.type === 'play-influence' && playerIndex === state.currentPlayer) {
+    playInfluenceCard(playerIndex, payload.cardId, payload.targetPlayerIndex);
+  }
+}
+
+function renderPhoneView() {
+  if (appScreen !== 'phone') return;
+
+  const view = phoneClient.view;
+  if (!view) {
+    phoneStatusTextEl.textContent = 'Warte auf die erste Synchronisation vom Brett.';
+    phoneGamePanelEl.classList.add('hidden');
+    return;
+  }
+
+  phoneGamePanelEl.classList.remove('hidden');
+  phoneTitleEl.textContent = `${view.name} · geheime Karten`;
+  phoneStatusTextEl.textContent = view.isCurrentTurn
+    ? 'Du bist am Zug. Wähle deine geheime Aktions- oder Einflusskarte direkt hier.'
+    : `${view.turnOwner} ist am Zug. Deine privaten Karten bleiben auf diesem Handy gespeichert.`;
+  phonePlayerChipEl.textContent = view.name;
+  phonePlayerChipEl.dataset.tone = view.tone;
+  phoneTurnHintEl.textContent = view.turnHint;
+
+  phoneHandAreaEl.innerHTML = '';
+  view.hand.forEach((card) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'phone-action-card';
+    button.dataset.cardId = card.uid;
+    if (card.selected) button.classList.add('selected');
+    button.disabled = !view.isCurrentTurn || !card.playable || view.gameOver;
+    button.innerHTML = `<strong>${card.label}</strong><span>${card.summary}</span>`;
+    phoneHandAreaEl.appendChild(button);
+  });
+
+  phoneInfluenceAreaEl.innerHTML = '';
+  view.influenceHand.forEach((card) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'phone-influence-card';
+    button.dataset.cardId = card.uid;
+    button.dataset.target = card.target;
+    button.disabled = !card.usable || view.gameOver;
+    if (phoneClient.pendingInfluenceCardId === card.uid) button.classList.add('selected');
+    button.innerHTML = `<strong>${card.label}</strong><span>${card.summary}</span>`;
+    phoneInfluenceAreaEl.appendChild(button);
+  });
+
+  phoneActiveCardEl.className = view.activeCard ? 'recent-card' : 'recent-card empty';
+  phoneActiveCardEl.innerHTML = view.activeCard
+    ? `<h3>${view.activeCard.label}</h3><p>${view.activeCard.summary}</p>`
+    : 'Noch keine Karte gewählt.';
+
+  phoneActionOptionsEl.innerHTML = '';
+  if (phoneClient.pendingInfluenceCardId) {
+    phoneActionHintEl.textContent = 'Wähle jetzt die Zielperson für diese Einflusskarte.';
+    const targetWrap = document.createElement('div');
+    targetWrap.className = 'phone-choice-targets';
+    view.influenceTargets.forEach((target) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'phone-choice-chip';
+      button.dataset.targetPlayerIndex = String(target.playerIndex);
+      button.textContent = target.name;
+      targetWrap.appendChild(button);
+    });
+    phoneActionOptionsEl.appendChild(targetWrap);
+  } else if (view.actionOptions.length > 0) {
+    phoneActionHintEl.textContent = 'Diese Kartenvariante kannst du direkt auf dem Handy festlegen.';
+    view.actionOptions.forEach((option) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'action-option-btn';
+      button.dataset.optionId = option.id;
+      button.textContent = `${option.label} · ${option.description}`;
+      phoneActionOptionsEl.appendChild(button);
+    });
+  } else if (view.splitOptions.length > 0) {
+    phoneActionHintEl.textContent = 'Nach der Brettauswahl kannst du die Split-Höhe hier festlegen.';
+    view.splitOptions.forEach((option) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'action-option-btn';
+      button.dataset.optionId = option.id;
+      button.textContent = option.label;
+      phoneActionOptionsEl.appendChild(button);
+    });
+  } else {
+    phoneActionHintEl.textContent = 'Wenn mehrere Varianten möglich sind, erscheinen sie hier.';
+  }
+
+  phoneScoreListEl.innerHTML = '';
+  view.publicPlayers.forEach((player) => {
+    const card = document.createElement('div');
+    card.className = `player-card${player.current ? ' current' : ''}`;
+    card.innerHTML = `
+      <div class="player-card-header">
+        <div class="player-card-name">${player.name}</div>
+        <span class="player-chip" data-tone="${player.tone}">${player.tone.toUpperCase()}</span>
+      </div>
+      <div class="player-card-meta">
+        <span class="meta-pill">Hand ${player.handCount}</span>
+        <span class="meta-pill">Einfluss ${player.influenceCount}</span>
+        <span class="meta-pill">Schutz ${player.shields}</span>
+        <span class="meta-pill">Erkenntnis ${player.insights}</span>
+      </div>
+    `;
+    phoneScoreListEl.appendChild(card);
+  });
+}
+
+function stopDemoPlayback() {
+  if (demoTimer) {
+    window.clearInterval(demoTimer);
+    demoTimer = null;
+  }
+  if (demoPlayBtn) {
+    demoPlayBtn.textContent = 'Demo abspielen';
+  }
+}
+
+function renderDemoPhone(targetEl, data) {
+  if (!targetEl || !data) return;
+  targetEl.innerHTML = '';
+
+  const status = document.createElement('div');
+  status.className = 'demo-phone-status';
+  status.textContent = data.status;
+  targetEl.appendChild(status);
+
+  data.cards.forEach((card) => {
+    const cardEl = document.createElement('div');
+    cardEl.className = `demo-phone-card ${card.kind || ''}`.trim();
+    cardEl.innerHTML = `<strong>${card.title}</strong><span>${card.text}</span>`;
+    targetEl.appendChild(cardEl);
+  });
+}
+
+function renderDemoStep() {
+  if (appScreen !== 'board' || !demoStepListEl) return;
+  const step = DEMO_STEPS[demoStepIndex];
+
+  demoStepListEl.innerHTML = '';
+  DEMO_STEPS.forEach((entry, index) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = `demo-step-btn${index === demoStepIndex ? ' active' : ''}`;
+    button.dataset.demoStep = String(index);
+    button.innerHTML = `<strong>${entry.kicker}</strong><span>${entry.title}</span>`;
+    demoStepListEl.appendChild(button);
+  });
+
+  demoEyebrowEl.textContent = step.kicker;
+  demoTitleEl.textContent = step.title;
+  demoTextEl.textContent = step.text;
+  demoHostTitleEl.textContent = step.hostTitle;
+
+  demoNotesEl.innerHTML = '';
+  step.notes.forEach((note) => {
+    const pill = document.createElement('span');
+    pill.className = 'demo-note';
+    pill.textContent = note;
+    demoNotesEl.appendChild(pill);
+  });
+
+  demoHostCardEl.innerHTML = '';
+  const strip = document.createElement('div');
+  strip.className = 'demo-board-strip';
+
+  if (step.hostRow?.length) {
+    const row = document.createElement('div');
+    row.className = 'demo-board-row';
+    step.hostRow.forEach((chipData) => {
+      const chip = document.createElement('span');
+      chip.className = 'demo-chip';
+      if (chipData.tone) chip.dataset.tone = chipData.tone;
+      chip.textContent = chipData.label;
+      row.appendChild(chip);
+    });
+    strip.appendChild(row);
+  }
+
+  step.hostBoxes.forEach((box) => {
+    const boxEl = document.createElement('article');
+    boxEl.className = 'demo-stage-box';
+    boxEl.innerHTML = `<h4>${box.title}</h4><p>${box.text}</p>`;
+    strip.appendChild(boxEl);
+  });
+  demoHostCardEl.appendChild(strip);
+
+  demoPhoneOneLabelEl.textContent = step.phoneOne.label;
+  demoPhoneTwoLabelEl.textContent = step.phoneTwo.label;
+  renderDemoPhone(demoPhoneOneEl, step.phoneOne);
+  renderDemoPhone(demoPhoneTwoEl, step.phoneTwo);
+
+  demoProgressEl.className = 'recent-card';
+  demoProgressEl.innerHTML = `
+    <div class="demo-progress-grid">
+      <strong>${demoStepIndex + 1} / ${DEMO_STEPS.length}</strong>
+      <span>${step.title}</span>
+      <span>${demoTimer ? 'Demo läuft automatisch weiter.' : 'Du kannst frei vor- und zurückspringen.'}</span>
+    </div>
+  `;
+
+  demoPrevBtn.disabled = demoStepIndex === 0;
+  demoNextBtn.disabled = demoStepIndex === DEMO_STEPS.length - 1;
+}
+
+function setDemoStep(nextIndex) {
+  if (nextIndex < 0 || nextIndex >= DEMO_STEPS.length) return;
+  demoStepIndex = nextIndex;
+  renderDemoStep();
+}
+
+function toggleDemoPlayback() {
+  if (demoTimer) {
+    stopDemoPlayback();
+    renderDemoStep();
+    return;
+  }
+
+  demoPlayBtn.textContent = 'Demo stoppen';
+  demoTimer = window.setInterval(() => {
+    if (demoStepIndex >= DEMO_STEPS.length - 1) {
+      stopDemoPlayback();
+      renderDemoStep();
+      return;
+    }
+    demoStepIndex += 1;
+    renderDemoStep();
+  }, 3800);
+  renderDemoStep();
+}
+
+function initDemo() {
+  if (appScreen !== 'board' || !demoStepListEl) return;
+
+  demoStepListEl.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-demo-step]');
+    if (!button) return;
+    stopDemoPlayback();
+    setDemoStep(Number(button.dataset.demoStep));
+  });
+
+  demoPrevBtn.addEventListener('click', () => {
+    stopDemoPlayback();
+    setDemoStep(demoStepIndex - 1);
+  });
+
+  demoNextBtn.addEventListener('click', () => {
+    stopDemoPlayback();
+    setDemoStep(demoStepIndex + 1);
+  });
+
+  demoPlayBtn.addEventListener('click', () => {
+    toggleDemoPlayback();
+  });
+
+  renderDemoStep();
+}
+
 function render() {
+  if (appScreen !== 'board') return;
   renderTurnPanel();
   renderPlayerList();
   renderBoard();
   renderLog();
   renderRecentCard();
+  renderConnectionList();
+  syncAllPhones();
 }
 
-playerCountPicker.addEventListener('click', (event) => {
-  const button = event.target.closest('.count-btn');
+function handleBoardConnectionClick(event) {
+  const button = event.target.closest('button[data-action]');
   if (!button) return;
-  selectedPlayerCount = Number(button.dataset.count);
-  [...playerCountPicker.querySelectorAll('.count-btn')].forEach((entry) => {
-    entry.classList.toggle('active', entry === button);
-  });
-  renderPlayerInputs();
-});
 
-newGameBtn.addEventListener('click', startNewGame);
-
-handAreaEl.addEventListener('click', (event) => {
-  const cardButton = event.target.closest('.hand-card');
-  if (!cardButton) return;
-  selectCard(cardButton.dataset.cardId);
-});
-
-actionOptionsEl.addEventListener('click', (event) => {
-  const button = event.target.closest('.action-option-btn');
-  if (!button) return;
-  handleActionOption(button.dataset.optionId);
-});
-
-boardEl.addEventListener('click', (event) => {
-  const token = event.target.closest('.token');
-  if (!token) return;
-  handleTokenSelection(Number(token.dataset.playerIndex), token.dataset.pieceId);
-});
-
-cardOptionsEl.addEventListener('click', (event) => {
-  const button = event.target.closest('.option-btn');
-  if (!button) return;
-  resolveLiteratureAnswer(Number(button.dataset.optionIndex));
-});
-
-cardContinueBtn.addEventListener('click', closeLiteratureModal);
-modalEl.addEventListener('click', (event) => {
-  if (event.target instanceof HTMLElement && event.target.dataset.close === 'true') {
-    if (state.pendingLiterature && state.pendingLiterature.type === 'schicksal') {
-      closeLiteratureModal();
-    }
+  const playerIndex = Number(button.dataset.playerIndex);
+  if (button.dataset.action === 'create-invite') {
+    createPhoneInvite(playerIndex).catch((error) => {
+      updateConnectionStatus(playerIndex, 'closed');
+      addLog(`Handy-Verbindung für ${getConnectionDisplayName(playerIndex)} fehlgeschlagen: ${error.message}`);
+      render();
+    });
   }
-});
 
-renderPlayerInputs();
-startNewGame();
+  if (button.dataset.action === 'copy-link') {
+    const connection = hostConnections.get(playerIndex);
+    if (!connection?.inviteLink) return;
+    copyText(connection.inviteLink);
+  }
+
+  if (button.dataset.action === 'apply-answer') {
+    const input = connectionListEl.querySelector(`[data-role="answer-input"][data-player-index="${playerIndex}"]`);
+    if (!(input instanceof HTMLTextAreaElement) || !input.value.trim()) return;
+    applyPhoneAnswer(playerIndex, input.value).catch((error) => {
+      addLog(`Antwort-Code für ${getConnectionDisplayName(playerIndex)} konnte nicht übernommen werden: ${error.message}`);
+      render();
+    });
+  }
+}
+
+async function initPhoneClient() {
+  boardAppEl.classList.add('hidden');
+  phoneAppEl.classList.remove('hidden');
+
+  const playerIndex = Number(query.get('player'));
+  const offerCode = query.get('offer');
+  phoneClient.playerIndex = Number.isNaN(playerIndex) ? null : playerIndex;
+
+  if (phoneClient.playerIndex === null || !offerCode) {
+    phoneStatusTextEl.textContent = 'Diese Handy-Ansicht braucht einen vollständigen Einladungslink vom Brett.';
+    phoneConnectPanelEl.classList.add('hidden');
+    return;
+  }
+
+  const pc = new RTCPeerConnection(RTC_CONFIG);
+  phoneClient.pc = pc;
+
+  pc.addEventListener('datachannel', (event) => {
+    const channel = event.channel;
+    phoneClient.channel = channel;
+    channel.addEventListener('open', () => {
+      phoneConnectPanelEl.classList.add('hidden');
+      phoneGamePanelEl.classList.remove('hidden');
+      phoneStatusTextEl.textContent = 'Verbindung offen. Deine geheimen Karten werden jetzt live synchronisiert.';
+    });
+    channel.addEventListener('message', (messageEvent) => {
+      let payload;
+      try {
+        payload = JSON.parse(messageEvent.data);
+      } catch {
+        return;
+      }
+      if (payload.type === 'sync') {
+        phoneClient.view = payload.view;
+        renderPhoneView();
+      }
+    });
+  });
+
+  const offer = decodeSignalPayload(offerCode);
+  await pc.setRemoteDescription(offer);
+  const answer = await pc.createAnswer();
+  await pc.setLocalDescription(answer);
+  await waitForIceComplete(pc);
+
+  const localDescription = pc.localDescription?.toJSON?.() || pc.localDescription;
+  phoneClient.answerCode = encodeSignalPayload(localDescription);
+  phoneAnswerOutputEl.value = phoneClient.answerCode;
+  phoneStatusTextEl.textContent = 'Antwort-Code kopieren und am Brett einfügen. Danach öffnet sich die Live-Verbindung automatisch.';
+}
+
+function sendPhoneMessage(payload) {
+  if (!phoneClient.channel || phoneClient.channel.readyState !== 'open') return;
+  phoneClient.channel.send(JSON.stringify(payload));
+}
+
+function initBoardApp() {
+  boardAppEl.classList.remove('hidden');
+  phoneAppEl.classList.add('hidden');
+
+  playerCountPicker.addEventListener('click', (event) => {
+    const button = event.target.closest('.count-btn');
+    if (!button) return;
+    selectedPlayerCount = Number(button.dataset.count);
+    [...playerCountPicker.querySelectorAll('.count-btn')].forEach((entry) => {
+      entry.classList.toggle('active', entry === button);
+    });
+    renderPlayerInputs();
+    renderConnectionList();
+  });
+
+  phoneModeToggleEl.addEventListener('change', () => {
+    phoneModeEnabled = phoneModeToggleEl.checked;
+    state.phoneMode = phoneModeEnabled;
+    render();
+  });
+
+  connectionListEl.addEventListener('click', handleBoardConnectionClick);
+
+  newGameBtn.addEventListener('click', startNewGame);
+
+  handAreaEl.addEventListener('click', (event) => {
+    const cardButton = event.target.closest('.hand-card');
+    if (!cardButton) return;
+    selectCard(cardButton.dataset.cardId);
+  });
+
+  actionOptionsEl.addEventListener('click', (event) => {
+    const button = event.target.closest('.action-option-btn');
+    if (!button) return;
+    handleActionOption(button.dataset.optionId);
+  });
+
+  boardEl.addEventListener('click', (event) => {
+    const token = event.target.closest('.token');
+    if (!token) return;
+    handleTokenSelection(Number(token.dataset.playerIndex), token.dataset.pieceId);
+  });
+
+  cardOptionsEl.addEventListener('click', (event) => {
+    const button = event.target.closest('.option-btn');
+    if (!button) return;
+    resolveLiteratureAnswer(Number(button.dataset.optionIndex));
+  });
+
+  cardContinueBtn.addEventListener('click', closeLiteratureModal);
+  modalEl.addEventListener('click', (event) => {
+    if (event.target instanceof HTMLElement && event.target.dataset.close === 'true') {
+      if (state.pendingLiterature && state.pendingLiterature.type === 'schicksal') {
+        closeLiteratureModal();
+      }
+    }
+  });
+
+  renderPlayerInputs();
+  renderConnectionList();
+  initDemo();
+  startNewGame();
+}
+
+function initPhoneApp() {
+  phoneAppEl.classList.remove('hidden');
+  boardAppEl.classList.add('hidden');
+
+  copyPhoneAnswerBtn.addEventListener('click', () => {
+    if (phoneClient.answerCode) {
+      copyText(phoneClient.answerCode);
+    }
+  });
+
+  phoneHandAreaEl.addEventListener('click', (event) => {
+    const button = event.target.closest('.phone-action-card');
+    if (!button) return;
+    phoneClient.pendingInfluenceCardId = null;
+    renderPhoneView();
+    sendPhoneMessage({ type: 'select-card', cardId: button.dataset.cardId });
+  });
+
+  phoneInfluenceAreaEl.addEventListener('click', (event) => {
+    const button = event.target.closest('.phone-influence-card');
+    if (!button || button.disabled) return;
+    if (button.dataset.target === 'self') {
+      phoneClient.pendingInfluenceCardId = null;
+      renderPhoneView();
+      sendPhoneMessage({ type: 'play-influence', cardId: button.dataset.cardId });
+      return;
+    }
+    phoneClient.pendingInfluenceCardId = button.dataset.cardId;
+    renderPhoneView();
+  });
+
+  phoneActionOptionsEl.addEventListener('click', (event) => {
+    const optionButton = event.target.closest('.action-option-btn');
+    if (optionButton) {
+      sendPhoneMessage({ type: 'select-option', optionId: optionButton.dataset.optionId });
+      return;
+    }
+
+    const targetButton = event.target.closest('.phone-choice-chip');
+    if (targetButton && phoneClient.pendingInfluenceCardId) {
+      sendPhoneMessage({
+        type: 'play-influence',
+        cardId: phoneClient.pendingInfluenceCardId,
+        targetPlayerIndex: Number(targetButton.dataset.targetPlayerIndex)
+      });
+      phoneClient.pendingInfluenceCardId = null;
+      renderPhoneView();
+    }
+  });
+
+  initPhoneClient().catch((error) => {
+    phoneStatusTextEl.textContent = `Handy-Verbindung fehlgeschlagen: ${error.message}`;
+  });
+}
+
+if (appScreen === 'phone') {
+  initPhoneApp();
+} else {
+  initBoardApp();
+}
