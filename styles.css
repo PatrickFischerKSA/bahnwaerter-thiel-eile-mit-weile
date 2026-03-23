@@ -367,7 +367,15 @@ li {
 
 .board-stage {
   display: grid;
-  gap: 18px;
+  grid-template-columns: minmax(320px, 430px) minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.board-panel {
+  position: sticky;
+  top: 86px;
+  align-self: start;
 }
 
 .demo {
@@ -895,39 +903,41 @@ li {
 }
 
 .board-head {
-  align-items: center;
+  display: grid;
+  gap: 12px;
 }
 
 .host-status-strip {
   display: grid;
-  grid-template-columns: minmax(220px, 1.4fr) repeat(3, minmax(120px, 0.6fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
-  margin-bottom: 18px;
+  margin-bottom: 6px;
 }
 
 .host-status-card {
-  padding: 14px 16px;
+  padding: 12px 14px;
   border-radius: 22px;
   border: 1px solid var(--line);
   background: rgba(255, 255, 255, 0.86);
   display: grid;
-  gap: 8px;
+  gap: 6px;
   align-content: center;
 }
 
 .host-status-card strong {
-  font-size: clamp(1.4rem, 2vw, 2rem);
+  font-size: clamp(1.15rem, 1.6vw, 1.8rem);
   line-height: 1;
 }
 
 .host-status-card.emphasis {
   background: linear-gradient(135deg, rgba(41, 57, 46, 0.08), rgba(255, 255, 255, 0.92));
+  grid-column: 1 / -1;
 }
 
 .legend {
   display: flex;
   flex-wrap: wrap;
-  justify-content: flex-end;
+  justify-content: flex-start;
   gap: 10px;
 }
 
@@ -968,12 +978,12 @@ li {
 
 .board {
   display: grid;
-  grid-template-columns: repeat(13, minmax(26px, 1fr));
-  grid-template-rows: repeat(13, minmax(26px, 1fr));
-  gap: clamp(4px, 0.52vw, 6px);
-  width: min(100%, calc(100svh - 280px), 860px);
+  grid-template-columns: repeat(13, minmax(18px, 1fr));
+  grid-template-rows: repeat(13, minmax(18px, 1fr));
+  gap: clamp(3px, 0.35vw, 5px);
+  width: min(100%, calc(100svh - 240px), 680px);
   aspect-ratio: 1;
-  padding: clamp(10px, 1.4vw, 18px);
+  padding: clamp(8px, 1vw, 14px);
   margin: 0 auto;
   border-radius: 28px;
   background:
@@ -989,7 +999,7 @@ li {
 
 .cell {
   position: relative;
-  border-radius: 16px;
+  border-radius: 13px;
   min-width: 0;
   min-height: 0;
   overflow: hidden;
@@ -1015,8 +1025,8 @@ li {
 .cell.track::after {
   content: "";
   position: absolute;
-  inset: auto 6px 6px;
-  height: 7px;
+  inset: auto 4px 4px;
+  height: 5px;
   border-radius: 999px;
   background:
     linear-gradient(90deg, rgba(53, 40, 28, 0.1), rgba(53, 40, 28, 0.22), rgba(53, 40, 28, 0.1));
@@ -1025,8 +1035,8 @@ li {
 .cell.track::before {
   content: "";
   position: absolute;
-  inset: 5px;
-  border-radius: 12px;
+  inset: 4px;
+  border-radius: 10px;
   border: 1px solid rgba(83, 65, 47, 0.08);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.22), transparent 42%),
@@ -1117,7 +1127,7 @@ li {
   display: grid;
   place-items: center;
   text-align: center;
-  padding: 10px;
+  padding: 6px;
   background:
     radial-gradient(circle at center, rgba(255, 255, 255, 0.98), rgba(236, 220, 179, 0.96));
   box-shadow:
@@ -1132,21 +1142,21 @@ li {
 }
 
 .center-sub {
-  margin-top: 6px;
+  margin-top: 4px;
   color: var(--muted);
-  font-size: 0.8rem;
+  font-size: 0.68rem;
 }
 
 .cell-badge {
   position: absolute;
-  top: 6px;
-  left: 6px;
-  min-width: 20px;
-  height: 20px;
+  top: 4px;
+  left: 4px;
+  min-width: 16px;
+  height: 16px;
   border-radius: 999px;
   display: grid;
   place-items: center;
-  font-size: 0.68rem;
+  font-size: 0.54rem;
   font-weight: 900;
   background: rgba(31, 27, 22, 0.88);
   color: #fffdf8;
@@ -1158,21 +1168,21 @@ li {
   inset: 0;
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: 2px;
   align-content: center;
   justify-content: center;
-  padding: 6px;
+  padding: 4px;
 }
 
 .token {
-  width: clamp(20px, 2.1vw, 28px);
-  height: clamp(20px, 2.1vw, 28px);
+  width: clamp(16px, 1.45vw, 22px);
+  height: clamp(16px, 1.45vw, 22px);
   border: 0;
   border-radius: 50%;
   cursor: pointer;
   display: grid;
   place-items: center;
-  font-size: clamp(0.62rem, 0.72vw, 0.76rem);
+  font-size: clamp(0.48rem, 0.55vw, 0.64rem);
   font-weight: 900;
   color: #fffdf8;
   box-shadow: 0 6px 12px rgba(20, 14, 11, 0.18);
@@ -1263,18 +1273,21 @@ li {
 .host-console {
   display: grid;
   gap: 16px;
+  position: sticky;
+  top: 86px;
+  align-self: start;
 }
 
 .host-panel-tabs {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 8px;
 }
 
 .host-panel-tab {
   border: 1px solid var(--line);
   border-radius: 999px;
-  padding: 11px 14px;
+  padding: 9px 12px;
   background: rgba(255, 255, 255, 0.84);
   color: var(--ink);
   font-weight: 800;
@@ -1289,18 +1302,18 @@ li {
 
 .host-panel-pane {
   display: grid;
-  gap: 14px;
+  gap: 12px;
 }
 
 .host-turn-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
-  gap: 16px;
+  grid-template-columns: 1fr;
+  gap: 12px;
 }
 
 .host-turn-grid .action-panel {
-  padding: 16px;
-  border-radius: 22px;
+  padding: 14px;
+  border-radius: 18px;
   background: rgba(255, 255, 255, 0.82);
   border: 1px solid var(--line);
 }
@@ -1334,21 +1347,21 @@ li {
 }
 
 .hand-card {
-  min-width: 92px;
-  padding: 12px 14px;
+  min-width: 80px;
+  padding: 10px 12px;
   text-align: left;
 }
 
 .hand-card strong {
   display: block;
-  font-size: 1.2rem;
+  font-size: 1rem;
   line-height: 1.1;
 }
 
 .hand-card span {
   display: block;
   margin-top: 4px;
-  font-size: 0.82rem;
+  font-size: 0.76rem;
   color: var(--muted);
 }
 
@@ -1685,6 +1698,7 @@ li {
 @media (max-width: 1180px) {
   .hero,
   .game-stage,
+  .board-stage,
   .host-turn-grid,
   .host-status-strip {
     grid-template-columns: 1fr;
@@ -1708,6 +1722,11 @@ li {
   .legend {
     justify-content: flex-start;
   }
+
+  .host-console,
+  .board-panel {
+    position: static;
+  }
 }
 
 @media (max-width: 820px) {
@@ -1730,14 +1749,14 @@ li {
 
   .board {
     gap: 4px;
-    padding: 10px;
-    width: min(100%, calc(100svh - 240px));
+    padding: 8px;
+    width: min(100%, 560px);
   }
 
   .token {
-    width: 24px;
-    height: 24px;
-    font-size: 0.68rem;
+    width: 18px;
+    height: 18px;
+    font-size: 0.52rem;
   }
 
   .rule-strip span,

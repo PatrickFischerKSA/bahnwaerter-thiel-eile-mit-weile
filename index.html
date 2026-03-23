@@ -164,7 +164,7 @@
 
         <div class="setup-note-card">
           <strong>Host-Hinweis</strong>
-          <p>Nach dem Start findest du Verbindungen, Spielstand, letzte Karte und Protokoll gesammelt in der Host-Konsole direkt unter dem Spielfeld.</p>
+          <p>Nach dem Start findest du Verbindungen, Spielstand, letzte Karte und Protokoll gesammelt in der Host-Konsole links neben dem Spielfeld.</p>
         </div>
 
         <div class="rule-strip">
@@ -177,21 +177,10 @@
 
       <section id="gameSection" class="game-stage app-section" data-section="spiel">
         <section class="board-stage">
-          <section class="board-panel panel">
-            <div class="panel-head board-head">
-              <div>
-                <h2>Spielbrett</h2>
-                <p>
-                  Startfelder, Kartenlogik und literarische Ereignisfelder greifen ineinander,
-                  das Zentrum markiert die Zielstation.
-                </p>
-              </div>
-              <div class="legend">
-                <span class="legend-item"><i class="legend-dot text"></i> Text</span>
-                <span class="legend-item"><i class="legend-dot deutung"></i> Deutung</span>
-                <span class="legend-item"><i class="legend-dot schicksal"></i> Schicksal</span>
-                <span class="legend-item"><i class="legend-dot start"></i> Startfeld</span>
-              </div>
+          <section class="host-console panel">
+            <div class="panel-head compact">
+              <h2>Host-Konsole</h2>
+              <p>Links liegen die wichtigsten Host-Infos. Das Spielfeld bleibt rechts kleiner und dadurch komplett besser überblickbar.</p>
             </div>
 
             <div class="host-status-strip">
@@ -211,15 +200,6 @@
                 <span class="mini-label">Handys</span>
                 <strong id="connectionCount">0 / 0</strong>
               </div>
-            </div>
-
-            <div id="board" class="board" aria-label="Spielbrett"></div>
-          </section>
-
-          <section class="host-console panel">
-            <div class="panel-head compact">
-              <h2>Host-Konsole</h2>
-              <p>Die grosse Übersicht bleibt beim Brett. Details öffnest du hier nur bei Bedarf, vieles liegt im Handy-Modus direkt auf den privaten Geräten.</p>
             </div>
 
             <div id="hostPanelTabs" class="host-panel-tabs" aria-label="Host-Konsole">
@@ -289,6 +269,25 @@
                 <div id="connectionList" class="connection-list"></div>
               </section>
             </section>
+          </section>
+
+          <section class="board-panel panel">
+            <div class="panel-head board-head">
+              <div>
+                <h2>Spielbrett</h2>
+                <p>
+                  Kompakter Host-Blick auf Strecke, Startfelder und Zielstation.
+                </p>
+              </div>
+              <div class="legend">
+                <span class="legend-item"><i class="legend-dot text"></i> Text</span>
+                <span class="legend-item"><i class="legend-dot deutung"></i> Deutung</span>
+                <span class="legend-item"><i class="legend-dot schicksal"></i> Schicksal</span>
+                <span class="legend-item"><i class="legend-dot start"></i> Startfeld</span>
+              </div>
+            </div>
+
+            <div id="board" class="board" aria-label="Spielbrett"></div>
           </section>
         </section>
       </section>
