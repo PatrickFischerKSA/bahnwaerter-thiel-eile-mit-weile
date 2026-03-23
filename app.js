@@ -146,12 +146,12 @@ const LITERATURE_CARDS = {
   text: [
     {
       title: 'Warum die zweite Ehe?',
-      prompt: 'Warum heiratet Thiel nach Minnas Tod relativ schnell erneut?',
+      prompt: 'Welches Motiv nennt der Text als entscheidenden Grund dafür, dass Thiel nach Minnas Tod wieder heiratet?',
       options: [
-        'Weil Tobias eine verlässliche Betreuung braucht.',
-        'Weil der Pastor ihn dazu zwingt.',
-        'Weil Minna ihn darum gebeten hat.',
-        'Weil er in der Kirche verspottet wird.'
+        'Die Versorgung des schwächlichen Tobias verlangt nach einer neuen Haushalts- und Pflegeordnung.',
+        'Der Bahndienst verbietet einem alleinstehenden Wärter ausdrücklich das Weiterarbeiten.',
+        'Thiel will sich von Minnas Erinnerung möglichst rasch lösen.',
+        'Lene bringt eine nennenswerte Mitgift in die Ehe ein.'
       ],
       correct: 0,
       explanation: 'Thiel begründet die zweite Heirat ausdrücklich mit Tobias, der ohne verlässliche Pflege nicht gut versorgt ist.',
@@ -159,38 +159,38 @@ const LITERATURE_CARDS = {
     },
     {
       title: 'Minnas Tod',
-      prompt: 'Wie stirbt Minna im Text?',
+      prompt: 'Welcher Zusammenhang aus Geburt, Verlust und Folgeschwäche ist für Minnas Tod und Tobias’ Zustand im Text zentral?',
       options: [
-        'Bei einem Brand im Wärterhaus.',
-        'An einer Krankheit im Winter.',
-        'Im Wochenbett nach Tobias’ Geburt.',
-        'Bei einem Unfall am Bahnübergang.'
+        'Minna stirbt im Wochenbett; Tobias überlebt, bleibt aber schwächlich und pflegebedürftig.',
+        'Minna verunglückt am Übergang; Tobias wird daraufhin zu einem stillen Einzelkind.',
+        'Minna erliegt einer Lungenkrankheit; Tobias wird danach von Lene gesund gepflegt.',
+        'Minna stirbt auf dem Feld; Tobias ist bei ihrer Schwester in Sicherheit.'
       ],
-      correct: 2,
+      correct: 0,
       explanation: 'Minna stirbt im Wochenbett; Tobias überlebt, bleibt aber schwach und pflegebedürftig.',
       reward: { kind: 'insight', amount: 1, text: 'Du gewinnst 1 Erkenntnispunkt.' }
     },
     {
       title: 'Die Bude als Kapelle',
-      prompt: 'Was macht Thiel nachts aus seinem Wärterhäuschen?',
+      prompt: 'Welche Gegenstände und welche Funktion machen aus Thiels Wärterhäuschen einen fast sakralen Erinnerungsraum?',
       options: [
-        'Einen Treffpunkt für Arbeiter.',
-        'Eine Kapelle der Erinnerung an Minna.',
-        'Eine Schlafstätte für Tobias.',
-        'Ein Lager für Kartoffeln und Werkzeuge.'
+        'Foto, Bibel und Gesangbuch verdichten die Bude zu einer privaten Gedächtniskapelle für Minna.',
+        'Werkzeuge, Laterne und Uniform verwandeln die Bude in ein reines Dienstarchiv.',
+        'Kinderbett, Wäsche und Milchgeschirr machen die Bude zum Ausweichraum für Tobias.',
+        'Karten, Pfeife und Branntwein öffnen die Bude für gesellige Bahnwärterabende.'
       ],
-      correct: 1,
+      correct: 0,
       explanation: 'Mit Foto, Bibel und Gesangbuch verwandelt Thiel die Bude in einen sakral aufgeladenen Erinnerungsraum.',
       reward: { kind: 'shield', amount: 1, text: 'Du erhältst 1 Schutzmarke.' }
     },
     {
       title: 'Der abgelegene Posten',
-      prompt: 'Was prägt Thiels Dienstort besonders stark?',
+      prompt: 'Welche Raumwirkung des Dienstorts ist für die psychische Anlage der Novelle besonders wichtig?',
       options: [
-        'Lärm der Grossstadt und dauernde Menschenmengen.',
-        'Die Nähe zu einem Hafen.',
-        'Die Abgeschiedenheit im märkischen Kiefernforst.',
-        'Ein Militärlager neben dem Übergang.'
+        'Lärm der Grossstadt und dauernde Menschenmengen zerstreuen Thiel permanent.',
+        'Die Nähe zu einem Hafen macht den Bahndienst nebensächlich.',
+        'Die isolierte Lage im märkischen Kiefernforst steigert Einsamkeit, Ritualisierung und innere Spannung.',
+        'Ein militärisch geordneter Kasernenraum verhindert jede seelische Entgrenzung.'
       ],
       correct: 2,
       explanation: 'Der Text betont die Isolation des Postens im märkischen Kiefernforst als psychisch verstärkenden Raum.',
@@ -198,12 +198,12 @@ const LITERATURE_CARDS = {
     },
     {
       title: 'Lene und Tobias',
-      prompt: 'Wie behandelt Lene Tobias überwiegend?',
+      prompt: 'Welche Charakterisierung von Lenes Umgang mit Tobias trifft den Text am genauesten?',
       options: [
-        'Mit fürsorglicher Geduld.',
-        'Mit Gleichgültigkeit und später offener Härte.',
-        'Als gleichberechtigtes Lieblingskind.',
-        'Sie schickt ihn in die Schule und schützt ihn.'
+        'Mit fürsorglicher Geduld und stiller Zärtlichkeit.',
+        'Sie behandelt ihn als Last, setzt ihn grob ein und zeigt wiederholt offene Härte statt Fürsorge.',
+        'Als gleichberechtigtes Lieblingskind neben dem eigenen Kind.',
+        'Sie schützt ihn vor Feldarbeit und entlastet Thiel im Geheimen.'
       ],
       correct: 1,
       explanation: 'Lene wendet sich von Tobias ab, nutzt ihn aus und setzt ihn Gewalt und Überforderung aus.',
@@ -211,12 +211,12 @@ const LITERATURE_CARDS = {
     },
     {
       title: 'Die Katastrophe',
-      prompt: 'Welche Situation führt unmittelbar zu Tobias’ Tod?',
+      prompt: 'Welche konkrete Alltagsszene an Arbeit und Bahndamm führt im Text unmittelbar zur Katastrophe?',
       options: [
-        'Thiel vergisst die Barriere zu schliessen.',
-        'Lene nimmt Tobias zum Kartoffelsetzen mit an die Gleise.',
-        'Tobias läuft nachts allein in den Wald.',
-        'Ein Blitz schlägt in das Wärterhaus ein.'
+        'Thiel vergisst die Barriere zu schliessen und bleibt in der Bude sitzen.',
+        'Lene nimmt Tobias zum Kartoffelsetzen mit an die Gleise und lässt ihn dort in gefährlicher Nähe zur Bahn.',
+        'Tobias flieht nach einem Kirchgang allein über den Bahndamm.',
+        'Ein defektes Signal lockt Tobias nachts aus dem Bett auf die Strecke.'
       ],
       correct: 1,
       explanation: 'Lene besteht darauf, dass Tobias beim Feldstück an der Bahn bleibt; kurz darauf wird er vom Zug erfasst.',
@@ -226,12 +226,12 @@ const LITERATURE_CARDS = {
   deutung: [
     {
       title: 'Innerer Riss',
-      prompt: 'Welcher Gegensatz bestimmt Thiels Innenleben besonders stark?',
+      prompt: 'Welche innere Spaltung trägt Thiels Figur am präzisesten?',
       options: [
-        'Pflicht und Besitzgier.',
-        'Erinnerung an Minna und Abhängigkeit von Lene.',
-        'Stadtleben und Landlust.',
-        'Humor und Leichtsinn.'
+        'Pflichtethos und Besitzgier strukturieren ausschliesslich sein Innenleben.',
+        'Die vergeistigte Bindung an Minna kollidiert mit seiner triebhaft-schuldhaften Bindung an Lene.',
+        'Stadtleben und Landlust stehen als Lebensmodelle unvereinbar gegeneinander.',
+        'Humor und Leichtsinn verdecken nur oberflächlich seinen Ernst.'
       ],
       correct: 1,
       explanation: 'Thiel schwankt zwischen vergeistigter Bindung an Minna und roher, schuldbehafteter Abhängigkeit von Lene.',
@@ -239,25 +239,25 @@ const LITERATURE_CARDS = {
     },
     {
       title: 'Naturalistische Studie',
-      prompt: 'Warum passt die Bezeichnung „novellistische Studie“ gut zum Text?',
+      prompt: 'Warum trifft die Formel „novellistische Studie“ den Text genauer als die Vorstellung einer blossen Schauererzählung?',
       options: [
-        'Weil der Erzähler vor allem Märchenfiguren erfindet.',
-        'Weil Milieu, Körperlichkeit und psychische Prozesse genau beobachtet werden.',
-        'Weil fast nur Dialoge vorkommen.',
-        'Weil der Text ohne Konflikte auskommt.'
+        'Weil der Text Milieu, Arbeitswelt, Körperlichkeit und psychische Zerrüttung nahezu protokollartig beobachtet.',
+        'Weil die Novelle fast ausschliesslich aus volkstümlichen Wundergeschichten besteht.',
+        'Weil nur die Pointe am Ende zählt, nicht aber soziale oder psychische Voraussetzungen.',
+        'Weil der Erzähler jede Figur idealisierend und ohne Härte darstellt.'
       ],
-      correct: 1,
+      correct: 0,
       explanation: 'Der Text wirkt stellenweise wie eine genaue Fall- und Milieustudie: Arbeit, Raum, Körper und Psyche greifen eng ineinander.',
       reward: { kind: 'shield', amount: 1, text: 'Du erhältst 1 Schutzmarke.' }
     },
     {
       title: 'Bahn und Wald',
-      prompt: 'Welche Deutung trifft das Motivfeld aus Bahn und Natur am besten?',
+      prompt: 'Welche Deutung des Zusammenspiels von Bahn und Kiefernforst erfasst die Spannung des Textes am genauesten?',
       options: [
-        'Die Natur bleibt völlig harmlos, nur Technik ist bedrohlich.',
+        'Die Natur wirkt rein idyllisch, während nur die Technik Gefahr erzeugt.',
         'Bahn und Wald bilden ein Spannungsfeld aus Ordnung, Isolation und Gefahr.',
-        'Der Wald steht nur für Ferien und Erholung.',
-        'Die Bahn ist ausschliesslich Symbol für Fortschritt.'
+        'Der Forst dient vor allem als romantischer Gegenraum ohne soziale Funktion.',
+        'Die Bahn erscheint ausschliesslich als positives Fortschrittssymbol.'
       ],
       correct: 1,
       explanation: 'Der Forst isoliert, die Bahn beschleunigt und bedroht; zusammen verdichten sie Thiels Situation.',
@@ -265,12 +265,12 @@ const LITERATURE_CARDS = {
     },
     {
       title: 'Vision und Wahn',
-      prompt: 'Welche Funktion haben Thiels religiöse Rituale und Visionen?',
+      prompt: 'Wie wirken Thiels religiöse Rituale und Visionen im Verlauf der Novelle zusammen?',
       options: [
-        'Sie zeigen nur komische Seiten an ihm.',
-        'Sie halten die Handlung an, ohne Bedeutung.',
-        'Sie kompensieren Schuld und führen zugleich tiefer in die Zerrüttung.',
-        'Sie beweisen, dass Thiel übernatürliche Kräfte besitzt.'
+        'Sie dienen bloss der Staffage und bleiben psychologisch folgenlos.',
+        'Sie stabilisieren Thiel vollständig und verhindern den Zusammenbruch.',
+        'Sie kompensieren Schuld, sakralisieren Minnas Erinnerung und vertiefen zugleich die innere Spaltung.',
+        'Sie beweisen, dass der Text eine übernatürliche Geistergeschichte erzählt.'
       ],
       correct: 2,
       explanation: 'Die Rituale geben Thiel Halt, steigern aber zugleich seine Abspaltung und den späteren Wahn.',
@@ -278,12 +278,12 @@ const LITERATURE_CARDS = {
     },
     {
       title: 'Tobias als Zentrum',
-      prompt: 'Warum ist Tobias für die Gesamtdeutung so wichtig?',
+      prompt: 'Warum ist Tobias mehr als nur ein Opfer der Handlung, nämlich ein Zentrum der Gesamtdeutung?',
       options: [
-        'Er zeigt den wirtschaftlichen Aufstieg der Familie.',
+        'Er markiert vor allem die gelungene Integration der Patchwork-Familie.',
         'An ihm bündeln sich Fürsorge, Gewalt, Schuld und moralisches Versagen.',
-        'Er erzählt den Text aus seiner Sicht.',
-        'Er rettet Lene am Ende.'
+        'Er fungiert als souveräner Ich-Erzähler des Schlusses.',
+        'Er löst den Konflikt zwischen Minna und Lene am Ende symbolisch auf.'
       ],
       correct: 1,
       explanation: 'Tobias macht die Brutalität im Familiengefüge sichtbar und wird zum Auslöser von Schuld, Wahn und Gewalt.',
@@ -291,12 +291,12 @@ const LITERATURE_CARDS = {
     },
     {
       title: 'Ende der Kontrolle',
-      prompt: 'Was zeigt das Ende besonders deutlich?',
+      prompt: 'Welche Aussage über Milieu, Psyche und Handlung kulminiert im Ende der Novelle?',
       options: [
-        'Dass Thiel am Schluss alles nüchtern erklärt.',
+        'Dass sich Thiels Krise durch vernünftige Selbstauskunft vollständig auflöst.',
         'Dass soziale und psychische Spannungen in totale Entgrenzung umschlagen.',
-        'Dass die Dorfgemeinschaft harmonisch vermittelt.',
-        'Dass Lene die eigentliche Erzählerin war.'
+        'Dass die Dorfgemeinschaft als moralische Instanz rettend eingreift.',
+        'Dass der Erzähler das Geschehen im Nachhinein als Missverständnis relativiert.'
       ],
       correct: 1,
       explanation: 'Nach Tobias’ Tod kippt Thiels mühsame Selbstkontrolle in Raserei, Mord und endgültigen Wahnsinn.',
