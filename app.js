@@ -126,20 +126,20 @@ const PLAYER_PRESETS = [
 ];
 
 const ACTION_LIBRARY = [
-  { key: '1-11', label: '1 / 11', kind: 'choice', summary: 'Start, 1 oder 11', copies: 8 },
-  { key: '13', label: '13', kind: 'choice', summary: 'Start oder 13', copies: 8 },
-  { key: '4pm', label: '4 ±', kind: 'choice', summary: '4 vor oder zurück', copies: 8 },
-  { key: '7', label: '7', kind: 'split', summary: '7 aufteilen', copies: 8 },
-  { key: 'swap', label: 'Tausch', kind: 'swap', summary: 'Figuren tauschen', copies: 8 },
-  { key: '2', label: '2', kind: 'move', steps: 2, summary: '2 vor', copies: 8 },
-  { key: '3', label: '3', kind: 'move', steps: 3, summary: '3 vor', copies: 8 },
-  { key: '5', label: '5', kind: 'move', steps: 5, summary: '5 vor', copies: 8 },
-  { key: '6', label: '6', kind: 'move', steps: 6, summary: '6 vor', copies: 8 },
-  { key: '8', label: '8', kind: 'move', steps: 8, summary: '8 vor', copies: 8 },
-  { key: '9', label: '9', kind: 'move', steps: 9, summary: '9 vor', copies: 8 },
-  { key: '10', label: '10', kind: 'move', steps: 10, summary: '10 vor', copies: 8 },
-  { key: '12', label: '12', kind: 'move', steps: 12, summary: '12 vor', copies: 8 },
-  { key: 'joker', label: '?', kind: 'joker', summary: 'beliebige Karte', copies: 6 }
+  { key: '1-11', label: '1 / 11', kind: 'choice', summary: 'Start, 1 oder 11', copies: 32 },
+  { key: '13', label: '13', kind: 'choice', summary: 'Start oder 13', copies: 32 },
+  { key: '4pm', label: '4 ±', kind: 'choice', summary: '4 vor oder zurück', copies: 32 },
+  { key: '7', label: '7', kind: 'split', summary: '7 aufteilen', copies: 32 },
+  { key: 'swap', label: 'Tausch', kind: 'swap', summary: 'Figuren tauschen', copies: 32 },
+  { key: '2', label: '2', kind: 'move', steps: 2, summary: '2 vor', copies: 32 },
+  { key: '3', label: '3', kind: 'move', steps: 3, summary: '3 vor', copies: 32 },
+  { key: '5', label: '5', kind: 'move', steps: 5, summary: '5 vor', copies: 32 },
+  { key: '6', label: '6', kind: 'move', steps: 6, summary: '6 vor', copies: 32 },
+  { key: '8', label: '8', kind: 'move', steps: 8, summary: '8 vor', copies: 32 },
+  { key: '9', label: '9', kind: 'move', steps: 9, summary: '9 vor', copies: 32 },
+  { key: '10', label: '10', kind: 'move', steps: 10, summary: '10 vor', copies: 32 },
+  { key: '12', label: '12', kind: 'move', steps: 12, summary: '12 vor', copies: 32 },
+  { key: 'joker', label: '?', kind: 'joker', summary: 'beliebige Karte', copies: 24 }
 ];
 
 const LITERATURE_CARDS = {
@@ -221,6 +221,240 @@ const LITERATURE_CARDS = {
       correct: 1,
       explanation: 'Lene besteht darauf, dass Tobias beim Feldstück an der Bahn bleibt; kurz darauf wird er vom Zug erfasst.',
       reward: { kind: 'advance', amount: 1, text: 'Deine Figur rückt 1 Feld vor.' }
+    },
+    {
+      title: 'Der Dienstcharakter',
+      prompt: 'Welche Beschreibung passt am besten zu Thiels Auftreten im Beruf, bevor seine Krise offen ausbricht?',
+      options: [
+        'Als unzuverlässiger Träumer, der Vorschriften nur locker nimmt.',
+        'Als exakt, schweigsam und pflichtstrikt, fast pedantisch verlässlich.',
+        'Als geselliger Wirtshausredner mit Hang zu Improvisation.',
+        'Als ehrgeiziger Aufsteiger, der sich offen mit Vorgesetzten anlegt.'
+      ],
+      correct: 1,
+      explanation: 'Thiel erscheint im Dienst lange als ausgesprochen exakt, ruhig und zuverlässig.',
+      reward: { kind: 'shield', amount: 1, text: 'Du erhältst 1 Schutzmarke.' }
+    },
+    {
+      title: 'Sonntagsordnung',
+      prompt: 'Welche Funktion haben Thiels regelmässige Sonntagsgänge nach Neu-Zittau im Gefüge der Novelle?',
+      options: [
+        'Sie markieren eine gesellige Flucht ins Wirtshausleben.',
+        'Sie verbinden religiöse Pflicht mit Erinnerungspflege und innerer Selbstdisziplin.',
+        'Sie dienen ausschliesslich dem Einkauf für Lenes Haushalt.',
+        'Sie belegen, dass Thiel seinen Dienst vernachlässigt.'
+      ],
+      correct: 1,
+      explanation: 'Die Gänge strukturieren Thiels Leben rituell und halten die Bindung an Minna wach.',
+      reward: { kind: 'insight', amount: 1, text: 'Du gewinnst 1 Erkenntnispunkt.' }
+    },
+    {
+      title: 'Minnas Fortleben',
+      prompt: 'In welcher Form bleibt Minna nach ihrem Tod im Text für Thiel besonders wirksam?',
+      options: [
+        'Als juristische Erbin, die den Haushalt finanziell bestimmt.',
+        'Als vergeistigte Erinnerungs- und Gewissensfigur, die in Visionen zurückkehrt.',
+        'Als ständig zitierte Dorftratschtante der Nachbarschaft.',
+        'Als reale Stimme, die nur Tobias im Traum hört.'
+      ],
+      correct: 1,
+      explanation: 'Minna bleibt als idealisierte innere Instanz gegenwärtig und kehrt in Visionen wieder.',
+      reward: { kind: 'shield', amount: 1, text: 'Du erhältst 1 Schutzmarke.' }
+    },
+    {
+      title: 'Lenes Erscheinung',
+      prompt: 'Welche Wirkung der Figur Lene stellt der Text besonders stark heraus?',
+      options: [
+        'Ihre feingliedrige, kränkliche Vergeistigung.',
+        'Ihre robuste, sinnliche und handfeste Körperlichkeit.',
+        'Ihre akademische Bildung und rhetorische Kultiviertheit.',
+        'Ihre weltabgewandte asketische Strenge.'
+      ],
+      correct: 1,
+      explanation: 'Lene wird als kraftvoll, derb und körpernah gezeichnet, bewusst im Kontrast zu Minna.',
+      reward: { kind: 'insight', amount: 1, text: 'Du gewinnst 1 Erkenntnispunkt.' }
+    },
+    {
+      title: 'Das zweite Kind',
+      prompt: 'Wie verändert die Geburt von Lenes Kind die Stellung von Tobias im Familiengefüge?',
+      options: [
+        'Tobias wird zum Mittelpunkt der Mutterliebe.',
+        'Seine Randstellung verschärft sich, weil Lene das eigene Kind bevorzugt.',
+        'Er wird zu Lenes offizieller Hilfe im Haus ernannt.',
+        'Thiel gibt Tobias daraufhin dauerhaft in fremde Pflege.'
+      ],
+      correct: 1,
+      explanation: 'Mit dem eigenen Kind nimmt Lenes Vernachlässigung und Härte gegenüber Tobias weiter zu.',
+      reward: { kind: 'shield', amount: 1, text: 'Du erhältst 1 Schutzmarke.' }
+    },
+    {
+      title: 'Acker an den Gleisen',
+      prompt: 'Warum ist die Feldarbeit direkt an der Bahnstrecke für die Handlung so folgenreich?',
+      options: [
+        'Weil dort Arbeit, Familienkonflikt und technische Gefahr unheilvoll zusammenfallen.',
+        'Weil die Dorfgemeinschaft dort ihre Feste veranstaltet.',
+        'Weil Thiel dort heimlich einen zweiten Posten übernimmt.',
+        'Weil Minna dort ein verborgenes Testament hinterlässt.'
+      ],
+      correct: 0,
+      explanation: 'Am Bahndamm verdichten sich Alltagsarbeit, Vernachlässigung und tödliche Gefahr in einem Raum.',
+      reward: { kind: 'advance', amount: 1, text: 'Deine Figur rückt 1 Feld vor.' }
+    },
+    {
+      title: 'Erzählbeginn',
+      prompt: 'Welche Erzählhaltung prägt die Darstellung Thiels zu Beginn am stärksten?',
+      options: [
+        'Ein nüchtern beobachtender, fast protokollierender Zugriff.',
+        'Eine rein subjektive Ich-Beichte Thiels.',
+        'Eine komische Dorfposse aus Lenes Perspektive.',
+        'Ein pathetischer Heldenepos-Ton.'
+      ],
+      correct: 0,
+      explanation: 'Der Anfang wirkt distanziert und registrierend, fast wie eine Fallbeschreibung.',
+      reward: { kind: 'insight', amount: 1, text: 'Du gewinnst 1 Erkenntnispunkt.' }
+    },
+    {
+      title: 'Körper und Sprache',
+      prompt: 'Welche Ebene dominiert besonders in der Beschreibung Lenes?',
+      options: [
+        'Abstrakte Begriffe religiöser Innerlichkeit.',
+        'Körperliche Präsenz, Arbeit, Materialität und derbe Direktheit.',
+        'Juristische Fachsprache des Bahndienstes.',
+        'Romantische Naturmetaphorik ohne soziale Schärfe.'
+      ],
+      correct: 1,
+      explanation: 'Lenes Darstellung ist stark über Körper, Arbeit und handfeste Materialität geführt.',
+      reward: { kind: 'shield', amount: 1, text: 'Du erhältst 1 Schutzmarke.' }
+    },
+    {
+      title: 'Tobias als Prüfstein',
+      prompt: 'Welche Funktion erfüllt Tobias’ Schwächlichkeit bereits vor der Katastrophe?',
+      options: [
+        'Sie macht ihn zum unauffälligen Hintergrund ohne Deutungswert.',
+        'Sie zwingt zur Pflege und legt dadurch Lenes Härte sowie Thiels Versäumnisse offen.',
+        'Sie erklärt, warum er selbst zum Täter des Schlusses wird.',
+        'Sie dient nur dazu, Minnas Schwester einzuführen.'
+      ],
+      correct: 1,
+      explanation: 'Gerade Tobias’ Bedürftigkeit macht die moralische Belastungsprobe der Familie sichtbar.',
+      reward: { kind: 'insight', amount: 1, text: 'Du gewinnst 1 Erkenntnispunkt.' }
+    },
+    {
+      title: 'Minnas Bild',
+      prompt: 'Wie fungiert Minnas Bild im Wärterhäuschen für Thiel?',
+      options: [
+        'Als beliebiger Schmuck ohne innere Bedeutung.',
+        'Als konkreter Erinnerungsanker, der Andacht, Schuld und Trost bündelt.',
+        'Als Beweisstück in einem Dienstverfahren.',
+        'Als Kinderspielzeug für Tobias.'
+      ],
+      correct: 1,
+      explanation: 'Das Bild verdichtet Thiels Bindung an Minna zu einem beinahe kultischen Zentrum.',
+      reward: { kind: 'shield', amount: 1, text: 'Du erhältst 1 Schutzmarke.' }
+    },
+    {
+      title: 'Vor der Kollision',
+      prompt: 'Was geht Tobias’ Tod in der Alltagslogik des Textes unmittelbar voraus?',
+      options: [
+        'Eine leichtsinnige Dorfwette unter Bahnarbeitern.',
+        'Eine Verkettung aus Überforderung, Lenes Härte und gefährlicher Nähe der Kinderarbeit zur Strecke.',
+        'Ein nächtlicher Ausflug Tobias’ aus Abenteuerlust.',
+        'Ein technischer Totalausfall der Signale ohne menschlichen Anteil.'
+      ],
+      correct: 1,
+      explanation: 'Die Novelle zeigt keine abstrakte Zufallskatastrophe, sondern eine aus dem Alltag heraus vorbereitete Vernachlässigung.',
+      reward: { kind: 'advance', amount: 1, text: 'Deine Figur rückt 1 Feld vor.' }
+    },
+    {
+      title: 'Akustische Warnung',
+      prompt: 'Welches akustische Motiv markiert im Text immer wieder die Nähe der Gefahr?',
+      options: [
+        'Das Kirchengeläut als einziges Leitsignal.',
+        'Der Pfiff und das Heranrollen der Eisenbahn.',
+        'Das Meeresrauschen des Hafens.',
+        'Das Gelächter der Wirtshausgäste.'
+      ],
+      correct: 1,
+      explanation: 'Pfiff, Rollen und Bahngeräusch bilden ein wiederkehrendes Drohmotiv.',
+      reward: { kind: 'shield', amount: 1, text: 'Du erhältst 1 Schutzmarke.' }
+    },
+    {
+      title: 'Dienst und Anerkennung',
+      prompt: 'Wie erscheint Thiel im Blick seines beruflichen Umfelds vor dem Zusammenbruch?',
+      options: [
+        'Als pflichtbewusster, anerkannter und in seiner Strenge etwas gefürchteter Bahnwärter.',
+        'Als offenkundig unfähiger Sonderling kurz vor der Entlassung.',
+        'Als jovialer Spassmacher, den niemand ernst nimmt.',
+        'Als politischer Agitator der Bahnarbeiter.'
+      ],
+      correct: 0,
+      explanation: 'Thiels Ruf stützt sich lange auf Zuverlässigkeit, Disziplin und stille Härte gegen sich selbst.',
+      reward: { kind: 'insight', amount: 1, text: 'Du gewinnst 1 Erkenntnispunkt.' }
+    },
+    {
+      title: 'Kein sicherer Abstand',
+      prompt: 'Was zeigt die räumliche Nähe von Wohnraum, Feldarbeit und Bahnlinie besonders deutlich?',
+      options: [
+        'Dass die Lebensbereiche sauber getrennt bleiben.',
+        'Dass Privates, Arbeit und Gefahr in Thiels Welt kaum voneinander zu trennen sind.',
+        'Dass der Bahndienst im Text nur dekorativer Hintergrund ist.',
+        'Dass Tobias fern jeder Erwachsenenarbeit aufwächst.'
+      ],
+      correct: 1,
+      explanation: 'Im Text greifen Familie, Arbeit und Technik fatal ineinander statt getrennt zu bleiben.',
+      reward: { kind: 'advance', amount: 1, text: 'Deine Figur rückt 1 Feld vor.' }
+    },
+    {
+      title: 'Beobachten statt Beichten',
+      prompt: 'Woran erkennt man besonders gut, dass der Anfang keine intime Bekenntnisprosa ist?',
+      options: [
+        'An der sachlichen Fremdbeobachtung und dem sozialen Einordnen der Figur.',
+        'An einem langen inneren Monolog in der Ich-Form.',
+        'An Briefen Minnas aus dem Jenseits.',
+        'An komischen Dialogen im Wirtshaus.'
+      ],
+      correct: 0,
+      explanation: 'Die Novelle setzt zunächst auf Distanz und soziale Verortung statt auf unmittelbare Selbstrede.',
+      reward: { kind: 'shield', amount: 1, text: 'Du erhältst 1 Schutzmarke.' }
+    },
+    {
+      title: 'Minna und Lene',
+      prompt: 'Welcher Gegensatz wird zwischen Minna und Lene am deutlichsten aufgebaut?',
+      options: [
+        'Vergeistigung und Sanftheit auf der einen, Körperlichkeit und Härte auf der anderen Seite.',
+        'Städtische Eleganz gegen ländliche Naivität.',
+        'Gelehrsamkeit gegen völlige Sprachlosigkeit.',
+        'Reichtum gegen extreme Armut.'
+      ],
+      correct: 0,
+      explanation: 'Die beiden Frauenfiguren sind bewusst kontrastiv angelegt und prägen Thiels Spaltung.',
+      reward: { kind: 'insight', amount: 1, text: 'Du gewinnst 1 Erkenntnispunkt.' }
+    },
+    {
+      title: 'Nach dem Unfall',
+      prompt: 'Welche Erfahrung prägt Thiel nach Tobias’ Tod besonders stark?',
+      options: [
+        'Ein sofort geordneter Trost durch die Dorfgemeinschaft.',
+        'Ein Schock, der sich rasch in Wahn, Schuld und Gewaltdrang verwandelt.',
+        'Ein entschlossener Plan zur Flucht in die Grossstadt.',
+        'Eine nüchterne gerichtliche Aussage ohne innere Folgen.'
+      ],
+      correct: 1,
+      explanation: 'Der Verlust kippt nicht in Verarbeitung, sondern in psychische Entgrenzung.',
+      reward: { kind: 'advance', amount: 1, text: 'Deine Figur rückt 1 Feld vor.' }
+    },
+    {
+      title: 'Der Schlussort',
+      prompt: 'Wo zeigt die Novelle Thiel nach der Gewalttat zuletzt?',
+      options: [
+        'Als geachteten Bahnwärter an alter Stelle.',
+        'In einer Heilanstalt beziehungsweise Anstalt geistiger Umnachtung.',
+        'Auf einem Schiff nach Übersee.',
+        'Als Einsiedler im märkischen Forst.'
+      ],
+      correct: 1,
+      explanation: 'Der Schluss rahmt Thiel als endgültig zerstörte Figur im Anstaltskontext.',
+      reward: { kind: 'shield', amount: 1, text: 'Du erhältst 1 Schutzmarke.' }
     }
   ],
   deutung: [
@@ -301,6 +535,240 @@ const LITERATURE_CARDS = {
       correct: 1,
       explanation: 'Nach Tobias’ Tod kippt Thiels mühsame Selbstkontrolle in Raserei, Mord und endgültigen Wahnsinn.',
       reward: { kind: 'advance', amount: 1, text: 'Deine Figur rückt 1 Feld vor.' }
+    },
+    {
+      title: 'Beruf im Titel',
+      prompt: 'Warum ist es deutungsträchtig, dass die Novelle nicht nach dem Mord, sondern nach Thiels Beruf benannt ist?',
+      options: [
+        'Weil der Titel die Tat vollständig verharmlost.',
+        'Weil Beruf, Pflicht und soziale Rolle den Rahmen bilden, in dem die Katastrophe entsteht.',
+        'Weil Hauptmann ursprünglich eine Eisenbahnwerbung schreiben wollte.',
+        'Weil die Familie im Text keine Rolle spielt.'
+      ],
+      correct: 1,
+      explanation: 'Der Titel rückt die Funktion im System und nicht nur die Sensation der Tat in den Vordergrund.',
+      reward: { kind: 'insight', amount: 1, text: 'Du gewinnst 1 Erkenntnispunkt.' }
+    },
+    {
+      title: 'Determinierende Kräfte',
+      prompt: 'Welche naturalistische Deutung beschreibt Thiels Zusammenbruch am treffendsten?',
+      options: [
+        'Er entspringt einzig einem freien Entschluss ohne Vorgeschichte.',
+        'Er entsteht aus dem Zusammenspiel von Milieu, Körper, Arbeit, psychischem Druck und sozialer Konstellation.',
+        'Er wird allein durch ein Wunder verursacht.',
+        'Er ist bloss eine rhetorische Übertreibung des Erzählers.'
+      ],
+      correct: 1,
+      explanation: 'Der Text zeigt keine isolierte Einzeltat, sondern ein dichtes Ursachengefüge.',
+      reward: { kind: 'shield', amount: 1, text: 'Du erhältst 1 Schutzmarke.' }
+    },
+    {
+      title: 'Erzählerdistanz',
+      prompt: 'Welche Wirkung hat die distanzierte Erzählweise im Blick auf Thiels Leid besonders stark?',
+      options: [
+        'Sie verniedlicht die Gewalt als harmloses Missverständnis.',
+        'Sie verstärkt den Eindruck einer beobachteten Fallgeschichte statt einer sentimentalen Klage.',
+        'Sie verwandelt den Text in eine reine Komödie.',
+        'Sie macht alle sozialen Zusammenhänge unsichtbar.'
+      ],
+      correct: 1,
+      explanation: 'Gerade die Nüchternheit schärft die Härte des Geschehens und die Studie des Falls.',
+      reward: { kind: 'insight', amount: 1, text: 'Du gewinnst 1 Erkenntnispunkt.' }
+    },
+    {
+      title: 'Religion ohne Erlösung',
+      prompt: 'Welche Deutung trifft Thiels Frömmigkeit im Gesamtverlauf am besten?',
+      options: [
+        'Sie führt ihn sicher zur moralischen Läuterung.',
+        'Sie ist Kompensation und Ordnungsversuch, kann die Gewaltverhältnisse aber nicht erlösen.',
+        'Sie spielt nur ironische Nebenrolle ohne Funktion.',
+        'Sie hebt alle sozialen Unterschiede im Text auf.'
+      ],
+      correct: 1,
+      explanation: 'Thiels Frömmigkeit stabilisiert punktuell, reicht aber nicht gegen die zerstörerischen Kräfte.',
+      reward: { kind: 'shield', amount: 1, text: 'Du erhältst 1 Schutzmarke.' }
+    },
+    {
+      title: 'Lenes Funktion',
+      prompt: 'Welche literarische Funktion erfüllt Lene über die Rolle der Antagonistin hinaus?',
+      options: [
+        'Sie verkörpert nur äusserliche Bosheit ohne sozialen Bezug.',
+        'Sie bündelt Körperlichkeit, Herrschaft im Haushalt und den Druck des unmittelbaren Milieus.',
+        'Sie eröffnet einen rein komischen Nebenplot.',
+        'Sie dient als neutrale Vermittlerin zwischen Minna und Thiel.'
+      ],
+      correct: 1,
+      explanation: 'Lene ist mehr als böse Gegenspielerin: Sie verdichtet eine ganze soziale und körperliche Sphäre.',
+      reward: { kind: 'insight', amount: 1, text: 'Du gewinnst 1 Erkenntnispunkt.' }
+    },
+    {
+      title: 'Minnas Idealbild',
+      prompt: 'Wie ist Minnas Nachwirkung deutungstheoretisch am treffendsten zu fassen?',
+      options: [
+        'Als bloss realistisches Erinnerungsfoto ohne Projektion.',
+        'Als idealisierte Gegenwelt, in die Thiel Gewissen, Reinheit und Trost hineinprojiziert.',
+        'Als satirische Karikatur bürgerlicher Frömmigkeit.',
+        'Als rein ökonomische Haushaltskraft.'
+      ],
+      correct: 1,
+      explanation: 'Minnas Bild ist stark idealisiert und trägt die Spaltung zwischen Geist und Körper mit.',
+      reward: { kind: 'shield', amount: 1, text: 'Du erhältst 1 Schutzmarke.' }
+    },
+    {
+      title: 'Kein Fortschrittsjubel',
+      prompt: 'Welche Aussage über die Eisenbahn passt am besten zur Novelle?',
+      options: [
+        'Sie erscheint als ungebrochener Fortschrittssegen.',
+        'Sie verbindet technische Ordnung mit Beschleunigung, Zwang und tödlicher Gefahr.',
+        'Sie bleibt bloss dekorativer Hintergrund ohne Einfluss.',
+        'Sie wird als märchenhaftes Wunderwesen gefeiert.'
+      ],
+      correct: 1,
+      explanation: 'Die Bahn steht nicht für naive Moderneuphorie, sondern für Ambivalenz und Gewalt.',
+      reward: { kind: 'advance', amount: 1, text: 'Deine Figur rückt 1 Feld vor.' }
+    },
+    {
+      title: 'Raumtriade',
+      prompt: 'Welche Raumkonstellation trägt Thiels innere Krise besonders wirksam?',
+      options: [
+        'Marktplatz, Rathaus und Schule.',
+        'Wärterhäuschen, Kiefernforst und Bahnlinie.',
+        'Salon, Ballsaal und Oper.',
+        'Gebirge, Gletscher und Passhöhe.'
+      ],
+      correct: 1,
+      explanation: 'Die Triade aus Bude, Forst und Schiene verdichtet Arbeit, Isolation und Bedrohung.',
+      reward: { kind: 'insight', amount: 1, text: 'Du gewinnst 1 Erkenntnispunkt.' }
+    },
+    {
+      title: 'Familie als Gewaltordnung',
+      prompt: 'Warum ist die Familie im Text kein privater Schutzraum?',
+      options: [
+        'Weil sie als Ort von Vernachlässigung, Macht und Überforderung gezeichnet ist.',
+        'Weil sie fast gar nicht dargestellt wird.',
+        'Weil dort ausschliesslich idyllische Harmonie herrscht.',
+        'Weil der Erzähler häusliche Szenen vermeidet.'
+      ],
+      correct: 0,
+      explanation: 'Gerade die Familie zeigt sich als Raum sozialer Härte statt als Rückzugsmöglichkeit.',
+      reward: { kind: 'shield', amount: 1, text: 'Du erhältst 1 Schutzmarke.' }
+    },
+    {
+      title: 'Akustische Dramaturgie',
+      prompt: 'Welche Funktion hat das Geräusch der Bahn in der Novelle?',
+      options: [
+        'Es füllt nur zufällig die Kulisse.',
+        'Es strukturiert Spannung und kündigt Gefahr körperlich-sinnlich an.',
+        'Es dient allein humoristischen Effekten.',
+        'Es ersetzt jede Charakterzeichnung.'
+      ],
+      correct: 1,
+      explanation: 'Der Text arbeitet stark mit akustischer Vorankündigung und körperlicher Wahrnehmung.',
+      reward: { kind: 'insight', amount: 1, text: 'Du gewinnst 1 Erkenntnispunkt.' }
+    },
+    {
+      title: 'Schuld der Passivität',
+      prompt: 'Worin liegt Thiels Schuld vor dem finalen Ausbruch besonders deutlich?',
+      options: [
+        'Ausschliesslich in einem juristischen Signalverstoss.',
+        'Auch darin, dass er Lenes Gewalt und Tobias’ Leid zu lange hinnimmt und nicht wirksam unterbricht.',
+        'Nur darin, dass er zu wenig arbeitet.',
+        'Darin, dass er Minna vergessen will.'
+      ],
+      correct: 1,
+      explanation: 'Thiel ist nicht nur Opfer, sondern auch durch seine Passivität moralisch belastet.',
+      reward: { kind: 'shield', amount: 1, text: 'Du erhältst 1 Schutzmarke.' }
+    },
+    {
+      title: 'Macht im Haushalt',
+      prompt: 'Wie verschieben sich die Machtverhältnisse zwischen Thiel und Lene im häuslichen Alltag?',
+      options: [
+        'Thiel beherrscht den Haushalt souverän.',
+        'Lene dominiert den Alltag faktisch, während Thiel sich innerlich entzieht und äusserlich nachgibt.',
+        'Beide bleiben vollkommen gleichberechtigt.',
+        'Minnas Familie führt den Haushalt von aussen.'
+      ],
+      correct: 1,
+      explanation: 'Im Haus wirkt Lene als starke, durchsetzende Kraft, der Thiel nur begrenzt entgegentritt.',
+      reward: { kind: 'insight', amount: 1, text: 'Du gewinnst 1 Erkenntnispunkt.' }
+    },
+    {
+      title: 'Novellenkern',
+      prompt: 'Was macht den Stoff trotz seiner sozial-analytischen Anlage weiterhin novellistisch?',
+      options: [
+        'Die völlige Ereignislosigkeit.',
+        'Die Konzentration auf einen folgenreichen Konflikt, leitmotivische Verdichtung und eine extreme Zuspitzung.',
+        'Die breite Chronik mehrerer Generationen.',
+        'Die ausschliessliche Form des Dramas.'
+      ],
+      correct: 1,
+      explanation: 'Der Text verbindet Studiencharakter mit novellistischer Konzentration und Zuspitzung.',
+      reward: { kind: 'shield', amount: 1, text: 'Du erhältst 1 Schutzmarke.' }
+    },
+    {
+      title: 'Trauma und Wahrnehmung',
+      prompt: 'Wie verändert Tobias’ Tod Thiels Wahrnehmung im weiteren Verlauf?',
+      options: [
+        'Gar nicht; er bleibt durchgehend nüchtern und kontrolliert.',
+        'Sie kippt von angespannter Selbstbeherrschung in halluzinatorische und wahnhafte Entgrenzung.',
+        'Sie wird ausschliesslich komisch verzerrt.',
+        'Sie endet in völliger sprachlicher Klarheit.'
+      ],
+      correct: 1,
+      explanation: 'Nach dem Unfall verschiebt sich die Wahrnehmung in Vision, Zerrbild und Raserei.',
+      reward: { kind: 'advance', amount: 1, text: 'Deine Figur rückt 1 Feld vor.' }
+    },
+    {
+      title: 'Tobias als Schnittstelle',
+      prompt: 'Warum ist Tobias auch strukturell die Verbindung zwischen Minnas und Lenes Sphäre?',
+      options: [
+        'Weil er beide Ehen als einziges gemeinsames Gespräch moderiert.',
+        'Weil an ihm Vergangenheit, neue Familie, Pflegepflicht und Gewaltkonflikt zusammenlaufen.',
+        'Weil er die Bahn beaufsichtigt.',
+        'Weil er als Erzähler beide Frauen bewertet.'
+      ],
+      correct: 1,
+      explanation: 'Tobias verbindet Erinnerung an Minna und die gegenwärtige Gewaltordnung mit Lene.',
+      reward: { kind: 'insight', amount: 1, text: 'Du gewinnst 1 Erkenntnispunkt.' }
+    },
+    {
+      title: 'Pflicht als Selbstschutz',
+      prompt: 'Welche Funktion hat Thiels strenges Pflichtethos vor dem Umschlag in Gewalt?',
+      options: [
+        'Es ist nur äussere Pose ohne innere Funktion.',
+        'Es wirkt als fragile Form von Selbstdisziplin, die seine innere Zerrissenheit notdürftig zusammenhält.',
+        'Es löst alle häuslichen Konflikte dauerhaft.',
+        'Es trennt ihn vollständig von Minnas Erinnerung.'
+      ],
+      correct: 1,
+      explanation: 'Dienstliche Ordnung gibt Thiel Halt, kann seine Krise aber letztlich nicht bannen.',
+      reward: { kind: 'shield', amount: 1, text: 'Du erhältst 1 Schutzmarke.' }
+    },
+    {
+      title: 'Anstaltsende',
+      prompt: 'Wie lässt sich das Ende in der Anstalt literarisch deuten?',
+      options: [
+        'Als glückliche Genesung und Wiedereingliederung.',
+        'Als endgültige Pathologisierung einer von Milieu und Schuld zerstörten Figur.',
+        'Als humorvolle Pointe ohne Tragweite.',
+        'Als Beweis dafür, dass alles nur geträumt war.'
+      ],
+      correct: 1,
+      explanation: 'Die Anstalt markiert keinen Ausweg, sondern die letzte Form des Zusammenbruchs.',
+      reward: { kind: 'insight', amount: 1, text: 'Du gewinnst 1 Erkenntnispunkt.' }
+    },
+    {
+      title: 'Blick auf den Körper',
+      prompt: 'Warum ist die Körperlichkeit in Hauptmanns Novelle mehr als blosses Detail?',
+      options: [
+        'Weil sie die soziale und psychische Verfassung sichtbar macht.',
+        'Weil sie nur dem sensationshungrigen Schmuck dient.',
+        'Weil körperliche Zustände im Text irrelevant bleiben.',
+        'Weil nur geistige Prozesse erzählt werden.'
+      ],
+      correct: 0,
+      explanation: 'Körper, Arbeit und Erschöpfung gehören im Naturalismus zum Erklärungssystem des Geschehens.',
+      reward: { kind: 'shield', amount: 1, text: 'Du erhältst 1 Schutzmarke.' }
     }
   ],
   schicksal: [
@@ -338,6 +806,114 @@ const LITERATURE_CARDS = {
       title: 'Erschöpfung am Damm',
       prompt: 'Milieu, Hitze, Arbeit und innerer Druck legen sich schwer auf die Runde.',
       explanation: 'Im Naturalismus wirken Umwelt und Körper nicht dekorativ, sondern handlungsprägend.',
+      reward: { kind: 'none', amount: 0, text: 'Kein Bonus in dieser Runde.' }
+    },
+    {
+      title: 'Kiefernrauschen',
+      prompt: 'Der Forst scheint still, aber gerade die Stille verdichtet die Anspannung.',
+      explanation: 'Natur beruhigt hier nicht einfach, sondern macht die innere Beklemmung hörbar.',
+      reward: { kind: 'insight', amount: 1, text: 'Du gewinnst 1 Erkenntnispunkt.' }
+    },
+    {
+      title: 'Dienst nach Vorschrift',
+      prompt: 'Jede Bewegung sitzt. Für einen Zug lang trägt dich reine Routine.',
+      explanation: 'Thiels Pflichtethos wirkt kurzfristig als Schutzpanzer.',
+      reward: { kind: 'shield', amount: 1, text: 'Du erhältst 1 Schutzmarke.' }
+    },
+    {
+      title: 'Bild der Toten',
+      prompt: 'Minnas Bild liegt im Blickfeld. Erinnerung und Gewissen ziehen sich zusammen.',
+      explanation: 'Die idealisierte Tote ordnet Thiels Innenraum für einen Moment.',
+      reward: { kind: 'shield', amount: 1, text: 'Du erhältst 1 Schutzmarke.' }
+    },
+    {
+      title: 'Grober Befehl',
+      prompt: 'Lenes Ton lässt keinen Widerspruch zu. Der häusliche Druck wächst.',
+      explanation: 'Im Haushalt zeigt sich ihre Dominanz unmittelbar und körperlich.',
+      reward: { kind: 'loseShield', amount: 1, text: 'Du verlierst 1 Schutzmarke, falls vorhanden.' }
+    },
+    {
+      title: 'Schwüler Nachmittag',
+      prompt: 'Hitze lastet auf Feld und Gleisen. Die Konzentration wird schwerer als sonst.',
+      explanation: 'Naturalistische Milieufaktoren wirken als Belastung des Körpers mit.',
+      reward: { kind: 'none', amount: 0, text: 'Kein Bonus in dieser Runde.' }
+    },
+    {
+      title: 'Tobias im Schatten',
+      prompt: 'Ein stiller Blick des Kindes erinnert daran, worum es moralisch eigentlich geht.',
+      explanation: 'Tobias bündelt Fürsorgepflicht und Schuldfrage in der Runde.',
+      reward: { kind: 'insight', amount: 1, text: 'Du gewinnst 1 Erkenntnispunkt.' }
+    },
+    {
+      title: 'Vorbeidröhnender Zug',
+      prompt: 'Die Schienen vibrieren, lange bevor die Lok sichtbar wird.',
+      explanation: 'Die Bahn kündigt Gefahr körperlich und akustisch an.',
+      reward: { kind: 'advance', amount: 1, text: 'Deine Figur rückt 1 Feld vor.' }
+    },
+    {
+      title: 'Ritual der Ordnung',
+      prompt: 'Gebet, Gesangbuch, Stille: Für einen Atemzug scheint das Innere wieder sortiert.',
+      explanation: 'Rituale stützen Thiel punktuell, ohne die Krise wirklich zu lösen.',
+      reward: { kind: 'shield', amount: 1, text: 'Du erhältst 1 Schutzmarke.' }
+    },
+    {
+      title: 'Stumpfe Müdigkeit',
+      prompt: 'Arbeit, Pflicht und Sorge machen jeden Entschluss träger.',
+      explanation: 'Erschöpfung ist im Text keine Nebensache, sondern Handlungskraft.',
+      reward: { kind: 'none', amount: 0, text: 'Kein Bonus in dieser Runde.' }
+    },
+    {
+      title: 'Strenge Selbstzucht',
+      prompt: 'Du hältst dich an die Form, obwohl im Innern längst Unruhe arbeitet.',
+      explanation: 'Selbstdisziplin trägt Thiel lange durch den Alltag.',
+      reward: { kind: 'shield', amount: 1, text: 'Du erhältst 1 Schutzmarke.' }
+    },
+    {
+      title: 'Zwischen Feld und Schiene',
+      prompt: 'Privates und Berufliches geraten unheilvoll an denselben Ort.',
+      explanation: 'Die Novelle lebt von genau dieser räumlichen Verdichtung.',
+      reward: { kind: 'advance', amount: 1, text: 'Deine Figur rückt 1 Feld vor.' }
+    },
+    {
+      title: 'Unruhiger Kirchweg',
+      prompt: 'Der Weg nach Neu-Zittau schenkt Ordnung, aber keine wirkliche Erlösung.',
+      explanation: 'Frömmigkeit beruhigt und verschärft zugleich die innere Spannung.',
+      reward: { kind: 'insight', amount: 1, text: 'Du gewinnst 1 Erkenntnispunkt.' }
+    },
+    {
+      title: 'Hartes Alltagsregime',
+      prompt: 'Niemand nennt es Gewalt, und doch frisst die Härte den Tag auf.',
+      explanation: 'Gerade das Gewöhnliche trägt im Text das Katastrophische in sich.',
+      reward: { kind: 'loseShield', amount: 1, text: 'Du verlierst 1 Schutzmarke, falls vorhanden.' }
+    },
+    {
+      title: 'Forstgrenze',
+      prompt: 'Am Rand des Waldes wirkt jeder Laut grösser und jeder Gedanke enger.',
+      explanation: 'Der Raum verstärkt das Seelische, statt es zu entlasten.',
+      reward: { kind: 'insight', amount: 1, text: 'Du gewinnst 1 Erkenntnispunkt.' }
+    },
+    {
+      title: 'Zug um Zug',
+      prompt: 'Der Takt der Bahn zwingt alles in ein schnelleres, härteres Mass.',
+      explanation: 'Beschleunigung gehört zum Druck der modernen Arbeitswelt.',
+      reward: { kind: 'advance', amount: 1, text: 'Deine Figur rückt 1 Feld vor.' }
+    },
+    {
+      title: 'Lenes Vorrang',
+      prompt: 'Im Haus setzt sich die stärkere Hand durch, nicht das bessere Argument.',
+      explanation: 'Macht zeigt sich bei Lene als Alltagspraxis.',
+      reward: { kind: 'loseShield', amount: 1, text: 'Du verlierst 1 Schutzmarke, falls vorhanden.' }
+    },
+    {
+      title: 'Tote Ordnung',
+      prompt: 'Der Gedanke an Minna stiftet Ruhe und zugleich unerreichbare Reinheit.',
+      explanation: 'Minnas Erinnerung ist Schutzraum und Schmerzquelle zugleich.',
+      reward: { kind: 'shield', amount: 1, text: 'Du erhältst 1 Schutzmarke.' }
+    },
+    {
+      title: 'Kinderarbeit am Damm',
+      prompt: 'Das scheinbar Gewöhnliche kippt einen Schritt zu nah an die Gefahr.',
+      explanation: 'Die Katastrophe wächst aus banaler Überforderung heraus.',
       reward: { kind: 'none', amount: 0, text: 'Kein Bonus in dieser Runde.' }
     }
   ]
