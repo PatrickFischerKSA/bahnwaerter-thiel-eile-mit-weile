@@ -1443,6 +1443,102 @@ const DEMO_STEPS = [
   }
 ];
 
+const DEMO_ROUTE_STOPS = [
+  { id: 'depot-rot', label: 'Depot', icon: '🚂', col: 1, row: 1 },
+  { id: 'waerterhaus', label: 'Wärterh.', icon: '🕯', col: 2, row: 1 },
+  { id: 'acker', label: 'Acker', icon: '🌾', col: 3, row: 1 },
+  { id: 'bahnuebergang', label: 'Übergang', icon: '🚧', col: 4, row: 2 },
+  { id: 'forst', label: 'Forst', icon: '🌲', col: 4, row: 3 },
+  { id: 'charite', label: 'Charité', icon: '🏥', col: 3, row: 4 },
+  { id: 'bahndamm', label: 'Bahndamm', icon: '🛤', col: 2, row: 4 },
+  { id: 'schoenschornstein', label: 'Schönsch.', icon: '💨', col: 1, row: 3 },
+  { id: 'neu-zittau', label: 'Neu-Zittau', icon: '⛪', col: 1, row: 2 }
+];
+
+function getDemoSceneForStep(stepIndex) {
+  switch (stepIndex) {
+    case 0:
+      return {
+        caption: 'Die Demo zeigt Host-Brett, Kartenbereich und beide Handys gleichzeitig.',
+        activeStops: ['depot-rot', 'neu-zittau'],
+        tokens: [
+          { tone: 'rot', number: '1', at: 'depot-rot', moving: true },
+          { tone: 'blau', number: '1', at: 'neu-zittau' }
+        ],
+        cards: [
+          { kind: 'system', title: 'QR-Einladung', text: 'Signalrot scannt den Einladungslink.' },
+          { kind: 'system', title: 'Verbindung', text: 'Beide Handys koppeln sich mit dem Host.' }
+        ]
+      };
+    case 1:
+      return {
+        caption: 'Die Karten liegen privat auf den Handys, das Brett zeigt nur den öffentlichen Spielstand.',
+        activeStops: ['waerterhaus', 'acker', 'forst'],
+        tokens: [
+          { tone: 'rot', number: '1', at: 'waerterhaus', moving: true },
+          { tone: 'blau', number: '1', at: 'forst' }
+        ],
+        cards: [
+          { kind: 'action', title: 'Geheime Aktionshand', text: '1/11, 7, Tausch und weitere Karten liegen nur auf dem Handy.' },
+          { kind: 'system', title: 'Öffentlich sichtbar', text: 'Am Zug, Runde, Brett und Lokpositionen bleiben öffentlich.' }
+        ]
+      };
+    case 2:
+      return {
+        caption: 'Einflusskarten verändern die Runde, ohne die ganze private Hand offenzulegen.',
+        activeStops: ['acker', 'bahndamm'],
+        tokens: [
+          { tone: 'rot', number: '1', at: 'acker' },
+          { tone: 'blau', number: '1', at: 'bahndamm', moving: true }
+        ],
+        cards: [
+          { kind: 'impact', title: 'Rückenwind', text: 'Signalrot erhält 1 Schutzmarke.' },
+          { kind: 'impact', title: 'Schattenwurf', text: 'Nebelblaus nächster Literaturbonus wird blockiert.' }
+        ]
+      };
+    case 3:
+      return {
+        caption: 'Die Lok fährt öffentlich über das Brett, während die Kartenentscheidung privat bleibt.',
+        activeStops: ['bahnuebergang', 'schoenschornstein', 'charite'],
+        tokens: [
+          { tone: 'rot', number: '1', at: 'bahnuebergang', moving: true },
+          { tone: 'blau', number: '1', at: 'schoenschornstein' }
+        ],
+        cards: [
+          { kind: 'action', title: 'Aktive Karte · 1 / 11', text: 'Variante 11 vor wurde auf dem Handy gewählt.' },
+          { kind: 'system', title: 'Zugziel', text: 'Die markierte Dampflokomotive fährt Richtung Bahnübergang.' }
+        ]
+      };
+    case 4:
+      return {
+        caption: 'Auf Literaturfeldern erscheinen Frage, Ort und Belohnung gleichzeitig im Host.',
+        activeStops: ['waerterhaus', 'acker'],
+        tokens: [
+          { tone: 'rot', number: '1', at: 'waerterhaus', moving: true },
+          { tone: 'blau', number: '1', at: 'forst' }
+        ],
+        cards: [
+          { kind: 'literature', title: 'Textkarte · Wärterhäuschen', text: 'Die Gruppe sieht Frage, Erklärung und Lösung gemeinsam.' },
+          { kind: 'reward', title: 'Ortsbonus', text: 'Wärterhäuschen: +1 Schutzmarke' }
+        ]
+      };
+    case 5:
+    default:
+      return {
+        caption: 'Am Ende wird der ganze Kreislauf sichtbar: neue Austeilrunde, Fortschritt und Sieg in der Charité.',
+        activeStops: ['charite', 'schoenschornstein'],
+        tokens: [
+          { tone: 'rot', number: '4', at: 'charite', moving: true },
+          { tone: 'blau', number: '2', at: 'schoenschornstein' }
+        ],
+        cards: [
+          { kind: 'reward', title: 'Charité', text: 'Vier rote Dampflokomotiven erreichen das Schlussbild.' },
+          { kind: 'system', title: 'Neue Runde', text: 'Danach beginnt die nächste Austeilrunde mit weniger Karten.' }
+        ]
+      };
+  }
+}
+
 function createInitialState() {
   const mode = getModeConfig(selectedGameMode);
   return {
@@ -3678,9 +3774,61 @@ function renderDemoPhone(targetEl, data) {
   });
 }
 
+function renderDemoScene(targetEl, scene) {
+  if (!targetEl || !scene) return;
+
+  const stage = document.createElement('section');
+  stage.className = 'demo-live-stage';
+
+  const boardWrap = document.createElement('div');
+  boardWrap.className = 'demo-route-wrap';
+
+  const board = document.createElement('div');
+  board.className = 'demo-route-board';
+
+  DEMO_ROUTE_STOPS.forEach((stop) => {
+    const stopEl = document.createElement('div');
+    stopEl.className = `demo-route-stop${scene.activeStops?.includes(stop.id) ? ' active' : ''}`;
+    stopEl.style.gridColumn = String(stop.col);
+    stopEl.style.gridRow = String(stop.row);
+    stopEl.innerHTML = `<span class="demo-route-icon">${stop.icon}</span><span class="demo-route-label">${stop.label}</span>`;
+
+    scene.tokens
+      .filter((token) => token.at === stop.id)
+      .forEach((token) => {
+        const tokenEl = document.createElement('span');
+        tokenEl.className = `demo-route-token${token.moving ? ' moving' : ''}`;
+        tokenEl.dataset.tone = token.tone;
+        tokenEl.innerHTML = `<span class="demo-route-token-icon">🚂</span><span class="demo-route-token-no">${token.number}</span>`;
+        stopEl.appendChild(tokenEl);
+      });
+
+    board.appendChild(stopEl);
+  });
+
+  const caption = document.createElement('p');
+  caption.className = 'demo-live-caption';
+  caption.textContent = scene.caption;
+
+  boardWrap.append(board, caption);
+
+  const cardRack = document.createElement('div');
+  cardRack.className = 'demo-card-rack';
+  scene.cards.forEach((card) => {
+    const cardEl = document.createElement('article');
+    cardEl.className = `demo-stage-card ${card.kind || 'system'}`.trim();
+    cardEl.innerHTML = `<strong>${card.title}</strong><span>${card.text}</span>`;
+    cardRack.appendChild(cardEl);
+  });
+
+  stage.append(boardWrap, cardRack);
+  targetEl.appendChild(stage);
+}
+
 function renderDemoStep() {
   if (appScreen !== 'board' || !demoStepListEl) return;
   const step = DEMO_STEPS[demoStepIndex];
+  const scene = getDemoSceneForStep(demoStepIndex);
 
   demoStepListEl.innerHTML = '';
   DEMO_STEPS.forEach((entry, index) => {
@@ -3758,6 +3906,8 @@ function renderDemoStep() {
     strip.appendChild(places);
   }
 
+  renderDemoScene(strip, scene);
+
   if (step.hostProgress?.length) {
     const progress = document.createElement('div');
     progress.className = 'demo-connection-progress';
@@ -3818,7 +3968,7 @@ function toggleDemoPlayback() {
     }
     demoStepIndex += 1;
     renderDemoStep();
-  }, 3800);
+  }, 4600);
   renderDemoStep();
 }
 
