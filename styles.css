@@ -494,8 +494,8 @@ li {
 
 .demo-visuals {
   display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
-  gap: 18px;
+  grid-template-columns: minmax(0, 1.18fr) minmax(420px, 0.92fr);
+  gap: 22px;
   align-items: start;
 }
 
@@ -507,7 +507,7 @@ li {
 }
 
 .demo-host-card {
-  padding: 18px;
+  padding: 20px;
   border-radius: 28px;
 }
 
@@ -637,13 +637,13 @@ li {
 
 .demo-live-stage {
   display: grid;
-  grid-template-columns: minmax(0, 1.15fr) minmax(220px, 0.85fr);
-  gap: 12px;
+  grid-template-columns: minmax(0, 1.45fr) minmax(250px, 0.82fr);
+  gap: 16px;
   align-items: start;
 }
 
 .demo-route-wrap {
-  padding: 14px;
+  padding: 16px;
   border-radius: 22px;
   background: linear-gradient(180deg, rgba(248, 243, 231, 0.98), rgba(241, 235, 221, 0.94));
   border: 1px solid var(--line);
@@ -653,10 +653,10 @@ li {
   position: relative;
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  grid-template-rows: repeat(4, minmax(58px, 1fr));
-  gap: 10px;
-  min-height: 286px;
-  padding: 10px;
+  grid-template-rows: repeat(4, minmax(76px, 1fr));
+  gap: 12px;
+  min-height: 380px;
+  padding: 14px;
   border-radius: 20px;
   background:
     radial-gradient(circle at center, rgba(255, 255, 255, 0.82), rgba(233, 225, 207, 0.94)),
@@ -675,7 +675,7 @@ li {
 
 .demo-route-stop {
   position: relative;
-  padding: 8px;
+  padding: 10px;
   border-radius: 18px;
   background: rgba(255, 255, 255, 0.86);
   border: 1px solid var(--line);
@@ -691,23 +691,23 @@ li {
 }
 
 .demo-route-icon {
-  font-size: 1rem;
+  font-size: 1.15rem;
   line-height: 1;
 }
 
 .demo-route-label {
-  font-size: 0.72rem;
+  font-size: 0.82rem;
   font-weight: 700;
   color: var(--muted);
 }
 
 .demo-route-token {
   position: absolute;
-  right: 8px;
-  bottom: 8px;
-  width: 28px;
-  height: 28px;
-  border-radius: 12px;
+  right: 10px;
+  bottom: 10px;
+  width: 34px;
+  height: 34px;
+  border-radius: 14px;
   display: grid;
   place-items: center;
   background: rgba(255, 255, 255, 0.96);
@@ -736,7 +736,7 @@ li {
 }
 
 .demo-route-token-icon {
-  font-size: 0.9rem;
+  font-size: 1rem;
   line-height: 1;
 }
 
@@ -744,13 +744,13 @@ li {
   position: absolute;
   right: -2px;
   bottom: -2px;
-  min-width: 10px;
-  height: 10px;
+  min-width: 12px;
+  height: 12px;
   padding: 0 2px;
   border-radius: 999px;
   display: grid;
   place-items: center;
-  font-size: 0.38rem;
+  font-size: 0.42rem;
   font-weight: 900;
   background: rgba(31, 27, 22, 0.86);
   color: #fffdf8;
@@ -765,6 +765,7 @@ li {
 .demo-card-rack {
   display: grid;
   gap: 10px;
+  align-content: start;
 }
 
 .demo-stage-card {
@@ -850,11 +851,13 @@ li {
 
 .demo-phone-stack {
   display: grid;
-  gap: 14px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  align-items: start;
 }
 
 .demo-phone {
-  padding: 14px;
+  padding: 16px;
   border-radius: 28px;
   position: relative;
 }
@@ -878,13 +881,13 @@ li {
 }
 
 .demo-phone-screen {
-  padding: 12px;
+  padding: 14px;
   border-radius: 20px;
   background: linear-gradient(180deg, rgba(248, 243, 231, 0.98), rgba(236, 229, 212, 0.96));
   border: 1px solid var(--line);
   display: grid;
   gap: 10px;
-  min-height: 180px;
+  min-height: 250px;
 }
 
 .demo-phone-card {
@@ -2055,14 +2058,12 @@ li {
     grid-template-columns: 1fr;
   }
 
-  .demo-layout,
-  .demo-visuals {
+  .demo-layout {
     grid-template-columns: 1fr;
   }
 
   .demo-host-metrics,
-  .demo-connection-progress,
-  .demo-live-stage {
+  .demo-connection-progress {
     grid-template-columns: 1fr;
   }
 
@@ -2078,6 +2079,13 @@ li {
   .host-console,
   .board-panel {
     position: static;
+  }
+}
+
+@media (max-width: 1040px) {
+  .demo-visuals,
+  .demo-live-stage {
+    grid-template-columns: 1fr;
   }
 }
 
