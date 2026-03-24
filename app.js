@@ -2120,6 +2120,14 @@ function getSelectedCard() {
   return player ? player.hand.find((card) => card.uid === state.selectedCardId) || null : null;
 }
 
+function usesPhoneTurnControl(playerIndex = state.currentPlayer) {
+  return state.phoneMode && isPhoneConnected(playerIndex);
+}
+
+function setTurnHintForCurrentPlayer(defaultText, phoneText = defaultText) {
+  turnHintEl.textContent = usesPhoneTurnControl() ? phoneText : defaultText;
+}
+
 function clearActionSelection() {
   state.selectedCardId = null;
   state.actionContext = null;
@@ -2357,9 +2365,10 @@ function ensureTurnReady() {
       continue;
     }
 
-    turnHintEl.textContent = state.phoneMode && isPhoneConnected(state.currentPlayer)
-      ? `${player.name} wählt die geheime Aktionskarte auf dem Handy.`
-      : `${player.name} wählt eine DOG-Aktionskarte.`;
+    setTurnHintForCurrentPlayer(
+      `${player.name} wählt eine DOG-Aktionskarte.`,
+      `${player.name} steuert den ganzen Zug auf dem Handy.`
+    );
     render();
     return;
   }
@@ -2388,7 +2397,10 @@ function selectCard(cardId) {
 
   if (state.selectedCardId === cardId) {
     clearActionSelection();
-    turnHintEl.textContent = `${getCurrentPlayer().name} wählt eine DOG-Aktionskarte.`;
+    setTurnHintForCurrentPlayer(
+      `${getCurrentPlayer().name} wählt eine DOG-Aktionskarte.`,
+      `${getCurrentPlayer().name} steuert den ganzen Zug auf dem Handy.`
+    );
     render();
     return;
   }
@@ -2404,7 +2416,10 @@ function selectCard(cardId) {
       stage: 'choose-variant',
       options: variants
     };
-    turnHintEl.textContent = `Lege fest, wie ${card.label} gespielt wird.`;
+    setTurnHintForCurrentPlayer(
+      `Lege fest, wie ${card.label} gespielt wird.`,
+      `Lege auf dem Handy fest, wie ${card.label} gespielt wird.`
+    );
   }
   render();
 }
@@ -2416,13 +2431,19 @@ function activateAction(action) {
       actionKind: 'move',
       steps: action.steps
     };
-    turnHintEl.textContent = `Wähle eine Figur für ${action.steps > 0 ? `${action.steps} vor` : `${Math.abs(action.steps)} zurück`}.`;
+    setTurnHintForCurrentPlayer(
+      `Wähle eine Figur für ${action.steps > 0 ? `${action.steps} vor` : `${Math.abs(action.steps)} zurück`}.`,
+      `Wähle auf dem Handy eine Lok für ${action.steps > 0 ? `${action.steps} vor` : `${Math.abs(action.steps)} zurück`}.`
+    );
   } else if (action.kind === 'start') {
     state.actionContext = {
       stage: 'pick-piece',
       actionKind: 'start'
     };
-    turnHintEl.textContent = 'Wähle eine Figur aus dem Depot für das Startfeld.';
+    setTurnHintForCurrentPlayer(
+      'Wähle eine Figur aus dem Depot für das Startfeld.',
+      'Wähle auf dem Handy eine Lok aus dem Depot für das Startfeld.'
+    );
   } else if (action.kind === 'split') {
     state.actionContext = {
       stage: 'pick-split-piece',
@@ -2430,14 +2451,20 @@ function activateAction(action) {
       remaining: 7,
       pendingPieceId: null
     };
-    turnHintEl.textContent = 'Verteile die 7 auf eine oder mehrere eigene Figuren.';
+    setTurnHintForCurrentPlayer(
+      'Verteile die 7 auf eine oder mehrere eigene Figuren.',
+      'Verteile die 7 auf dem Handy auf eine oder mehrere eigene Loks.'
+    );
   } else if (action.kind === 'swap') {
     state.actionContext = {
       stage: 'pick-swap-source',
       actionKind: 'swap',
       sourcePieceId: null
     };
-    turnHintEl.textContent = 'Wähle zuerst deine eigene Tauschfigur.';
+    setTurnHintForCurrentPlayer(
+      'Wähle zuerst deine eigene Tauschfigur.',
+      'Wähle auf dem Handy zuerst deine eigene Tauschlok.'
+    );
   }
 }
 
@@ -2470,7 +2497,10 @@ function handleActionOption(optionId) {
       actionKind: 'split',
       remaining
     };
-    turnHintEl.textContent = `Noch ${remaining} Felder aus der 7 verteilen.`;
+    setTurnHintForCurrentPlayer(
+      `Noch ${remaining} Felder aus der 7 verteilen.`,
+      `Verteile auf dem Handy noch ${remaining} Felder aus der 7.`
+    );
     render();
   }
 }
@@ -2536,7 +2566,10 @@ function handleTokenSelection(playerIndex, pieceId) {
       pendingPieceId: pieceId,
       legalAmounts
     };
-    turnHintEl.textContent = `Wie viele Felder soll Figur ${pieceId.split('-')[1]} ziehen?`;
+    setTurnHintForCurrentPlayer(
+      `Wie viele Felder soll Figur ${pieceId.split('-')[1]} ziehen?`,
+      `Lege auf dem Handy fest, wie viele Felder Lok ${piece.pieceIndex + 1} ziehen soll.`
+    );
     render();
     return;
   }
@@ -2547,7 +2580,10 @@ function handleTokenSelection(playerIndex, pieceId) {
       stage: 'pick-swap-target',
       sourcePieceId: pieceId
     };
-    turnHintEl.textContent = 'Wähle nun eine gegnerische Figur als Tauschziel.';
+    setTurnHintForCurrentPlayer(
+      'Wähle nun eine gegnerische Figur als Tauschziel.',
+      'Wähle auf dem Handy nun eine gegnerische Lok als Tauschziel.'
+    );
     render();
     return;
   }
@@ -2745,11 +2781,73 @@ function isPhoneConnected(playerIndex) {
   return connection?.status === 'connected' && connection.channel?.readyState === 'open';
 }
 
+function getPieceLocationLabel(playerIndex, piece) {
+  const player = state.players[playerIndex];
+  const pieceState = getPieceState(player, piece);
+  if (pieceState.zone === 'home') return 'im Depot';
+  if (pieceState.zone === 'finish') return 'in der Charité';
+  if (pieceState.zone === 'lane') return `auf der Zielspur ${pieceState.laneIndex + 1}`;
+
+  const place = SPECIAL_SPACES.get(pieceState.absoluteIndex)?.place;
+  return place ? `bei ${place}` : `auf der Strecke ${piece.steps + 1}`;
+}
+
+function buildPhonePieceChoices(playerIndex) {
+  if (playerIndex !== state.currentPlayer || !state.actionContext) return [];
+
+  const player = state.players[playerIndex];
+  const describePiece = (piece, details) => ({
+    playerIndex,
+    pieceId: piece.id,
+    label: `🚂 Lok ${piece.pieceIndex + 1}`,
+    description: details
+  });
+
+  if (state.actionContext.stage === 'pick-piece') {
+    return player.pieces
+      .filter((piece) => isTokenSelectable(playerIndex, piece))
+      .map((piece) => describePiece(
+        piece,
+        state.actionContext.actionKind === 'start'
+          ? `${getPieceLocationLabel(playerIndex, piece)}; aufs Startsignal setzen`
+          : `${getPieceLocationLabel(playerIndex, piece)}; ${state.actionContext.steps > 0 ? `${state.actionContext.steps} vor` : `${Math.abs(state.actionContext.steps)} zurück`}`
+      ));
+  }
+
+  if (state.actionContext.stage === 'pick-split-piece') {
+    return player.pieces
+      .filter((piece) => isTokenSelectable(playerIndex, piece))
+      .map((piece) => {
+        const legalAmounts = getLegalSplitAmounts(playerIndex, piece.id, state.actionContext.remaining);
+        return describePiece(piece, `${getPieceLocationLabel(playerIndex, piece)}; möglich: ${legalAmounts.join(', ')}`);
+      });
+  }
+
+  if (state.actionContext.stage === 'pick-swap-source') {
+    return getSwapSources(playerIndex)
+      .filter((piece) => isTokenSelectable(playerIndex, piece))
+      .map((piece) => describePiece(piece, `${getPieceLocationLabel(playerIndex, piece)}; als eigene Tauschlok`));
+  }
+
+  if (state.actionContext.stage === 'pick-swap-target') {
+    return getSwapTargets(playerIndex)
+      .filter(({ playerIndex: targetPlayerIndex, piece }) => isTokenSelectable(targetPlayerIndex, piece))
+      .map(({ playerIndex: targetPlayerIndex, piece }) => ({
+        playerIndex: targetPlayerIndex,
+        pieceId: piece.id,
+        label: `${state.players[targetPlayerIndex].name} · 🚂 Lok ${piece.pieceIndex + 1}`,
+        description: getPieceLocationLabel(targetPlayerIndex, piece)
+      }));
+  }
+
+  return [];
+}
+
 function renderHiddenHandMessage(player) {
   handAreaEl.innerHTML = '';
   const info = document.createElement('div');
   info.className = 'recent-card';
-  info.innerHTML = `<h3>${player.hand.length} geheime Karten</h3><p>Diese Aktionshand ist nur auf ${player.name}s Handy sichtbar.</p>`;
+  info.innerHTML = `<h3>${player.hand.length} geheime Karten</h3><p>Diese Aktionshand und die ganze Zugsteuerung sind nur auf ${player.name}s Handy sichtbar.</p>`;
   handAreaEl.appendChild(info);
 }
 
@@ -2784,12 +2882,16 @@ function renderHand() {
 }
 
 function renderActiveCard() {
+  if (usesPhoneTurnControl()) {
+    activeCardSummaryEl.className = 'recent-card';
+    activeCardSummaryEl.innerHTML = '<h3>Vollsteuerungsmodus</h3><p>Aktionskarte, Varianten, Lokwahl und Zielauswahl laufen vollständig auf dem Handy.</p>';
+    return;
+  }
+
   const selectedCard = getSelectedCard();
   if (!selectedCard) {
     activeCardSummaryEl.className = 'recent-card empty';
-    activeCardSummaryEl.textContent = state.phoneMode && isPhoneConnected(state.currentPlayer)
-      ? 'Die geheime Aktionskarte wird auf dem Handy gewählt.'
-      : 'Wähle eine spielbare Aktionskarte aus deiner Hand.';
+    activeCardSummaryEl.textContent = 'Wähle eine spielbare Aktionskarte aus deiner Hand.';
     return;
   }
 
@@ -2806,6 +2908,14 @@ function renderActiveCard() {
 function renderActionOptions() {
   actionOptionsEl.innerHTML = '';
   if (!state.actionContext) return;
+
+  if (usesPhoneTurnControl()) {
+    const note = document.createElement('p');
+    note.className = 'action-panel-note';
+    note.textContent = 'Im Vollsteuerungsmodus werden Varianten, Lokwahl und Zusatzschritte direkt auf dem Handy bestätigt.';
+    actionOptionsEl.appendChild(note);
+    return;
+  }
 
   if (state.actionContext.stage === 'choose-variant') {
     state.actionContext.options.forEach((option) => {
@@ -2865,6 +2975,10 @@ function createTokenButton(playerIndex, piece) {
 
   if (isTokenSelectable(playerIndex, piece)) {
     button.classList.add('selectable');
+    if (usesPhoneTurnControl()) {
+      button.classList.add('remote-selectable');
+      button.disabled = true;
+    }
   } else {
     button.disabled = true;
   }
@@ -3308,6 +3422,7 @@ function buildPhoneView(playerIndex) {
     name: player.name,
     tone: player.tone,
     isCurrentTurn: playerIndex === state.currentPlayer,
+    privateControlActive: usesPhoneTurnControl(playerIndex),
     gameOver: state.gameOver,
     turnOwner: current?.name || '',
     turnHint: turnHintEl.textContent,
@@ -3340,6 +3455,7 @@ function buildPhoneView(playerIndex) {
         label: `${amount} Feld${amount === 1 ? '' : 'er'}`
       }))
       : [],
+    pieceChoices: buildPhonePieceChoices(playerIndex),
     roundSize: state.activeDealSize,
     deckCount: state.deck.length,
     modeLabel: getModeConfig(state.modeKey).label,
@@ -3625,6 +3741,10 @@ function handlePhoneMessage(playerIndex, rawData) {
     handleActionOption(payload.optionId);
   }
 
+  if (payload.type === 'select-token' && playerIndex === state.currentPlayer) {
+    handleTokenSelection(Number(payload.playerIndex), payload.pieceId);
+  }
+
   if (payload.type === 'play-influence' && playerIndex === state.currentPlayer) {
     playInfluenceCard(playerIndex, payload.cardId, payload.targetPlayerIndex);
   }
@@ -3643,7 +3763,9 @@ function renderPhoneView() {
   phoneGamePanelEl.classList.remove('hidden');
   phoneTitleEl.textContent = `${view.name} · geheime Karten`;
   phoneStatusTextEl.textContent = view.isCurrentTurn
-    ? 'Du bist am Zug. Wähle deine geheime Aktions- oder Einflusskarte direkt hier.'
+    ? view.privateControlActive
+      ? 'Du bist am Zug. Im Vollsteuerungsmodus steuerst du Karte, Lokwahl und Zusatzschritte komplett hier.'
+      : 'Du bist am Zug. Wähle deine geheime Aktions- oder Einflusskarte direkt hier.'
     : `${view.turnOwner} ist am Zug. Deine privaten Karten bleiben auf diesem Handy gespeichert.`;
   phonePlayerChipEl.textContent = view.name;
   phonePlayerChipEl.dataset.tone = view.tone;
@@ -3674,10 +3796,12 @@ function renderPhoneView() {
     phoneInfluenceAreaEl.appendChild(button);
   });
 
-  phoneActiveCardEl.className = view.activeCard ? 'recent-card' : 'recent-card empty';
+  phoneActiveCardEl.className = view.activeCard || view.privateControlActive ? 'recent-card' : 'recent-card empty';
   phoneActiveCardEl.innerHTML = view.activeCard
     ? `<h3>${view.activeCard.label}</h3><p>${view.activeCard.summary}</p>`
-    : 'Noch keine Karte gewählt.';
+    : view.privateControlActive
+      ? '<h3>Vollsteuerungsmodus</h3><p>Dieses Handy steuert die komplette verdeckte Zugfolge.</p>'
+      : 'Noch keine Karte gewählt.';
 
   phoneActionOptionsEl.innerHTML = '';
   if (phoneClient.pendingInfluenceCardId) {
@@ -3693,6 +3817,20 @@ function renderPhoneView() {
       targetWrap.appendChild(button);
     });
     phoneActionOptionsEl.appendChild(targetWrap);
+  } else if (view.pieceChoices.length > 0) {
+    phoneActionHintEl.textContent = 'Wähle jetzt die passende Lok direkt auf diesem Handy.';
+    const pieceWrap = document.createElement('div');
+    pieceWrap.className = 'phone-piece-grid';
+    view.pieceChoices.forEach((choice) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'phone-piece-card';
+      button.dataset.playerIndex = String(choice.playerIndex);
+      button.dataset.pieceId = choice.pieceId;
+      button.innerHTML = `<strong>${choice.label}</strong><span>${choice.description}</span>`;
+      pieceWrap.appendChild(button);
+    });
+    phoneActionOptionsEl.appendChild(pieceWrap);
   } else if (view.actionOptions.length > 0) {
     phoneActionHintEl.textContent = 'Diese Kartenvariante kannst du direkt auf dem Handy festlegen.';
     view.actionOptions.forEach((option) => {
@@ -3704,7 +3842,7 @@ function renderPhoneView() {
       phoneActionOptionsEl.appendChild(button);
     });
   } else if (view.splitOptions.length > 0) {
-    phoneActionHintEl.textContent = 'Nach der Brettauswahl kannst du die Split-Höhe hier festlegen.';
+    phoneActionHintEl.textContent = 'Verteile jetzt die restlichen Felder der 7 direkt auf dem Handy.';
     view.splitOptions.forEach((option) => {
       const button = document.createElement('button');
       button.type = 'button';
@@ -3714,7 +3852,9 @@ function renderPhoneView() {
       phoneActionOptionsEl.appendChild(button);
     });
   } else {
-    phoneActionHintEl.textContent = 'Wenn mehrere Varianten möglich sind, erscheinen sie hier.';
+    phoneActionHintEl.textContent = view.privateControlActive
+      ? 'Mehrdeutige Karten, Lokwahl und Zusatzschritte erscheinen hier, sobald du sie brauchst.'
+      : 'Wenn mehrere Varianten möglich sind, erscheinen sie hier.';
   }
 
   phoneScoreListEl.innerHTML = '';
@@ -4184,6 +4324,7 @@ function initBoardApp() {
   });
 
   boardEl.addEventListener('click', (event) => {
+    if (usesPhoneTurnControl()) return;
     const token = event.target.closest('.token');
     if (!token) return;
     handleTokenSelection(Number(token.dataset.playerIndex), token.dataset.pieceId);
@@ -4260,6 +4401,16 @@ function initPhoneApp() {
       });
       phoneClient.pendingInfluenceCardId = null;
       renderPhoneView();
+      return;
+    }
+
+    const pieceButton = event.target.closest('.phone-piece-card');
+    if (pieceButton) {
+      sendPhoneMessage({
+        type: 'select-token',
+        playerIndex: Number(pieceButton.dataset.playerIndex),
+        pieceId: pieceButton.dataset.pieceId
+      });
     }
   });
 

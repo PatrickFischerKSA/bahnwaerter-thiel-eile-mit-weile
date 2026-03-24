@@ -1520,6 +1520,11 @@ li {
   box-shadow: 0 0 0 4px rgba(41, 57, 46, 0.16), 0 8px 14px rgba(20, 14, 11, 0.28);
 }
 
+.token.remote-selectable {
+  cursor: default;
+  box-shadow: 0 0 0 4px rgba(49, 90, 130, 0.18), 0 8px 14px rgba(20, 14, 11, 0.2);
+}
+
 .token:disabled {
   cursor: default;
 }
@@ -1949,8 +1954,15 @@ li {
   gap: 12px;
 }
 
+.phone-piece-grid {
+  display: grid;
+  gap: 12px;
+  width: 100%;
+}
+
 .phone-action-card,
-.phone-influence-card {
+.phone-influence-card,
+.phone-piece-card {
   width: 100%;
   padding: 16px;
   text-align: left;
@@ -1962,13 +1974,15 @@ li {
 }
 
 .phone-action-card strong,
-.phone-influence-card strong {
+.phone-influence-card strong,
+.phone-piece-card strong {
   display: block;
   font-size: 1.05rem;
 }
 
 .phone-action-card span,
-.phone-influence-card span {
+.phone-influence-card span,
+.phone-piece-card span {
   display: block;
   margin-top: 6px;
   color: var(--muted);
@@ -1990,6 +2004,12 @@ li {
 .phone-influence-card:disabled {
   opacity: 0.44;
   cursor: not-allowed;
+}
+
+.phone-piece-card:hover,
+.phone-piece-card:focus-visible {
+  border-color: rgba(49, 90, 130, 0.48);
+  box-shadow: 0 14px 28px rgba(49, 90, 130, 0.14);
 }
 
 .phone-choice-targets {
