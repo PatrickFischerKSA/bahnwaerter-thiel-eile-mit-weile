@@ -1,12 +1,12 @@
 # Spielanleitung
 
-## Bahnwärter Thiel: Eile mit Weile
+## Bahnwärter Thiel - ein digitalisiertes Kartenspiel
 
 Diese Anleitung beschreibt den aktuellen Spielstand der digitalen Version mit Brett, Handy-Modus, Ortsfeldern, Literaturkarten, Einflusskarten und DOG-inspirierter Aktionslogik.
 
 ## 1. Worum geht es?
 
-`Bahnwärter Thiel: Eile mit Weile` ist ein digitales Brettspiel für `2 bis 4 Mitspieler*innen` auf der Grundlage von Gerhart Hauptmanns Novelle. Das Spiel verbindet drei Ebenen:
+`Bahnwärter Thiel - ein digitalisiertes Kartenspiel` ist ein digitales Brettspiel für `2 bis 4 Mitspieler*innen` auf der Grundlage von Gerhart Hauptmanns Novelle. Das Spiel verbindet drei Ebenen:
 
 - ein öffentliches Brett mit Dampflokomotiven als Spielfiguren
 - private Aktions- und Einflusskarten
