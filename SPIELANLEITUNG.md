@@ -2,296 +2,271 @@
 
 ## Bahnwärter Thiel - ein digitales Kartenspiel
 
-Diese Anleitung beschreibt den aktuellen Spielstand der digitalen Version mit Brett, Handy-Modus, Ortsfeldern, Literaturkarten, Einflusskarten und DOG-inspirierter Aktionslogik.
+Diese Anleitung ist bewusst kurz, konkret und spielnah geschrieben.
 
 ## 1. Worum geht es?
 
-`Bahnwärter Thiel - ein digitales Kartenspiel` ist ein digitales Brettspiel für `2 bis 4 Mitspieler*innen` auf der Grundlage von Gerhart Hauptmanns Novelle. Das Spiel verbindet drei Ebenen:
+Ihr spielt mit Dampflokomotiven auf einem gemeinsamen Brett.
 
-- ein öffentliches Brett mit Dampflokomotiven als Spielfiguren
-- private Aktions- und Einflusskarten
-- Literaturfelder mit Wissen, Deutung und Schicksalsmomenten aus dem Text
+Ziel:
 
-Ziel ist es, die eigenen Dampflokomotiven durch den Parcours bis ins `Schlussbild der Charité` zu bringen.
+- Bringe deine eigenen Loks ins Schlussfeld `Charité`.
+- Im `Normalmodus` brauchst du `4` Loks im Ziel.
+- Im `Kurzmodus` brauchst du `2` Loks im Ziel.
 
 ## 2. Was braucht ihr?
 
-- `1 gemeinsames Gerät` für das öffentliche Brett
-- optional `1 Handy pro Person`, wenn ihr den Handy-Modus nutzen wollt
-- etwas Zeit für die Literaturfragen, wenn ihr das Spiel auch als Unterrichtsgespräch nutzen möchtet
+- `1 gemeinsames Gerät` für das Brett
+- optional `1 Handy pro Person` für geheime Karten
 
-## 3. Spielmodi
+## 3. Wer klickt wann?
 
-Es gibt zwei Modi:
+Das ist die wichtigste Regel des ganzen Spiels:
 
-- `Normalmodus`
-  Vier eigene Figuren müssen in die Charité.
-  Der Kartenzyklus pro Runde ist `6-5-4-3-2-1`.
+- Immer klickt nur `eine` Person.
+- Immer ist nur die Person am Zug aktiv.
+- Alle anderen warten.
 
-- `Kurzmodus`
-  Zwei eigene Figuren müssen in die Charité.
-  Der Kartenzyklus pro Runde ist `5-4-3`.
+Merksatz:
 
-## 4. Vorbereitung
+> Nur die Person am Zug klickt. Alle anderen schauen zu.
 
-1. Wählt `2 bis 4` Spielende.
-2. Gebt bei Bedarf eigene Namen ein.
-3. Entscheidet euch für `Normal` oder `Kurz`.
-4. Entscheidet, ob ihr den `Handy-Modus` einschalten wollt.
-5. Startet die Partie.
+## 4. So startet ihr das Spiel
 
-Wenn der Handy-Modus aktiv ist:
+1. Wählt `2`, `3` oder `4` Spielende.
+2. Prüft die Namen.
+3. Wählt `Normal` oder `Kurz`.
+4. Entscheidet, ob ihr mit oder ohne `Handy-Modus` spielt.
+5. Klickt auf `Partie jetzt starten`.
 
-1. Der Host erzeugt pro Person einen `QR-Code` und einen `Einladungslink`.
-2. Jede Spielperson öffnet ihren Link auf dem eigenen Handy.
-3. Danach erscheinen die privaten Karten auf dem jeweiligen Gerät.
+## 5. Wenn ihr ohne Handy spielt
 
-Ohne Handy-Modus bleibt die Partie als `Hot-Seat-Spiel` auf einem gemeinsamen Gerät spielbar.
+- Alle spielen am selben Gerät.
+- Die Aktionskarten sind auf dem Brett sichtbar.
+- Die aktive Person klickt die Karte und danach die passende Lok direkt dort an.
 
-## 5. Ziel des Spiels
+Das ist die einfachste Version.
 
-Gewonnen hat, wer zuerst genügend eigene Dampflokomotiven ins `Schlussbild der Charité` gebracht hat:
+## 6. Wenn ihr mit Handy spielt
 
-- `4` Figuren im Normalmodus
-- `2` Figuren im Kurzmodus
-
-## 6. So sieht eine Runde aus
-
-Zu Beginn jeder Kartenrunde erhält jede Person eine neue Hand von Aktionskarten. Die Anzahl hängt vom Modus und vom aktuellen Rundenschritt ab.
-
-Beispiele:
-
-- Runde 1 im Normalmodus: `6` Aktionskarten pro Person
-- Runde 2 im Normalmodus: `5`
-- Runde 3 im Normalmodus: `4`
-- im Kurzmodus entsprechend `5`, dann `4`, dann `3`
-
-Sobald alle Hände leer sind, wird automatisch die nächste Kartenrunde ausgeteilt.
-
-Zusätzlich versucht das Spiel, die `Einflusskarten` wieder aufzufüllen. Jede Person hält dabei maximal `2 Einflusskarten`.
-
-## 7. Zugablauf
-
-Ein Zug läuft immer in dieser Reihenfolge:
-
-1. Die aktive Person wählt `1 Aktionskarte`.
-2. Wenn nötig, wählt sie eine Variante dieser Karte.
-3. Danach zieht sie `1 eigene Dampflokomotive`.
-4. Falls die Lok auf einem Literaturfeld landet, öffnet sich eine Karte.
-5. Danach ist die nächste Person am Zug.
-
-Wenn eine Person `keine spielbare Aktionskarte` mehr hat, legt das Spiel ihre Resthand automatisch ab und überspringt sie bis zur nächsten Austeilrunde.
-
-## 8. Die Aktionskarten
-
-Die Grundlogik orientiert sich an `DOG`.
-
-### Standardkarten
-
-- `2`, `3`, `5`, `6`, `8`, `9`, `10`, `12`
-  Ziehen eine eigene Lok genau so viele Felder vor.
-
-### Wahlkarten
-
-- `1 / 11`
-  Entweder eine Lok `1 Feld`, `11 Felder` oder mit `Start` aus dem Depot aufs Startfeld.
-
-- `13`
-  Entweder `13 Felder` oder mit `Start` aus dem Depot aufs Startfeld.
-
-- `4 ±`
-  Entweder `4 Felder vor` oder `4 Felder zurück`.
-
-### Spezialkarten
-
-- `7`
-  Die `7` darf auf mehrere eigene Loks aufgeteilt werden.
-
-- `Tausch`
-  Eine eigene Lok auf der Strecke wird mit einer gegnerischen Lok auf der Strecke getauscht.
-  Startfelder sind davon ausgenommen.
-
-- `?` Joker
-  Der Joker darf wie fast jede andere wichtige Karte eingesetzt werden:
-  `Start`, `1`, `11`, `13`, `4 vor`, `4 zurück`, `7`, `Tausch`, `12`.
-
-## 9. Start, Depot und Ziehen
-
-- Alle Loks beginnen im `Depot`.
-- Eine Lok darf nur mit einer `Startkarte` ins Spiel kommen.
-- Als Startkarten gelten `1 / 11`, `13` und der passende `Joker`.
-- Eine Lok auf einem geschützten Startfeld kann nicht einfach von einer gegnerischen Lok verdrängt werden.
-
-## 10. Zusammenstösse und Schutz
-
-Wenn eine Lok auf einem normalen Streckenfeld landet, auf dem bereits eine gegnerische Lok steht, wird diese angegriffen.
-
-- Hat die verteidigende Person `1 Schutzmarke`, verliert sie stattdessen diese Marke.
-- Hat sie keine Schutzmarke mehr, wird die Lok zurück ins `Depot` geschickt.
-
-Schutzmarken sind also eine Art einmaliger Puffer gegen Rückschläge.
-
-## 11. Einflusskarten
-
-Zusätzlich zu den Aktionskarten besitzt jede Person geheime `Einflusskarten`. Pro eigenem Zug darf maximal `1 Einflusskarte` eingesetzt werden.
-
-Aktuell gibt es:
-
-- `Rückenwind`
-  Du erhältst sofort `1 Schutzmarke`.
-
-- `Lektüreschub`
-  Du erhältst sofort `1 Erkenntnispunkt`.
-
-- `Reservelaterne`
-  Du ziehst sofort `1 zusätzliche Aktionskarte`.
-
-- `Signalstörung`
-  Eine gewählte Person verliert `1 Schutzmarke`.
-
-- `Streckensperre`
-  Eine gewählte Person verliert zufällig `1 Aktionskarte`.
-
-- `Schattenwurf`
-  Der `nächste Literaturbonus` einer gewählten Person wird blockiert.
+- Das Brett zeigt die öffentliche Runde.
+- Die geheimen Karten liegen nur auf den Handys.
+- Die aktive Person tippt ihre Karte auf dem eigenen Handy an.
+- Danach folgen auf dem Handy weitere Schritte.
 
 Wichtig:
 
-- Einflusskarten sind privat.
-- Das Brett zeigt vor allem die `Folge`, nicht zwingend die konkrete Karte.
+- Das Handy ist privat.
+- Zeig deine Karten nicht offen in die Gruppe.
 
-## 12. Literaturfelder
+## 7. So läuft ein normaler Zug ab
 
-Landet eine Lok auf einem Sonderfeld, wird eine Literaturkarte ausgelöst. Es gibt drei Typen:
+Jeder Zug läuft immer in dieser Reihenfolge:
 
-- `Textkarten`
-  fragen textnahes Wissen ab
+1. Die aktive Person wählt `genau 1 Aktionskarte`.
+2. Wenn die Karte mehrere Bedeutungen hat, wählt sie `genau 1 Variante`.
+3. Danach wählt sie `genau 1 passende Lok`.
+4. Die Lok bewegt sich.
+5. Wenn die Lok auf einem Literaturfeld landet, stoppt der Zug kurz für eine Karte.
+6. Danach ist die nächste Person dran.
 
-- `Deutungskarten`
-  fragen nach Interpretation, Motiven und literarischer Einordnung
+Merke:
 
-- `Schicksalskarten`
-  lösen sofort einen erzählerischen Effekt aus
+- Nicht doppelt klicken.
+- Nach jedem Klick zuerst den Assistenten lesen.
 
-### Antwortlogik
+## 8. Woran erkennt man spielbare Karten?
 
-Bei `Text` und `Deutung`:
+- `Helle Karten` sind jetzt spielbar.
+- `Graue Karten` gehen in diesem Moment nicht.
 
-- Die Lok ist bereits auf das Feld gezogen.
-- Danach beantwortet die aktive Person die Frage per Multiple Choice.
-- Nur bei `richtiger Antwort` gibt es den Bonus.
+Wenn du unsicher bist:
 
-Bei `Schicksal`:
+- Lies zuerst den Text auf der Karte.
+- Dann lies den Spiel-Assistenten.
+- Erst dann klicken.
 
-- Es gibt keine Quizantwort.
-- Der Effekt wird sofort ausgelöst.
+## 9. Die wichtigsten Aktionskarten
 
-### Wichtiger Zusatz
+### `1 / 11`
 
-Bei einer richtigen `Text-` oder `Deutungskarte` vergibt das Spiel nicht nur den Karteneffekt, sondern zusätzlich `1 Erkenntnispunkt`, solange kein `Schattenwurf` den Literaturbonus blockiert.
+- Diese Karte ist oft eine `Startkarte`.
+- Nach dem Klick entscheidest du:
+  - `Start`
+  - `1 Feld`
+  - `11 Felder`
 
-## 13. Ortsfelder und ihre Wirkungen
+### `13`
 
-Die Sonderfelder sind jetzt nicht mehr abstrakt, sondern als Orte aus der Spielwelt benannt. Der Ortsname erscheint im Protokoll und im Kartenfenster, und jede Station besitzt eine eigene Zusatzwirkung.
+- Entweder `Start`
+- oder `13 Felder`
 
-### Text-Orte
+### `4 ±`
 
-- `Wärterhäuschen`
-  Ortsbonus: `+1 Schutzmarke`
+- Entweder `4 Felder vor`
+- oder `4 Felder zurück`
 
-- `Acker an den Gleisen`
-  Ortswirkung: `+1 Feld`
+### `7`
 
-- `Barriere`
-  Ortsbonus: `+1 Schutzmarke`
+- Die `7` darf auf mehrere eigene Loks aufgeteilt werden.
+- Das Spiel fragt dich Schritt für Schritt:
+  - zuerst Lok wählen
+  - dann Feldzahl wählen
+  - dann eventuell nächste Lok wählen
 
-### Deutungs-Orte
+### `Tausch`
 
-- `Neu-Zittau`
-  Ortsbonus: `+1 Erkenntnispunkt`
+- Zuerst wählst du `deine eigene Lok`.
+- Danach wählst du `eine gegnerische Lok`.
+- Erst nach dem zweiten Klick wird getauscht.
 
-- `Kiefernforst`
-  Ortsbonus: `+1 Erkenntnispunkt`
+### `?` Joker
 
-### Schicksals-Orte
+- Der Joker kann eine wichtige Karte ersetzen.
+- Das Spiel fragt dich nach dem Klick, was der Joker sein soll.
 
-- `Bahnübergang`
-  Ortswirkung: `+1 Feld`
+### Zahlenkarten `2`, `3`, `5`, `6`, `8`, `9`, `10`, `12`
 
-- `Bahndamm`
-  Ortswirkung: `-1 Schutzmarke`, falls vorhanden
+- Diese Karten sind einfach:
+- Wähle die Karte.
+- Wähle eine passende Lok.
+- Ziehe genau so viele Felder vor.
 
-- `Schönschornstein`
-  Ortswirkung: `+1 Feld`
+## 10. Startfeld, Depot und Ziel
 
-Diese Ortswirkung kommt zusätzlich zur eigentlichen Literaturkarte ins Spiel.
+- Alle Loks beginnen im `Depot`.
+- Eine Lok kommt nur mit einer `Startkarte` aus dem Depot.
+- Im Zielbereich `Charité` sind Loks sicher angekommen.
 
-## 14. Schutzmarken und Erkenntnispunkte
+## 11. Was passiert bei einem Zusammenstoss?
 
-### Schutzmarken
+Wenn deine Lok auf einem Feld landet, auf dem eine gegnerische Lok steht:
 
-Schutzmarken helfen gegen Rückschläge auf der Strecke. Wenn eine gegnerische Lok dich schlägt, wird zuerst eine Schutzmarke verbraucht.
+- Zuerst wird geprüft, ob die andere Person eine `Schutzmarke` hat.
+- Wenn ja, verliert sie die Schutzmarke.
+- Wenn nein, geht ihre Lok zurück ins `Depot`.
 
-### Erkenntnispunkte
+## 12. Was sind Einflusskarten?
 
-Erkenntnispunkte zeigen den literarischen Fortschritt im Spiel an. Sie entstehen vor allem durch richtige Antworten und bestimmte Orts- oder Schicksalseffekte.
+Einflusskarten sind Zusatzkarten.
 
-## 15. Handy-Modus oder gemeinsamer Bildschirm?
+Wichtige Regel:
 
-### Ohne Handy-Modus
+- Pro eigenem Zug darfst du höchstens `1 Einflusskarte` spielen.
 
-- Alle spielen am selben Gerät.
-- Die Karten sind sichtbar, wenn gerade jemand am Zug ist.
-- Das ist die einfachste Variante.
+Beispiele:
 
-### Mit Handy-Modus
+- `Rückenwind` gibt dir `1 Schutzmarke`.
+- `Lektüreschub` gibt dir `1 Erkenntnispunkt`.
+- `Reservelaterne` gibt dir `1 zusätzliche Aktionskarte`.
+- `Signalstörung` nimmt einer anderen Person `1 Schutzmarke`.
+- `Streckensperre` lässt eine andere Person zufällig `1 Aktionskarte` verlieren.
+- `Schattenwurf` blockiert den nächsten Literaturbonus einer anderen Person.
 
-- Das Brett bleibt `öffentlich`.
-- Aktionskarten und Einflusskarten bleiben `privat` auf den jeweiligen Handys.
-- Das macht das Spiel näher an einem echten Karten- und Strategiespiel.
+## 13. Was sind Literaturkarten?
 
-Die Handys zeigen:
+Es gibt drei Sorten:
 
-- die eigene Aktionshand
-- die eigene Einfluss-Hand
-- mögliche Kartenvarianten
-- offene Rundendaten wie Zugperson, Runde, Deck und letzte Karte
+### Textkarte
 
-## 16. Was zeigt die Host-Konsole?
+- fragt nach dem Inhalt der Novelle
 
-Die linke Host-Konsole bündelt die Informationen des gemeinsamen Bretts:
+### Deutungskarte
 
-- `Spielzug`
-- `Spielstand`
-- `Letzte Karte`
-- `Protokoll`
-- `Handys`
+- fragt nach Interpretation, Motiv oder Aussage
 
-Die Bereiche sind aufklappbar, damit das Spielfeld möglichst gut sichtbar bleibt.
+### Schicksalskarte
 
-## 17. Siegbedingung noch einmal ganz kurz
+- wirkt sofort
+- hier gibt es kein Quiz
 
-- Lokomotiven aus dem Depot auf die Strecke bringen
-- mit Aktionskarten klug ziehen
-- Einflusskarten gezielt einsetzen
-- Literaturkarten beantworten
-- Ortswirkungen mitnehmen
-- als erste Person genügend eigene Loks ins `Schlussbild der Charité` bringen
+Bei `Textkarten` und `Deutungskarten` gilt:
 
-## 18. Kurze Moderationsfassung für eine Spielrunde
+- Nur die aktive Person antwortet.
+- Erst die Frage ganz lesen.
+- Dann genau `eine` Antwort antippen.
+- Danach das Feedback lesen.
 
-Wenn du das Spiel schnell erklären willst, kannst du es so zusammenfassen:
+## 14. Wann gibt es einen Bonus?
 
-> Wir spielen mit privaten Aktionskarten wie bei DOG.  
-> Unsere Figuren sind Dampflokomotiven.  
-> Startkarten bringen Loks aus dem Depot auf die Strecke.  
-> Wer auf Literaturfelder kommt, löst Fragen oder Schicksalsmomente aus.  
-> Die benannten Orte wie Wärterhäuschen, Neu-Zittau oder Schönschornstein geben zusätzliche Wirkungen.  
+Wenn du eine `Textkarte` oder `Deutungskarte` richtig beantwortest:
+
+- bekommst du den Kartenbonus
+- und meistens zusätzlich `1 Erkenntnispunkt`
+
+Wenn du falsch antwortest:
+
+- bekommst du keinen Bonus
+
+## 15. Was bedeuten die Orte auf dem Brett?
+
+Einige Felder sind besondere Orte aus der Novelle.
+
+Beispiele:
+
+- `Wärterhäuschen` gibt Schutz
+- `Neu-Zittau` gibt Erkenntnis
+- `Bahndamm` kann Schutz kosten
+- `Bahnübergang` oder `Schönschornstein` können Bewegung auslösen
+
+Wichtig:
+
+- Der Ortseffekt kommt zusätzlich zur Literaturkarte.
+
+## 16. Wenn du am Handy spielst
+
+Auf dem Handy siehst du:
+
+- deine geheimen Aktionskarten
+- deine Einflusskarten
+- Varianten einer Karte
+- die Auswahl möglicher Loks
+- offene Rundendaten
+
+Wenn du gerade `nicht` am Zug bist:
+
+- nichts drücken
+- Handy privat halten
+- warten, bis dein Name erscheint
+
+## 17. Die drei häufigsten Fehler
+
+### Fehler 1: Zu schnell klicken
+
+Lösung:
+
+- Nach jedem Klick kurz warten.
+- Erst den nächsten Hinweis lesen.
+
+### Fehler 2: Zwei Karten gleichzeitig denken
+
+Lösung:
+
+- Immer nur `eine` Karte spielen.
+- Erst wenn dieser Zug ganz fertig ist, ist die nächste Person dran.
+
+### Fehler 3: Falsche Person klickt
+
+Lösung:
+
+- Immer zuerst schauen: `Wer ist am Zug?`
+- Nur diese Person darf gerade etwas antippen.
+
+## 18. Die Kurzfassung in 20 Sekunden
+
+> Wähle eine Karte.
+> Wähle dann die passende Lok.
+> Lies die Hinweise nach jedem Klick.
+> Nur die Person am Zug klickt.
+> Literaturfelder unterbrechen den Zug kurz.
 > Gewonnen hat, wer zuerst genug eigene Loks in die Charité bringt.
 
-## 19. Empfehlung für den Unterricht
+## 19. Wenn etwas unklar ist
 
-- `Kurzmodus` eignet sich gut für eine erste Einführung.
-- `Normalmodus` eignet sich besser, wenn Strategie und Literaturgespräch gleich wichtig sind.
-- Der Handy-Modus lohnt sich besonders, wenn Geheimhaltung und taktische Spannung wichtig sind.
-- Für eine reine Textwiederholung kann man nach jeder Literaturkarte kurz stoppen und die Erklärung gemeinsam besprechen.
+Dann gilt immer diese Reihenfolge:
+
+1. Schau, `wer am Zug ist`.
+2. Lies den `Spiel-Assistenten`.
+3. Klicke nur den `einen` nächsten Schritt.
+
+Das Spiel ist absichtlich so gebaut, dass es euch während der Partie führt.

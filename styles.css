@@ -212,6 +212,12 @@ li {
   gap: 14px;
 }
 
+.turn-assistant-panel {
+  position: sticky;
+  top: 96px;
+  z-index: 14;
+}
+
 .assistant-steps {
   display: grid;
   gap: 10px;
@@ -245,6 +251,106 @@ li {
 .assistant-steps.compact li {
   padding: 10px 12px;
   border-radius: 16px;
+}
+
+.assistant-callout,
+.assistant-rule-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.assistant-fact {
+  padding: 12px 14px;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.assistant-fact strong,
+.assistant-fact span {
+  display: block;
+}
+
+.assistant-fact strong {
+  margin-bottom: 4px;
+  color: var(--ink);
+}
+
+.assistant-fact span {
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.assistant-legend {
+  display: grid;
+  gap: 10px;
+}
+
+.legend-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.legend-card-grid.compact {
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+
+.legend-card {
+  padding: 14px;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.88);
+}
+
+.legend-card-kicker {
+  margin: 0 0 6px;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.legend-card strong,
+.legend-card span,
+.legend-card small {
+  display: block;
+}
+
+.legend-card strong {
+  color: var(--ink);
+}
+
+.legend-card span {
+  margin-top: 6px;
+  color: var(--muted);
+}
+
+.legend-card small {
+  margin-top: 8px;
+  color: var(--ink-soft);
+  line-height: 1.45;
+}
+
+.legend-card.action {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(235, 243, 248, 0.92));
+}
+
+.legend-card.influence {
+  background: linear-gradient(135deg, rgba(255, 249, 240, 0.95), rgba(249, 236, 214, 0.92));
+}
+
+.legend-card.text {
+  background: linear-gradient(135deg, rgba(248, 250, 239, 0.95), rgba(228, 239, 206, 0.92));
+}
+
+.legend-card.deutung {
+  background: linear-gradient(135deg, rgba(243, 246, 255, 0.95), rgba(221, 229, 252, 0.92));
+}
+
+.legend-card.schicksal {
+  background: linear-gradient(135deg, rgba(255, 244, 240, 0.95), rgba(248, 221, 213, 0.92));
 }
 
 .start-cta-row .primary-btn {
@@ -1774,6 +1880,14 @@ li {
   color: var(--muted);
 }
 
+.hand-card small {
+  display: block;
+  margin-top: 8px;
+  font-size: 0.72rem;
+  line-height: 1.45;
+  color: var(--ink-soft);
+}
+
 .hand-card.selected {
   background: linear-gradient(135deg, rgba(41, 57, 46, 0.92), rgba(68, 92, 70, 0.94));
   color: #fffdf8;
@@ -1782,6 +1896,21 @@ li {
 
 .hand-card.selected span {
   color: rgba(255, 250, 243, 0.86);
+}
+
+.hand-card.selected small,
+.hand-card.selected .card-state,
+.phone-action-card.selected small,
+.phone-influence-card.selected small,
+.phone-action-card.selected .card-state,
+.phone-influence-card.selected .card-state {
+  color: rgba(255, 250, 243, 0.92);
+}
+
+.hand-card.selected .card-state,
+.phone-action-card.selected .card-state,
+.phone-influence-card.selected .card-state {
+  background: rgba(255, 255, 255, 0.16);
 }
 
 .hand-card.disabled {
@@ -2045,6 +2174,14 @@ li {
   font-size: 0.92rem;
 }
 
+.phone-action-card small,
+.phone-influence-card small {
+  display: block;
+  margin-top: 8px;
+  color: var(--ink-soft);
+  line-height: 1.45;
+}
+
 .phone-action-card.selected,
 .phone-influence-card.selected {
   background: linear-gradient(135deg, rgba(49, 90, 130, 0.92), rgba(33, 59, 82, 0.96));
@@ -2081,6 +2218,50 @@ li {
   border: 1px solid var(--line);
   background: rgba(255, 255, 255, 0.86);
   cursor: pointer;
+}
+
+.card-state {
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 8px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-style: normal;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+}
+
+.card-state.available {
+  background: rgba(68, 113, 82, 0.14);
+  color: #2d6b41;
+}
+
+.card-state.blocked {
+  background: rgba(104, 104, 104, 0.12);
+  color: #6b6b6b;
+}
+
+.modal-assistant {
+  margin: 0 0 16px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid var(--line);
+}
+
+.modal-assistant strong,
+.modal-assistant span {
+  display: block;
+}
+
+.modal-assistant strong {
+  margin-bottom: 6px;
+}
+
+.modal-assistant span {
+  color: var(--muted);
+  line-height: 1.45;
 }
 
 .phone-choice-chip:disabled {
@@ -2153,7 +2334,8 @@ li {
   }
 
   .host-console,
-  .board-panel {
+  .board-panel,
+  .turn-assistant-panel {
     position: static;
   }
 }
@@ -2187,7 +2369,9 @@ li {
   .count-picker,
   .mode-picker,
   .button-row,
-  .assistant-actions {
+  .assistant-actions,
+  .assistant-callout,
+  .assistant-rule-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -2277,7 +2461,9 @@ li {
   .count-picker,
   .mode-picker,
   .button-row,
-  .assistant-actions {
+  .assistant-actions,
+  .assistant-callout,
+  .assistant-rule-grid {
     grid-template-columns: 1fr;
   }
 
@@ -2311,6 +2497,11 @@ li {
 
   .phone-choice-targets {
     display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .legend-card-grid,
+  .legend-card-grid.compact {
     grid-template-columns: 1fr;
   }
 }

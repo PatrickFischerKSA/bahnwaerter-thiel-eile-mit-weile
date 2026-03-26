@@ -1044,6 +1044,18 @@ const INFLUENCE_LIBRARY = [
   }
 ];
 
+const CARD_SHOWCASE = [
+  { kind: 'action', title: '1 / 11', text: 'Start oder 1 oder 11 Felder', detail: 'Erst Karte wählen, dann entscheiden, was genau sie tun soll.' },
+  { kind: 'action', title: '4 ±', text: '4 vor oder 4 zurück', detail: 'Nach dem Klick entscheidest du die Richtung.' },
+  { kind: 'action', title: '7', text: '7 auf mehrere eigene Loks verteilen', detail: 'Die 7 wird Schritt für Schritt aufgeteilt.' },
+  { kind: 'action', title: 'Tausch', text: 'Eigene Lok mit gegnerischer Lok tauschen', detail: 'Zuerst deine Lok, dann das Ziel wählen.' },
+  { kind: 'influence', title: 'Rückenwind', text: 'Sofort 1 Schutzmarke', detail: 'Einflusskarten sind Zusatzkarten. Pro eigenem Zug höchstens eine.' },
+  { kind: 'influence', title: 'Signalstörung', text: 'Eine Person verliert 1 Schutzmarke', detail: 'Negative Einflusskarten brauchen zuerst ein Ziel.' },
+  { kind: 'text', title: 'Textkarte', text: 'Frage zum Inhalt', detail: 'Richtig beantwortet = Bonus und Erkenntnis.' },
+  { kind: 'deutung', title: 'Deutungskarte', text: 'Frage zur Interpretation', detail: 'Hier zählen Figur, Motiv und Aussage.' },
+  { kind: 'schicksal', title: 'Schicksalskarte', text: 'Soforteffekt ohne Quiz', detail: 'Diese Karte wirkt sofort und stoppt den Zug kurz.' }
+];
+
 const boardAppEl = document.getElementById('boardApp');
 const phoneAppEl = document.getElementById('phoneApp');
 const pageNavButtonsEl = document.getElementById('pageNavButtons');
@@ -1054,6 +1066,9 @@ const gameModePickerEl = document.getElementById('gameModePicker');
 const gameModeDescriptionEl = document.getElementById('gameModeDescription');
 const setupCoachSummaryEl = document.getElementById('setupCoachSummary');
 const setupCoachStepsEl = document.getElementById('setupCoachSteps');
+const setupAssistantNowEl = document.getElementById('setupAssistantNow');
+const setupAssistantRulesEl = document.getElementById('setupAssistantRules');
+const setupCardShowcaseEl = document.getElementById('setupCardShowcase');
 const newGameBtn = document.getElementById('newGameBtn');
 const openPhoneConnectBtn = document.getElementById('openPhoneConnectBtn');
 const openGameBoardBtn = document.getElementById('openGameBoardBtn');
@@ -1071,6 +1086,9 @@ const actionOptionsEl = document.getElementById('actionOptions');
 const turnHintEl = document.getElementById('turnHint');
 const turnCoachSummaryEl = document.getElementById('turnCoachSummary');
 const turnCoachStepsEl = document.getElementById('turnCoachSteps');
+const turnAssistantNowEl = document.getElementById('turnAssistantNow');
+const turnAssistantRulesEl = document.getElementById('turnAssistantRules');
+const turnCardLegendEl = document.getElementById('turnCardLegend');
 const jumpToTurnBtn = document.getElementById('jumpToTurnBtn');
 const jumpToPhonesBtn = document.getElementById('jumpToPhonesBtn');
 const playerListEl = document.getElementById('playerList');
@@ -1080,6 +1098,7 @@ const modalEl = document.getElementById('cardModal');
 const cardTypeEl = document.getElementById('cardType');
 const cardTitleEl = document.getElementById('cardTitle');
 const cardPromptEl = document.getElementById('cardPrompt');
+const cardAssistantEl = document.getElementById('cardAssistant');
 const cardOptionsEl = document.getElementById('cardOptions');
 const cardFeedbackEl = document.getElementById('cardFeedback');
 const cardContinueBtn = document.getElementById('cardContinueBtn');
@@ -1110,6 +1129,9 @@ const phonePlayerChipEl = document.getElementById('phonePlayerChip');
 const phoneTurnHintEl = document.getElementById('phoneTurnHint');
 const phoneAssistantSummaryEl = document.getElementById('phoneAssistantSummary');
 const phoneAssistantStepsEl = document.getElementById('phoneAssistantSteps');
+const phoneAssistantNowEl = document.getElementById('phoneAssistantNow');
+const phoneAssistantRulesEl = document.getElementById('phoneAssistantRules');
+const phoneCardLegendEl = document.getElementById('phoneCardLegend');
 const phoneHandAreaEl = document.getElementById('phoneHandArea');
 const phoneInfluenceAreaEl = document.getElementById('phoneInfluenceArea');
 const phoneActiveCardEl = document.getElementById('phoneActiveCard');
@@ -2150,6 +2172,265 @@ function renderAssistantSteps(target, steps) {
   });
 }
 
+function renderAssistantFacts(target, items) {
+  if (!target) return;
+  target.innerHTML = '';
+  items.forEach((item) => {
+    const card = document.createElement('div');
+    card.className = 'assistant-fact';
+    card.innerHTML = `<strong>${item.label}</strong><span>${item.text}</span>`;
+    target.appendChild(card);
+  });
+}
+
+function getCompactCardShowcase() {
+  return [
+    CARD_SHOWCASE[0],
+    CARD_SHOWCASE[2],
+    CARD_SHOWCASE[3],
+    CARD_SHOWCASE[4],
+    CARD_SHOWCASE[6],
+    CARD_SHOWCASE[8]
+  ];
+}
+
+function renderCardShowcase(target, cards) {
+  if (!target) return;
+  target.innerHTML = '';
+  cards.forEach((card) => {
+    const article = document.createElement('article');
+    article.className = `legend-card ${card.kind}`;
+    article.innerHTML = `
+      <p class="legend-card-kicker">${card.kind === 'action'
+        ? 'Aktionskarte'
+        : card.kind === 'influence'
+          ? 'Einflusskarte'
+          : 'Literaturkarte'}</p>
+      <strong>${card.title}</strong>
+      <span>${card.text}</span>
+      <small>${card.detail}</small>
+    `;
+    target.appendChild(article);
+  });
+}
+
+function getActionCardGuide(card) {
+  if (!card) return 'Wähle zuerst eine helle Karte. Danach sagt dir der Assistent sofort, was kommt.';
+  switch (card.label) {
+    case '1 / 11':
+      return 'Diese Karte ist eine Startkarte. Nach dem Klick entscheidest du: Start, 1 Feld oder 11 Felder.';
+    case '13':
+      return 'Mit dieser Karte startest du eine Lok aus dem Depot oder ziehst 13 Felder.';
+    case '4 ±':
+      return 'Mit dieser Karte wählst du erst nach dem Klick: 4 vor oder 4 zurück.';
+    case '7':
+      return 'Die 7 wird nicht auf einmal gespielt. Du verteilst sie Schritt für Schritt auf eigene Loks.';
+    case 'Tausch':
+      return 'Beim Tausch klickst du zuerst deine Lok und danach die gegnerische Lok.';
+    case '?':
+      return 'Der Joker kopiert eine wichtige Karte. Nach dem Klick musst du zuerst festlegen, was er heute sein soll.';
+    default:
+      return `Mit ${card.label} ziehst du danach genau ${card.label} Felder mit einer eigenen Lok.`;
+  }
+}
+
+function getActionCardStatusText(card, playable) {
+  if (playable) {
+    return `Jetzt spielbar. ${getActionCardGuide(card)}`;
+  }
+  return 'Gerade gesperrt. Diese Karte passt in diesem Moment nicht zu einer legalen Lok oder einem erlaubten Zug.';
+}
+
+function getInfluenceCardGuide(card) {
+  switch (card.label) {
+    case 'Rückenwind':
+      return 'Gibt dir sofort Schutz. Du brauchst kein Ziel.';
+    case 'Lektüreschub':
+      return 'Gibt dir sofort 1 Erkenntnispunkt.';
+    case 'Reservelaterne':
+      return 'Zieht dir sofort 1 zusätzliche Aktionskarte.';
+    case 'Signalstörung':
+      return 'Danach musst du eine Zielperson auswählen.';
+    case 'Streckensperre':
+      return 'Danach wählst du eine Zielperson. Sie verliert zufällig eine Aktionskarte.';
+    case 'Schattenwurf':
+      return 'Danach wählst du eine Zielperson. Ihr nächster Literaturbonus verfällt.';
+    default:
+      return card.summary;
+  }
+}
+
+function getCurrentBoardActionDetails(viaPhone) {
+  if (!state.players.length) {
+    return {
+      next: 'Wähle oben Spielendezahl, Modus und Namen. Danach auf "Partie jetzt starten" tippen.',
+      after: 'Sofort danach beginnt Runde 1.',
+      rule: 'Vor dem Start klickt noch niemand auf Karten oder Lokomotiven.'
+    };
+  }
+
+  const player = getCurrentPlayer();
+  const deviceText = viaPhone ? `auf ${player.name}s Handy` : 'am Brett';
+
+  if (state.pendingLiterature) {
+    return {
+      next: `${player.name} liest jetzt die offene Literaturkarte ${deviceText} und tippt genau eine Antwort an.`,
+      after: 'Danach zeigt das Spiel sofort, ob es einen Bonus gibt.',
+      rule: 'Bei Text- und Deutungskarten gibt nur die aktive Person die Antwort. Schicksalskarten wirken sofort.'
+    };
+  }
+
+  if (!state.selectedCardId && !state.actionContext) {
+    return {
+      next: viaPhone
+        ? `${player.name} tippt jetzt auf dem Handy genau eine helle Aktionskarte oder eine erlaubte Einflusskarte an.`
+        : `${player.name} tippt jetzt im Bereich Handkarten genau eine helle Karte an.`,
+      after: 'Danach erscheinen Varianten, markierte Loks oder Zielpersonen.',
+      rule: 'Helle Karten sind spielbar. Ausgegraute Karten darfst du in diesem Zug nicht benutzen.'
+    };
+  }
+
+  if (state.actionContext?.stage === 'choose-variant') {
+    return {
+      next: viaPhone
+        ? `${player.name} tippt jetzt auf dem Handy genau eine Kartenvariante an.`
+        : `${player.name} tippt jetzt unter "Mögliche Aktionen" genau eine Variante an.`,
+      after: 'Erst danach darf eine Lok oder eine Zielperson gewählt werden.',
+      rule: 'Bei 1/11, 13, 4 ± oder Joker muss zuerst die Bedeutung der Karte festgelegt werden.'
+    };
+  }
+
+  if (state.actionContext?.stage === 'pick-piece') {
+    return {
+      next: viaPhone
+        ? `${player.name} tippt jetzt auf dem Handy genau eine erlaubte Lok an.`
+        : `${player.name} tippt jetzt auf dem Brett genau eine markierte Lok an.`,
+      after: 'Wenn die Lok auf einem Literaturfeld landet, öffnet sich sofort eine Karte.',
+      rule: state.actionContext.actionKind === 'start'
+        ? 'Startkarten holen eine Lok aus dem Depot auf das Startfeld.'
+        : 'Nur markierte Loks dürfen mit der gewählten Karte bewegt werden.'
+    };
+  }
+
+  if (state.actionContext?.stage === 'pick-split-piece') {
+    return {
+      next: `${player.name} wählt jetzt die nächste Lok für einen Teil der 7.`,
+      after: 'Danach fragt das Spiel sofort nach der Feldzahl für diese Lok.',
+      rule: 'Die 7 darf auf mehrere eigene Loks aufgeteilt werden. Gegnerische Loks sind tabu.'
+    };
+  }
+
+  if (state.actionContext?.stage === 'pick-split-amount') {
+    return {
+      next: `${player.name} tippt jetzt die genaue Feldzahl für die gewählte Lok an.`,
+      after: 'Wenn noch Rest bleibt, folgt sofort die nächste Lok.',
+      rule: `Gerade bleiben noch ${state.actionContext.remaining} Felder der 7 zu verteilen.`
+    };
+  }
+
+  if (state.actionContext?.stage === 'pick-swap-source') {
+    return {
+      next: `${player.name} wählt jetzt zuerst die eigene Tauschlok.`,
+      after: 'Erst danach darf die gegnerische Ziellok gewählt werden.',
+      rule: 'Ein Tausch braucht immer zwei Klicks: zuerst eigene Lok, dann gegnerische Lok.'
+    };
+  }
+
+  if (state.actionContext?.stage === 'pick-swap-target') {
+    return {
+      next: `${player.name} wählt jetzt die gegnerische Ziellok für den Tausch.`,
+      after: 'Nach diesem Klick wird der Tausch sofort ausgeführt.',
+      rule: 'Nur gegnerische, legal markierte Loks sind als Tauschziel erlaubt.'
+    };
+  }
+
+  return {
+    next: `${player.name} liest den Hinweis und führt genau den nächsten Schritt aus.`,
+    after: 'Nach jedem Klick aktualisiert der Assistent die Anweisung.',
+    rule: 'Immer nur einen Klick machen und danach neu lesen.'
+  };
+}
+
+function describeTurnAssistantFacts() {
+  const player = getCurrentPlayer();
+  if (!player) return { callout: [], rules: [] };
+  const viaPhone = usesPhoneTurnControl();
+  const details = getCurrentBoardActionDetails(viaPhone);
+  return {
+    callout: [
+      { label: 'Wer klickt jetzt?', text: `${player.name} ist am Zug. Alle anderen warten.` },
+      { label: 'Nächster Klick', text: details.next },
+      { label: 'Danach', text: details.after }
+    ],
+    rules: [
+      { label: 'Wichtig', text: details.rule },
+      { label: 'Merke dir', text: viaPhone ? 'Im Handy-Modus werden Karten, Varianten und Lokwahl privat auf dem Handy gesteuert.' : 'Am Brett-Modus werden Karte und Lok direkt hier am gemeinsamen Bildschirm gewählt.' },
+      { label: 'Stopp-Regel', text: 'Nach jedem einzelnen Klick kurz anhalten und den neuen Hinweis lesen, nicht mehrfach antippen.' }
+    ]
+  };
+}
+
+function describeSetupAssistantFacts() {
+  return {
+    callout: [
+      { label: 'Wer startet?', text: 'Eine Person bedient zuerst das gemeinsame Brett und gibt das Startsignal.' },
+      { label: 'Erster Klick', text: phoneModeEnabled ? 'Partie starten, danach sofort die Handy-Verbindungen öffnen.' : 'Partie starten, danach direkt zum Spielbrett wechseln.' },
+      { label: 'Was sehen alle?', text: 'Die Beispielkarten unten zeigen schon vor dem Start, welche Kartentypen im Spiel vorkommen.' }
+    ],
+    rules: [
+      { label: 'Grundregel 1', text: 'In jedem Zug spielt genau eine Person genau eine Aktionskarte.' },
+      { label: 'Grundregel 2', text: 'Nur die Person am Zug klickt. Alle anderen schauen zu oder warten auf ihr Handy.' },
+      { label: 'Grundregel 3', text: 'Wenn eine Lok auf einem Literaturfeld landet, stoppt der Zug kurz für eine Karte.' }
+    ]
+  };
+}
+
+function describePhoneAssistantFacts(view) {
+  if (!view) {
+    return {
+      callout: [
+        { label: 'Was jetzt?', text: 'Zuerst den persönlichen Link oder QR-Code vom Brett öffnen.' },
+        { label: 'Dann', text: 'Den Antwort-Code zurück ans Brett geben oder die automatische Verbindung abwarten.' },
+        { label: 'Ergebnis', text: 'Erst danach erscheinen hier deine privaten Karten.' }
+      ],
+      rules: [
+        { label: 'Wichtig', text: 'Dieses Handy gehört immer genau einer Spielperson.' },
+        { label: 'Privat', text: 'Aktionskarten und Einflusskarten bleiben nur hier sichtbar.' },
+        { label: 'Noch nicht tippen', text: 'Vor der Verbindung bringt Tippen noch nichts.' }
+      ]
+    };
+  }
+
+  if (!view.isCurrentTurn) {
+    return {
+      callout: [
+        { label: 'Wer klickt jetzt?', text: `${view.turnOwner} ist am Zug. Du wartest.` },
+        { label: 'Was du tust', text: 'Nichts drücken und dein Handy privat halten.' },
+        { label: 'Wann du wieder dran bist', text: 'Sobald dein Name oben erscheint, darfst du wieder tippen.' }
+      ],
+      rules: [
+        { label: 'Wichtig', text: 'Nicht aus Neugier Karten antippen, wenn du nicht am Zug bist.' },
+        { label: 'Privat', text: 'Deine Karten bleiben nur auf deinem Handy sichtbar.' },
+        { label: 'Vorbereitung', text: 'Du kannst in Ruhe deine Karten lesen, aber noch nichts auslösen.' }
+      ]
+    };
+  }
+
+  const assistant = describePhoneAssistant(view);
+  return {
+    callout: [
+      { label: 'Wer klickt jetzt?', text: 'Du bist am Zug.' },
+      { label: 'Nächster Klick', text: assistant.steps[0]?.text || 'Lies den nächsten Hinweis.' },
+      { label: 'Danach', text: assistant.steps[1]?.text || 'Danach erscheint sofort der nächste Schritt.' }
+    ],
+    rules: [
+      { label: 'Wichtig', text: 'Immer nur einmal tippen und kurz warten, bis der nächste Schritt erscheint.' },
+      { label: 'Helle Karten', text: 'Helle Karten sind spielbar. Ausgegraute Karten gehen jetzt nicht.' },
+      { label: 'Merke dir', text: 'Wenn eine Karte mehrere Bedeutungen hat, fragt dich das Handy danach automatisch weiter.' }
+    ]
+  };
+}
+
 function getSetupCoachData() {
   const modeLabel = getModeConfig(selectedGameMode).label;
   const summary = phoneModeEnabled
@@ -2544,8 +2825,8 @@ function ensureTurnReady() {
     }
 
     setTurnHintForCurrentPlayer(
-      `${player.name} wählt eine DOG-Aktionskarte.`,
-      `${player.name} steuert den ganzen Zug auf dem Handy.`
+      `${player.name} tippt jetzt auf genau eine helle Aktionskarte.`,
+      `${player.name} tippt jetzt auf dem Handy auf genau eine helle Aktionskarte.`
     );
     render();
     return;
@@ -2576,8 +2857,8 @@ function selectCard(cardId) {
   if (state.selectedCardId === cardId) {
     clearActionSelection();
     setTurnHintForCurrentPlayer(
-      `${getCurrentPlayer().name} wählt eine DOG-Aktionskarte.`,
-      `${getCurrentPlayer().name} steuert den ganzen Zug auf dem Handy.`
+      `${getCurrentPlayer().name} tippt jetzt wieder auf genau eine helle Aktionskarte.`,
+      `${getCurrentPlayer().name} tippt jetzt wieder auf dem Handy auf genau eine helle Aktionskarte.`
     );
     render();
     return;
@@ -2595,8 +2876,8 @@ function selectCard(cardId) {
       options: variants
     };
     setTurnHintForCurrentPlayer(
-      `Lege fest, wie ${card.label} gespielt wird.`,
-      `Lege auf dem Handy fest, wie ${card.label} gespielt wird.`
+      `Entscheide jetzt genau, was ${card.label} bedeuten soll.`,
+      `Entscheide jetzt auf dem Handy genau, was ${card.label} bedeuten soll.`
     );
   }
   render();
@@ -2610,8 +2891,8 @@ function activateAction(action) {
       steps: action.steps
     };
     setTurnHintForCurrentPlayer(
-      `Wähle eine Figur für ${action.steps > 0 ? `${action.steps} vor` : `${Math.abs(action.steps)} zurück`}.`,
-      `Wähle auf dem Handy eine Lok für ${action.steps > 0 ? `${action.steps} vor` : `${Math.abs(action.steps)} zurück`}.`
+      `Tippe jetzt genau die Lok an, die ${action.steps > 0 ? `${action.steps} Felder vor` : `${Math.abs(action.steps)} Felder zurück`} gehen soll.`,
+      `Tippe jetzt auf dem Handy genau die Lok an, die ${action.steps > 0 ? `${action.steps} Felder vor` : `${Math.abs(action.steps)} Felder zurück`} gehen soll.`
     );
   } else if (action.kind === 'start') {
     state.actionContext = {
@@ -2619,8 +2900,8 @@ function activateAction(action) {
       actionKind: 'start'
     };
     setTurnHintForCurrentPlayer(
-      'Wähle eine Figur aus dem Depot für das Startfeld.',
-      'Wähle auf dem Handy eine Lok aus dem Depot für das Startfeld.'
+      'Tippe jetzt eine Lok aus dem Depot an. Sie kommt aufs Startfeld.',
+      'Tippe jetzt auf dem Handy eine Lok aus dem Depot an. Sie kommt aufs Startfeld.'
     );
   } else if (action.kind === 'split') {
     state.actionContext = {
@@ -2630,8 +2911,8 @@ function activateAction(action) {
       pendingPieceId: null
     };
     setTurnHintForCurrentPlayer(
-      'Verteile die 7 auf eine oder mehrere eigene Figuren.',
-      'Verteile die 7 auf dem Handy auf eine oder mehrere eigene Loks.'
+      'Verteile die 7 jetzt Schritt für Schritt auf eine oder mehrere eigene Loks.',
+      'Verteile die 7 jetzt auf dem Handy Schritt für Schritt auf eine oder mehrere eigene Loks.'
     );
   } else if (action.kind === 'swap') {
     state.actionContext = {
@@ -2640,8 +2921,8 @@ function activateAction(action) {
       sourcePieceId: null
     };
     setTurnHintForCurrentPlayer(
-      'Wähle zuerst deine eigene Tauschfigur.',
-      'Wähle auf dem Handy zuerst deine eigene Tauschlok.'
+      'Tippe zuerst deine eigene Tauschlok an.',
+      'Tippe auf dem Handy zuerst deine eigene Tauschlok an.'
     );
   }
 }
@@ -2676,8 +2957,8 @@ function handleActionOption(optionId) {
       remaining
     };
     setTurnHintForCurrentPlayer(
-      `Noch ${remaining} Felder aus der 7 verteilen.`,
-      `Verteile auf dem Handy noch ${remaining} Felder aus der 7.`
+      `Es bleiben noch ${remaining} Felder der 7. Wähle jetzt die nächste passende Lok.`,
+      `Es bleiben noch ${remaining} Felder der 7. Wähle jetzt auf dem Handy die nächste passende Lok.`
     );
     render();
   }
@@ -2745,8 +3026,8 @@ function handleTokenSelection(playerIndex, pieceId) {
       legalAmounts
     };
     setTurnHintForCurrentPlayer(
-      `Wie viele Felder soll Figur ${pieceId.split('-')[1]} ziehen?`,
-      `Lege auf dem Handy fest, wie viele Felder Lok ${piece.pieceIndex + 1} ziehen soll.`
+      `Wie viele Felder soll diese Lok jetzt ziehen? Tippe genau eine Zahl an.`,
+      `Wie viele Felder soll diese Lok jetzt ziehen? Tippe auf dem Handy genau eine Zahl an.`
     );
     render();
     return;
@@ -2759,8 +3040,8 @@ function handleTokenSelection(playerIndex, pieceId) {
       sourcePieceId: pieceId
     };
     setTurnHintForCurrentPlayer(
-      'Wähle nun eine gegnerische Figur als Tauschziel.',
-      'Wähle auf dem Handy nun eine gegnerische Lok als Tauschziel.'
+      'Tippe jetzt die gegnerische Lok an, mit der getauscht werden soll.',
+      'Tippe jetzt auf dem Handy die gegnerische Lok an, mit der getauscht werden soll.'
     );
     render();
     return;
@@ -2783,6 +3064,11 @@ function openLiteratureModal() {
   cardTypeEl.textContent = fieldMeta?.place ? `${typeLabel} · ${fieldMeta.place}` : typeLabel;
   cardTitleEl.textContent = card.title;
   cardPromptEl.textContent = card.prompt;
+  if (cardAssistantEl) {
+    cardAssistantEl.innerHTML = type === 'schicksal'
+      ? '<strong>So läuft diese Karte ab</strong><span>Diese Schicksalskarte wirkt sofort. Lest kurz die Erklärung und tippt dann auf "Weiter".</span>'
+      : '<strong>So läuft diese Karte ab</strong><span>Nur die aktive Person beantwortet jetzt die Frage. Erst lesen, dann genau eine Antwort antippen, dann das Feedback abwarten.</span>';
+  }
   cardOptionsEl.innerHTML = '';
   cardFeedbackEl.textContent = '';
   cardContinueBtn.classList.add('hidden');
@@ -2833,6 +3119,11 @@ function resolveLiteratureAnswer(optionIndex) {
     correct ? rewardText : '',
     correct ? fieldEffectText : ''
   );
+  if (cardAssistantEl) {
+    cardAssistantEl.innerHTML = correct
+      ? '<strong>Antwort abgeschlossen</strong><span>Gut. Lies kurz das Feedback und tippe dann auf "Weiter". Danach geht der Zug automatisch weiter.</span>'
+      : '<strong>Antwort abgeschlossen</strong><span>Lies kurz die Auflösung und tippe dann auf "Weiter". Erst danach geht das Spiel weiter.</span>';
+  }
   updateRecentCard(
     pending.type,
     card.title,
@@ -2951,6 +3242,10 @@ function renderSetupCoach() {
     setupCoachSummaryEl.textContent = summary;
   }
   renderAssistantSteps(setupCoachStepsEl, steps);
+  const facts = describeSetupAssistantFacts();
+  renderAssistantFacts(setupAssistantNowEl, facts.callout);
+  renderAssistantFacts(setupAssistantRulesEl, facts.rules);
+  renderCardShowcase(setupCardShowcaseEl, CARD_SHOWCASE);
   if (newGameBtn) {
     newGameBtn.textContent = phoneModeEnabled ? 'Partie starten und Handys verbinden' : 'Partie jetzt starten';
   }
@@ -2965,6 +3260,10 @@ function renderTurnCoach() {
     turnCoachSummaryEl.textContent = summary;
   }
   renderAssistantSteps(turnCoachStepsEl, steps);
+  const facts = describeTurnAssistantFacts();
+  renderAssistantFacts(turnAssistantNowEl, facts.callout);
+  renderAssistantFacts(turnAssistantRulesEl, facts.rules);
+  renderCardShowcase(turnCardLegendEl, getCompactCardShowcase());
   if (jumpToPhonesBtn) {
     jumpToPhonesBtn.hidden = !phoneModeEnabled;
   }
@@ -3050,7 +3349,7 @@ function renderHiddenHandMessage(player) {
   handAreaEl.innerHTML = '';
   const info = document.createElement('div');
   info.className = 'recent-card';
-  info.innerHTML = `<h3>${player.hand.length} geheime Karten</h3><p>Diese Aktionshand und die ganze Zugsteuerung sind nur auf ${player.name}s Handy sichtbar.</p>`;
+  info.innerHTML = `<h3>${player.hand.length} geheime Karten auf dem Handy</h3><p>Auf dem Brett siehst du diese Karten absichtlich nicht. ${player.name} hat sie nur auf dem eigenen Handy vor sich und klickt sie dort an.</p>`;
   handAreaEl.appendChild(info);
 }
 
@@ -3072,14 +3371,20 @@ function renderHand() {
     button.type = 'button';
     button.className = 'hand-card';
     button.dataset.cardId = card.uid;
-    if (!playableSet.has(card.uid)) button.classList.add('disabled');
+    const playable = playableSet.has(card.uid);
+    if (!playable) button.classList.add('disabled');
     if (state.selectedCardId === card.uid) button.classList.add('selected');
 
+    const kicker = document.createElement('em');
+    kicker.className = `card-state ${playable ? 'available' : 'blocked'}`;
+    kicker.textContent = playable ? 'Jetzt spielbar' : 'Gerade gesperrt';
     const title = document.createElement('strong');
     title.textContent = card.label;
     const summary = document.createElement('span');
     summary.textContent = card.summary;
-    button.append(title, summary);
+    const detail = document.createElement('small');
+    detail.textContent = getActionCardStatusText(card, playable);
+    button.append(kicker, title, summary, detail);
     handAreaEl.appendChild(button);
   });
 }
@@ -3105,7 +3410,9 @@ function renderActiveCard() {
   title.textContent = selectedCard.label;
   const body = document.createElement('p');
   body.textContent = selectedCard.summary;
-  activeCardSummaryEl.append(title, body);
+  const detail = document.createElement('p');
+  detail.textContent = getActionCardGuide(selectedCard);
+  activeCardSummaryEl.append(title, body, detail);
 }
 
 function renderActionOptions() {
@@ -4070,11 +4377,16 @@ function renderPhoneView() {
   if (appScreen !== 'phone') return;
 
   const view = phoneClient.view;
+  renderCardShowcase(phoneCardLegendEl, getCompactCardShowcase());
   if (!view) {
     phoneStatusTextEl.textContent = 'Warte auf die erste Synchronisation vom Brett.';
     phoneGamePanelEl.classList.add('hidden');
     if (phoneAssistantSummaryEl) phoneAssistantSummaryEl.textContent = 'Noch keine Verbindung zum Brett.';
-    renderAssistantSteps(phoneAssistantStepsEl, describePhoneAssistant(null).steps);
+    const assistant = describePhoneAssistant(null);
+    renderAssistantSteps(phoneAssistantStepsEl, assistant.steps);
+    const facts = describePhoneAssistantFacts(null);
+    renderAssistantFacts(phoneAssistantNowEl, facts.callout);
+    renderAssistantFacts(phoneAssistantRulesEl, facts.rules);
     return;
   }
 
@@ -4093,6 +4405,9 @@ function renderPhoneView() {
     phoneAssistantSummaryEl.textContent = assistant.summary;
   }
   renderAssistantSteps(phoneAssistantStepsEl, assistant.steps);
+  const facts = describePhoneAssistantFacts(view);
+  renderAssistantFacts(phoneAssistantNowEl, facts.callout);
+  renderAssistantFacts(phoneAssistantRulesEl, facts.rules);
 
   phoneHandAreaEl.innerHTML = '';
   view.hand.forEach((card) => {
@@ -4102,7 +4417,12 @@ function renderPhoneView() {
     button.dataset.cardId = card.uid;
     if (card.selected) button.classList.add('selected');
     button.disabled = !view.isCurrentTurn || !card.playable || view.gameOver;
-    button.innerHTML = `<strong>${card.label}</strong><span>${card.summary}</span>`;
+    button.innerHTML = `
+      <em class="card-state ${view.isCurrentTurn && card.playable && !view.gameOver ? 'available' : 'blocked'}">${view.isCurrentTurn && card.playable && !view.gameOver ? 'Jetzt spielbar' : 'Warten'}</em>
+      <strong>${card.label}</strong>
+      <span>${card.summary}</span>
+      <small>${getActionCardStatusText(card, view.isCurrentTurn && card.playable && !view.gameOver)}</small>
+    `;
     phoneHandAreaEl.appendChild(button);
   });
 
@@ -4115,7 +4435,12 @@ function renderPhoneView() {
     button.dataset.target = card.target;
     button.disabled = !card.usable || view.gameOver;
     if (phoneClient.pendingInfluenceCardId === card.uid) button.classList.add('selected');
-    button.innerHTML = `<strong>${card.label}</strong><span>${card.summary}</span>`;
+    button.innerHTML = `
+      <em class="card-state ${card.usable && !view.gameOver ? 'available' : 'blocked'}">${card.usable && !view.gameOver ? 'Jetzt spielbar' : 'Warten'}</em>
+      <strong>${card.label}</strong>
+      <span>${card.summary}</span>
+      <small>${getInfluenceCardGuide(card)}</small>
+    `;
     phoneInfluenceAreaEl.appendChild(button);
   });
 

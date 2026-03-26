@@ -43,7 +43,17 @@
               <h2>Spiel-Assistent</h2>
               <p id="phoneAssistantSummary">Warte auf die erste Synchronisation vom Brett.</p>
             </div>
+            <div id="phoneAssistantNow" class="assistant-callout"></div>
             <ol id="phoneAssistantSteps" class="assistant-steps compact"></ol>
+            <div id="phoneAssistantRules" class="assistant-rule-grid compact"></div>
+          </section>
+
+          <section class="panel phone-panel">
+            <div class="panel-head compact">
+              <h2>Spielkarten verstehen</h2>
+              <p>Diese Kartentypen tauchen im Spiel immer wieder auf.</p>
+            </div>
+            <div id="phoneCardLegend" class="legend-card-grid compact"></div>
           </section>
 
           <section class="panel phone-panel">
@@ -171,7 +181,9 @@
             <h2>Spielstart-Assistent</h2>
             <p id="setupCoachSummary">Lege die Runde fest und starte die Partie mit einem klaren Startsignal.</p>
           </div>
+          <div id="setupAssistantNow" class="assistant-callout"></div>
           <ol id="setupCoachSteps" class="assistant-steps"></ol>
+          <div id="setupAssistantRules" class="assistant-rule-grid"></div>
           <div class="button-row start-cta-row">
             <button id="newGameBtn" class="primary-btn wide" type="button">Partie jetzt starten</button>
             <button id="openPhoneConnectBtn" class="count-btn" type="button">Handys verbinden</button>
@@ -190,6 +202,14 @@
           <span>7 kann auf mehrere eigene Figuren verteilt werden.</span>
           <span>Kurzmodus: 2 Figuren ins Ziel, Kartenzyklus 5-4-3.</span>
         </div>
+
+        <section class="setup-note-card">
+          <div class="panel-head compact">
+            <h2>Spielkarten im Überblick</h2>
+            <p>Bevor ihr startet, könnt ihr hier die wichtigsten Karten einmal sehen.</p>
+          </div>
+          <div id="setupCardShowcase" class="legend-card-grid"></div>
+        </section>
       </section>
 
       <section id="gameSection" class="game-stage app-section" data-section="spiel">
@@ -198,7 +218,13 @@
             <h2>Spiel-Assistent</h2>
             <p id="turnCoachSummary">Starte eine Partie oder öffne die Verbindungen für die Handys.</p>
           </div>
+          <div id="turnAssistantNow" class="assistant-callout"></div>
           <ol id="turnCoachSteps" class="assistant-steps"></ol>
+          <div id="turnAssistantRules" class="assistant-rule-grid"></div>
+          <div class="assistant-legend">
+            <p class="mini-label">Kartenhilfe</p>
+            <div id="turnCardLegend" class="legend-card-grid compact"></div>
+          </div>
           <div class="button-row assistant-actions">
             <button id="jumpToTurnBtn" class="primary-btn" type="button">Zum aktuellen Zug</button>
             <button id="jumpToPhonesBtn" class="count-btn" type="button">Zu den Handy-Verbindungen</button>
@@ -448,6 +474,7 @@
       <p id="cardType" class="modal-kicker">Karte</p>
       <h2 id="cardTitle">Literaturkarte</h2>
       <p id="cardPrompt" class="modal-prompt"></p>
+      <div id="cardAssistant" class="modal-assistant"></div>
       <div id="cardOptions" class="option-list"></div>
       <p id="cardFeedback" class="card-feedback"></p>
       <div class="modal-actions">
