@@ -1056,6 +1056,37 @@ const CARD_SHOWCASE = [
   { kind: 'schicksal', title: 'Schicksalskarte', text: 'Soforteffekt ohne Quiz', detail: 'Diese Karte wirkt sofort und stoppt den Zug kurz.' }
 ];
 
+const RULE_PRIMER = [
+  {
+    title: 'Muss man DOG kennen?',
+    text: 'Nein. Du musst nur die Hinweise hier lesen. Das Spiel sagt dir bei jedem Schritt, was du anklicken darfst und was nicht.'
+  },
+  {
+    title: 'Wer spielt wann?',
+    text: 'Immer spielt nur die Person, deren Name bei "Am Zug" steht. Nur diese Person klickt. Alle anderen warten.'
+  },
+  {
+    title: 'Welche Karte spielt man?',
+    text: 'In deinem Zug spielst du genau 1 helle Aktionskarte. Optional darfst du zusätzlich höchstens 1 Einflusskarte spielen, wenn sie erlaubt ist.'
+  },
+  {
+    title: 'Wie viele Felder geht eine Lok?',
+    text: 'Die gewählte Karte bestimmt die Feldzahl: 2 = zwei Felder, 10 = zehn Felder, 13 = dreizehn Felder. Bei 4 ±, 1 / 11, Joker und 7 fragt das Spiel nach.'
+  },
+  {
+    title: 'Wann darf eine Lok aus dem Depot?',
+    text: 'Nur mit einer Startkarte: 1 / 11, 13 oder Joker als Start. Ohne Startkarte bleibt die Lok im Depot.'
+  },
+  {
+    title: 'Wann geht eine Lok zurück?',
+    text: 'Wenn eine gegnerische Lok auf deinem Feld landet und du keine Schutzmarke hast, muss deine Lok zurück ins Depot.'
+  },
+  {
+    title: 'Was passiert ohne spielbare Karte?',
+    text: 'Dann kannst du nichts wählen. Das Spiel legt deine Resthand automatisch ab und du wartest bis zur nächsten Kartenrunde.'
+  }
+];
+
 const boardAppEl = document.getElementById('boardApp');
 const phoneAppEl = document.getElementById('phoneApp');
 const pageNavButtonsEl = document.getElementById('pageNavButtons');
@@ -1068,6 +1099,8 @@ const setupCoachSummaryEl = document.getElementById('setupCoachSummary');
 const setupCoachStepsEl = document.getElementById('setupCoachSteps');
 const setupAssistantNowEl = document.getElementById('setupAssistantNow');
 const setupAssistantRulesEl = document.getElementById('setupAssistantRules');
+const setupStepPathEl = document.getElementById('setupStepPath');
+const setupRulePrimerEl = document.getElementById('setupRulePrimer');
 const setupCardShowcaseEl = document.getElementById('setupCardShowcase');
 const newGameBtn = document.getElementById('newGameBtn');
 const openPhoneConnectBtn = document.getElementById('openPhoneConnectBtn');
@@ -1088,7 +1121,9 @@ const turnCoachSummaryEl = document.getElementById('turnCoachSummary');
 const turnCoachStepsEl = document.getElementById('turnCoachSteps');
 const turnAssistantNowEl = document.getElementById('turnAssistantNow');
 const turnAssistantRulesEl = document.getElementById('turnAssistantRules');
+const turnStepPathEl = document.getElementById('turnStepPath');
 const turnCardLegendEl = document.getElementById('turnCardLegend');
+const turnRulePrimerEl = document.getElementById('turnRulePrimer');
 const jumpToTurnBtn = document.getElementById('jumpToTurnBtn');
 const jumpToPhonesBtn = document.getElementById('jumpToPhonesBtn');
 const playerListEl = document.getElementById('playerList');
@@ -1129,6 +1164,7 @@ const phonePlayerChipEl = document.getElementById('phonePlayerChip');
 const phoneTurnHintEl = document.getElementById('phoneTurnHint');
 const phoneAssistantSummaryEl = document.getElementById('phoneAssistantSummary');
 const phoneAssistantStepsEl = document.getElementById('phoneAssistantSteps');
+const phoneStepPathEl = document.getElementById('phoneStepPath');
 const phoneAssistantNowEl = document.getElementById('phoneAssistantNow');
 const phoneAssistantRulesEl = document.getElementById('phoneAssistantRules');
 const phoneCardLegendEl = document.getElementById('phoneCardLegend');
@@ -2183,6 +2219,23 @@ function renderAssistantFacts(target, items) {
   });
 }
 
+function renderStepPath(target, steps) {
+  if (!target) return;
+  target.innerHTML = '';
+  steps.forEach((step, index) => {
+    const article = document.createElement('article');
+    article.className = `step-path-card ${step.state || 'pending'}`;
+    article.innerHTML = `
+      <span class="step-path-index">${index + 1}</span>
+      <div class="step-path-copy">
+        <strong>${step.title}</strong>
+        <span>${step.text}</span>
+      </div>
+    `;
+    target.appendChild(article);
+  });
+}
+
 function getCompactCardShowcase() {
   return [
     CARD_SHOWCASE[0],
@@ -2210,6 +2263,150 @@ function renderCardShowcase(target, cards) {
       <span>${card.text}</span>
       <small>${card.detail}</small>
     `;
+    target.appendChild(article);
+  });
+}
+
+function getRulePrimerCards() {
+  const player = state.players?.[state.currentPlayer];
+  return RULE_PRIMER.map((rule) => {
+    if (rule.title === 'Wer spielt wann?' && player) {
+      return {
+        ...rule,
+        text: `${player.name} ist gerade am Zug, wenn sein Name oben bei "Am Zug" steht. Grundsätzlich klickt immer nur die aktive Person.`
+      };
+    }
+    if (rule.title === 'Welche Karte spielt man?' && player) {
+      return {
+        ...rule,
+        text: `${player.name} wählt in seinem Zug genau 1 helle Aktionskarte. Eine Einflusskarte ist nur zusätzlich und nur dann erlaubt, wenn sie gerade spielbar ist.`
+      };
+    }
+    return rule;
+  });
+}
+
+function getSetupStepPath() {
+  return [
+    { title: 'Runde wählen', text: 'Personenzahl und Modus festlegen.', state: 'done' },
+    { title: 'Namen prüfen', text: 'Kontrollieren, wer mitspielt.', state: 'done' },
+    { title: 'Start klicken', text: 'Partie mit dem grossen Button starten.', state: 'current' },
+    { title: phoneModeEnabled ? 'Handys verbinden' : 'Zum Brett gehen', text: phoneModeEnabled ? 'Danach die privaten Handy-Schirme koppeln.' : 'Danach direkt die erste Karte spielen.', state: 'pending' }
+  ];
+}
+
+function getTurnStepPath() {
+  const stage = state.actionContext?.stage || '';
+  const path = [
+    { title: 'Karte wählen', text: 'Eine helle Aktionskarte auswählen.', state: 'pending' },
+    { title: 'Bedeutung klären', text: 'Nur bei Karten mit mehreren Möglichkeiten.', state: 'pending' },
+    { title: 'Lok oder Ziel wählen', text: 'Passende Lok oder Zielperson anklicken.', state: 'pending' },
+    { title: 'Zug ausführen', text: 'Bewegung, Tausch oder Effekt läuft.', state: 'pending' },
+    { title: 'Literaturkarte lösen', text: 'Nur wenn ein Sonderfeld getroffen wurde.', state: 'pending' },
+    { title: 'Nächste Person', text: 'Zug endet, nächste Person ist dran.', state: 'pending' }
+  ];
+
+  if (state.gameOver) {
+    path.forEach((step) => { step.state = 'done'; });
+    return path;
+  }
+
+  if (state.pendingLiterature) {
+    path[0].state = 'done';
+    path[1].state = 'done';
+    path[2].state = 'done';
+    path[3].state = 'done';
+    path[4].state = 'current';
+    return path;
+  }
+
+  if (!state.selectedCardId && !state.actionContext) {
+    path[0].state = 'current';
+    return path;
+  }
+
+  path[0].state = 'done';
+
+  if (stage === 'choose-variant') {
+    path[1].state = 'current';
+    return path;
+  }
+
+  path[1].state = 'done';
+
+  if (stage === 'pick-piece' || stage === 'pick-split-piece' || stage === 'pick-split-amount' || stage === 'pick-swap-source' || stage === 'pick-swap-target') {
+    path[2].state = 'current';
+    return path;
+  }
+
+  if (state.selectedCardId) {
+    path[2].state = 'done';
+    path[3].state = 'current';
+    return path;
+  }
+
+  return path;
+}
+
+function getPhoneStepPath(view) {
+  const path = [
+    { title: 'Karte wählen', text: 'Eine helle Karte auf dem Handy antippen.', state: 'pending' },
+    { title: 'Bedeutung klären', text: 'Falls die Karte mehrere Möglichkeiten hat.', state: 'pending' },
+    { title: 'Lok oder Ziel wählen', text: 'Lok oder Zielperson auf dem Handy auswählen.', state: 'pending' },
+    { title: 'Zug läuft', text: 'Das Spiel verarbeitet den Schritt.', state: 'pending' },
+    { title: 'Literaturkarte', text: 'Nur bei einem Sonderfeld.', state: 'pending' },
+    { title: 'Warten / nächste Person', text: 'Nach dem Zug ist die nächste Person dran.', state: 'pending' }
+  ];
+
+  if (!view) {
+    path[0].title = 'Link öffnen';
+    path[0].text = 'Persönlichen Link oder QR-Code öffnen.';
+    path[0].state = 'current';
+    path[1].title = 'Antwort senden';
+    path[1].text = 'Antwort-Code ans Brett geben.';
+    path[2].title = 'Verbindung steht';
+    path[2].text = 'Erst dann erscheinen deine Karten.';
+    return path.slice(0, 3);
+  }
+
+  if (!view.isCurrentTurn) {
+    path[5].state = 'current';
+    return path;
+  }
+
+  const hasCardChoice = view.hand.some((card) => card.playable) || view.influenceHand.some((card) => card.usable);
+  if (hasCardChoice) {
+    path[0].state = 'current';
+  }
+
+  if (view.actionOptions.length > 0 || view.splitOptions.length > 0) {
+    path[0].state = 'done';
+    path[1].state = 'current';
+  }
+
+  if (view.pieceChoices.length > 0 || phoneClient.pendingInfluenceCardId) {
+    path[0].state = 'done';
+    path[1].state = 'done';
+    path[2].state = 'current';
+  }
+
+  if (view.activeCard && view.pieceChoices.length === 0 && view.actionOptions.length === 0 && view.splitOptions.length === 0 && !phoneClient.pendingInfluenceCardId) {
+    path[0].state = 'done';
+    path[1].state = 'done';
+    path[2].state = 'done';
+    path[3].state = 'current';
+  }
+
+  return path;
+}
+
+function renderRulePrimer(target, rules) {
+  if (!target) return;
+  target.innerHTML = '';
+  rules.forEach((rule) => {
+    const article = document.createElement('article');
+    article.className = 'rule-primer-card';
+    article.innerHTML = `<strong>${rule.title}</strong><span>${rule.text}</span>`;
     target.appendChild(article);
   });
 }
@@ -3241,10 +3438,12 @@ function renderSetupCoach() {
   if (setupCoachSummaryEl) {
     setupCoachSummaryEl.textContent = summary;
   }
+  renderStepPath(setupStepPathEl, getSetupStepPath());
   renderAssistantSteps(setupCoachStepsEl, steps);
   const facts = describeSetupAssistantFacts();
   renderAssistantFacts(setupAssistantNowEl, facts.callout);
   renderAssistantFacts(setupAssistantRulesEl, facts.rules);
+  renderRulePrimer(setupRulePrimerEl, getRulePrimerCards());
   renderCardShowcase(setupCardShowcaseEl, CARD_SHOWCASE);
   if (newGameBtn) {
     newGameBtn.textContent = phoneModeEnabled ? 'Partie starten und Handys verbinden' : 'Partie jetzt starten';
@@ -3259,11 +3458,13 @@ function renderTurnCoach() {
   if (turnCoachSummaryEl) {
     turnCoachSummaryEl.textContent = summary;
   }
+  renderStepPath(turnStepPathEl, getTurnStepPath());
   renderAssistantSteps(turnCoachStepsEl, steps);
   const facts = describeTurnAssistantFacts();
   renderAssistantFacts(turnAssistantNowEl, facts.callout);
   renderAssistantFacts(turnAssistantRulesEl, facts.rules);
   renderCardShowcase(turnCardLegendEl, getCompactCardShowcase());
+  renderRulePrimer(turnRulePrimerEl, getRulePrimerCards());
   if (jumpToPhonesBtn) {
     jumpToPhonesBtn.hidden = !phoneModeEnabled;
   }
@@ -4381,6 +4582,7 @@ function renderPhoneView() {
   if (!view) {
     phoneStatusTextEl.textContent = 'Warte auf die erste Synchronisation vom Brett.';
     phoneGamePanelEl.classList.add('hidden');
+    renderStepPath(phoneStepPathEl, getPhoneStepPath(null));
     if (phoneAssistantSummaryEl) phoneAssistantSummaryEl.textContent = 'Noch keine Verbindung zum Brett.';
     const assistant = describePhoneAssistant(null);
     renderAssistantSteps(phoneAssistantStepsEl, assistant.steps);
@@ -4404,6 +4606,7 @@ function renderPhoneView() {
   if (phoneAssistantSummaryEl) {
     phoneAssistantSummaryEl.textContent = assistant.summary;
   }
+  renderStepPath(phoneStepPathEl, getPhoneStepPath(view));
   renderAssistantSteps(phoneAssistantStepsEl, assistant.steps);
   const facts = describePhoneAssistantFacts(view);
   renderAssistantFacts(phoneAssistantNowEl, facts.callout);

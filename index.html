@@ -6,7 +6,7 @@
   <title>Bahnwärter Thiel - ein digitales Kartenspiel</title>
   <meta
     name="description"
-    content="Bahnwärter Thiel - ein digitales Kartenspiel: DOG-inspirierte Kartenmechanik mit Brett, Handy-Modus, Einflusskarten, Wissenskarten und erklärendem Demoablauf."
+    content="Bahnwärter Thiel - ein digitales Kartenspiel mit Brett, Handy-Modus, Einflusskarten, Wissenskarten und klarer Schritt-für-Schritt-Erklärung."
   />
   <link rel="stylesheet" href="styles.css" />
 </head>
@@ -40,9 +40,10 @@
         <section id="phoneGamePanel" class="hidden">
           <section class="panel phone-panel assistant-panel">
             <div class="panel-head compact">
-              <h2>Spiel-Assistent</h2>
+              <h2>Schritt-für-Schritt-Assistent</h2>
               <p id="phoneAssistantSummary">Warte auf die erste Synchronisation vom Brett.</p>
             </div>
+            <div id="phoneStepPath" class="step-path"></div>
             <div id="phoneAssistantNow" class="assistant-callout"></div>
             <ol id="phoneAssistantSteps" class="assistant-steps compact"></ol>
             <div id="phoneAssistantRules" class="assistant-rule-grid compact"></div>
@@ -106,8 +107,8 @@
         <p class="eyebrow">Volldigitales Literaturspiel</p>
         <h1>Bahnwärter Thiel - ein digitales Kartenspiel</h1>
         <p class="lead">
-          Ein vollständig spielbares Brettspiel in einer DOG-inspirierten Kartenvariante:
-          mit Aktionskarten, Startzügen, Tauschkarte, 4 ±, 7er-Aufteilung, Wissenskarten und
+          Ein vollständig spielbares Brettspiel mit klaren Aktionskarten,
+          Startzügen, Tauschkarte, 4 ±, 7er-Aufteilung, Wissenskarten und
           literarischen Schicksalsfeldern rund um Gerhart Hauptmanns
           <em>Bahnwärter Thiel</em>.
         </p>
@@ -178,9 +179,10 @@
 
         <section class="setup-note-card start-assistant-card">
           <div class="panel-head compact">
-            <h2>Spielstart-Assistent</h2>
+            <h2>Schritt-für-Schritt-Start</h2>
             <p id="setupCoachSummary">Lege die Runde fest und starte die Partie mit einem klaren Startsignal.</p>
           </div>
+          <div id="setupStepPath" class="step-path"></div>
           <div id="setupAssistantNow" class="assistant-callout"></div>
           <ol id="setupCoachSteps" class="assistant-steps"></ol>
           <div id="setupAssistantRules" class="assistant-rule-grid"></div>
@@ -198,10 +200,18 @@
 
         <div class="rule-strip">
           <span>Startkarten bringen Figuren aus dem Depot aufs Startfeld.</span>
-          <span>4 ± erlaubt Vor- oder Rückwärtszug wie bei DOG.</span>
+          <span>4 ± erlaubt 4 Felder vor oder 4 Felder zurück.</span>
           <span>7 kann auf mehrere eigene Figuren verteilt werden.</span>
           <span>Kurzmodus: 2 Figuren ins Ziel, Kartenzyklus 5-4-3.</span>
         </div>
+
+        <section class="setup-note-card">
+          <div class="panel-head compact">
+            <h2>Spielregeln von Grund auf</h2>
+            <p>Ohne Vorwissen: Wer klickt wann, wie weit darf man ziehen und wann geht eine Lok zurück?</p>
+          </div>
+          <div id="setupRulePrimer" class="rule-primer-grid"></div>
+        </section>
 
         <section class="setup-note-card">
           <div class="panel-head compact">
@@ -215,15 +225,20 @@
       <section id="gameSection" class="game-stage app-section" data-section="spiel">
         <section class="panel turn-assistant-panel">
           <div class="panel-head compact">
-            <h2>Spiel-Assistent</h2>
+            <h2>Schritt-für-Schritt-Assistent</h2>
             <p id="turnCoachSummary">Starte eine Partie oder öffne die Verbindungen für die Handys.</p>
           </div>
+          <div id="turnStepPath" class="step-path"></div>
           <div id="turnAssistantNow" class="assistant-callout"></div>
           <ol id="turnCoachSteps" class="assistant-steps"></ol>
           <div id="turnAssistantRules" class="assistant-rule-grid"></div>
           <div class="assistant-legend">
             <p class="mini-label">Kartenhilfe</p>
             <div id="turnCardLegend" class="legend-card-grid compact"></div>
+          </div>
+          <div class="assistant-legend">
+            <p class="mini-label">Grundregeln im Spiel</p>
+            <div id="turnRulePrimer" class="rule-primer-grid compact"></div>
           </div>
           <div class="button-row assistant-actions">
             <button id="jumpToTurnBtn" class="primary-btn" type="button">Zum aktuellen Zug</button>

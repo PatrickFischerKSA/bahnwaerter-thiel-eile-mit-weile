@@ -260,6 +260,73 @@ li {
   gap: 10px;
 }
 
+.step-path {
+  display: grid;
+  gap: 10px;
+}
+
+.step-path-card {
+  display: grid;
+  grid-template-columns: 34px 1fr;
+  gap: 12px;
+  align-items: start;
+  padding: 12px 14px;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.84);
+}
+
+.step-path-index {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  background: rgba(49, 90, 130, 0.12);
+  color: var(--accent);
+  font-weight: 800;
+}
+
+.step-path-copy strong,
+.step-path-copy span {
+  display: block;
+}
+
+.step-path-copy strong {
+  margin-bottom: 4px;
+  color: var(--ink);
+}
+
+.step-path-copy span {
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.step-path-card.current {
+  border-color: rgba(49, 90, 130, 0.34);
+  background: linear-gradient(135deg, rgba(242, 248, 252, 0.96), rgba(255, 255, 255, 0.92));
+  box-shadow: 0 14px 28px rgba(49, 90, 130, 0.12);
+}
+
+.step-path-card.current .step-path-index {
+  background: rgba(49, 90, 130, 0.86);
+  color: #fff;
+}
+
+.step-path-card.done {
+  background: rgba(240, 247, 239, 0.92);
+}
+
+.step-path-card.done .step-path-index {
+  background: rgba(68, 113, 82, 0.84);
+  color: #fff;
+}
+
+.step-path-card.pending {
+  opacity: 0.88;
+}
+
 .assistant-fact {
   padding: 12px 14px;
   border-radius: 18px;
@@ -295,6 +362,38 @@ li {
 
 .legend-card-grid.compact {
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+
+.rule-primer-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.rule-primer-grid.compact {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.rule-primer-card {
+  padding: 14px;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(246, 241, 231, 0.92));
+}
+
+.rule-primer-card strong,
+.rule-primer-card span {
+  display: block;
+}
+
+.rule-primer-card strong {
+  margin-bottom: 6px;
+  color: var(--ink);
+}
+
+.rule-primer-card span {
+  color: var(--muted);
+  line-height: 1.5;
 }
 
 .legend-card {
@@ -2501,7 +2600,9 @@ li {
   }
 
   .legend-card-grid,
-  .legend-card-grid.compact {
+  .legend-card-grid.compact,
+  .rule-primer-grid,
+  .rule-primer-grid.compact {
     grid-template-columns: 1fr;
   }
 }
