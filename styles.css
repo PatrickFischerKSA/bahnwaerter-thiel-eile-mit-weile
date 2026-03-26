@@ -213,9 +213,9 @@ li {
 }
 
 .turn-assistant-panel {
-  position: sticky;
-  top: 96px;
-  z-index: 14;
+  position: static;
+  top: auto;
+  z-index: auto;
 }
 
 .assistant-steps {
@@ -352,6 +352,49 @@ li {
 .assistant-legend {
   display: grid;
   gap: 10px;
+}
+
+.assistant-launcher-actions {
+  align-items: stretch;
+}
+
+.assistant-launcher-actions .count-btn,
+.assistant-launcher-actions .primary-btn {
+  flex: 0 0 auto;
+}
+
+.assistant-details {
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.assistant-details summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 14px 16px;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.assistant-details summary::-webkit-details-marker {
+  display: none;
+}
+
+.assistant-details summary::after {
+  content: "+";
+  float: right;
+  color: var(--accent);
+}
+
+.assistant-details[open] summary::after {
+  content: "–";
+}
+
+.assistant-details-body {
+  display: grid;
+  gap: 14px;
+  padding: 0 14px 14px;
 }
 
 .legend-card-grid {
@@ -2149,6 +2192,33 @@ li {
   box-shadow: 0 24px 60px rgba(18, 15, 12, 0.3);
 }
 
+.help-modal-card {
+  width: min(980px, calc(100vw - 28px));
+  max-height: calc(100vh - 36px);
+  overflow: auto;
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.88);
+  color: var(--ink);
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.help-modal-section {
+  display: grid;
+  gap: 12px;
+  margin-top: 18px;
+}
+
 .modal-prompt {
   margin: 16px 0 18px;
   font-size: 1.04rem;
@@ -2468,6 +2538,7 @@ li {
   .count-picker,
   .mode-picker,
   .button-row,
+  .assistant-launcher-actions,
   .assistant-actions,
   .assistant-callout,
   .assistant-rule-grid {
@@ -2560,6 +2631,7 @@ li {
   .count-picker,
   .mode-picker,
   .button-row,
+  .assistant-launcher-actions,
   .assistant-actions,
   .assistant-callout,
   .assistant-rule-grid {

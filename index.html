@@ -179,13 +179,14 @@
 
         <section class="setup-note-card start-assistant-card">
           <div class="panel-head compact">
-            <h2>Schritt-für-Schritt-Start</h2>
+            <h2>Spielhilfe</h2>
             <p id="setupCoachSummary">Lege die Runde fest und starte die Partie mit einem klaren Startsignal.</p>
           </div>
-          <div id="setupStepPath" class="step-path"></div>
-          <div id="setupAssistantNow" class="assistant-callout"></div>
-          <ol id="setupCoachSteps" class="assistant-steps"></ol>
-          <div id="setupAssistantRules" class="assistant-rule-grid"></div>
+          <div class="button-row assistant-launcher-actions">
+            <button class="count-btn" type="button" data-help-context="setup" data-help-panel="assistant">Start-Assistent</button>
+            <button class="count-btn" type="button" data-help-context="setup" data-help-panel="rules">Regeln</button>
+            <button class="count-btn" type="button" data-help-context="setup" data-help-panel="cards">Kartenhilfe</button>
+          </div>
           <div class="button-row start-cta-row">
             <button id="newGameBtn" class="primary-btn wide" type="button">Partie jetzt starten</button>
             <button id="openPhoneConnectBtn" class="count-btn" type="button">Handys verbinden</button>
@@ -204,41 +205,18 @@
           <span>7 kann auf mehrere eigene Figuren verteilt werden.</span>
           <span>Kurzmodus: 2 Figuren ins Ziel, Kartenzyklus 5-4-3.</span>
         </div>
-
-        <section class="setup-note-card">
-          <div class="panel-head compact">
-            <h2>Spielregeln von Grund auf</h2>
-            <p>Ohne Vorwissen: Wer klickt wann, wie weit darf man ziehen und wann geht eine Lok zurück?</p>
-          </div>
-          <div id="setupRulePrimer" class="rule-primer-grid"></div>
-        </section>
-
-        <section class="setup-note-card">
-          <div class="panel-head compact">
-            <h2>Spielkarten im Überblick</h2>
-            <p>Bevor ihr startet, könnt ihr hier die wichtigsten Karten einmal sehen.</p>
-          </div>
-          <div id="setupCardShowcase" class="legend-card-grid"></div>
-        </section>
       </section>
 
       <section id="gameSection" class="game-stage app-section" data-section="spiel">
         <section class="panel turn-assistant-panel">
           <div class="panel-head compact">
-            <h2>Schritt-für-Schritt-Assistent</h2>
+            <h2>Spielhilfe</h2>
             <p id="turnCoachSummary">Starte eine Partie oder öffne die Verbindungen für die Handys.</p>
           </div>
-          <div id="turnStepPath" class="step-path"></div>
-          <div id="turnAssistantNow" class="assistant-callout"></div>
-          <ol id="turnCoachSteps" class="assistant-steps"></ol>
-          <div id="turnAssistantRules" class="assistant-rule-grid"></div>
-          <div class="assistant-legend">
-            <p class="mini-label">Kartenhilfe</p>
-            <div id="turnCardLegend" class="legend-card-grid compact"></div>
-          </div>
-          <div class="assistant-legend">
-            <p class="mini-label">Grundregeln im Spiel</p>
-            <div id="turnRulePrimer" class="rule-primer-grid compact"></div>
+          <div class="button-row assistant-launcher-actions">
+            <button class="primary-btn" type="button" data-help-context="turn" data-help-panel="assistant">Assistent öffnen</button>
+            <button class="count-btn" type="button" data-help-context="turn" data-help-panel="rules">Regeln öffnen</button>
+            <button class="count-btn" type="button" data-help-context="turn" data-help-panel="cards">Kartenhilfe öffnen</button>
           </div>
           <div class="button-row assistant-actions">
             <button id="jumpToTurnBtn" class="primary-btn" type="button">Zum aktuellen Zug</button>
@@ -495,6 +473,28 @@
       <div class="modal-actions">
         <button id="cardContinueBtn" class="primary-btn hidden" type="button">Weiter</button>
       </div>
+    </div>
+  </div>
+
+  <div id="helpModal" class="modal hidden" aria-hidden="true">
+    <div class="modal-backdrop" data-close-help="true"></div>
+    <div class="modal-card help-modal-card" role="dialog" aria-modal="true" aria-labelledby="helpModalTitle">
+      <button id="helpModalCloseBtn" class="modal-close-btn" type="button" aria-label="Hilfe schliessen">×</button>
+      <p id="helpModalKicker" class="modal-kicker">Spielhilfe</p>
+      <h2 id="helpModalTitle">Hilfe</h2>
+      <p id="helpModalIntro" class="modal-prompt"></p>
+      <div id="helpModalStepPath" class="step-path hidden"></div>
+      <div id="helpModalCallout" class="assistant-callout hidden"></div>
+      <ol id="helpModalSteps" class="assistant-steps hidden"></ol>
+      <div id="helpModalFacts" class="assistant-rule-grid hidden"></div>
+      <section id="helpModalRuleSection" class="help-modal-section hidden">
+        <p class="mini-label">Grundregeln</p>
+        <div id="helpModalRulePrimer" class="rule-primer-grid"></div>
+      </section>
+      <section id="helpModalCardSection" class="help-modal-section hidden">
+        <p class="mini-label">Kartenhilfe</p>
+        <div id="helpModalCardLegend" class="legend-card-grid compact"></div>
+      </section>
     </div>
   </div>
 

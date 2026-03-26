@@ -1130,6 +1130,19 @@ const playerListEl = document.getElementById('playerList');
 const logListEl = document.getElementById('logList');
 const recentCardEl = document.getElementById('recentCard');
 const modalEl = document.getElementById('cardModal');
+const helpModalEl = document.getElementById('helpModal');
+const helpModalKickerEl = document.getElementById('helpModalKicker');
+const helpModalTitleEl = document.getElementById('helpModalTitle');
+const helpModalIntroEl = document.getElementById('helpModalIntro');
+const helpModalStepPathEl = document.getElementById('helpModalStepPath');
+const helpModalCalloutEl = document.getElementById('helpModalCallout');
+const helpModalStepsEl = document.getElementById('helpModalSteps');
+const helpModalFactsEl = document.getElementById('helpModalFacts');
+const helpModalRuleSectionEl = document.getElementById('helpModalRuleSection');
+const helpModalRulePrimerEl = document.getElementById('helpModalRulePrimer');
+const helpModalCardSectionEl = document.getElementById('helpModalCardSection');
+const helpModalCardLegendEl = document.getElementById('helpModalCardLegend');
+const helpModalCloseBtn = document.getElementById('helpModalCloseBtn');
 const cardTypeEl = document.getElementById('cardType');
 const cardTitleEl = document.getElementById('cardTitle');
 const cardPromptEl = document.getElementById('cardPrompt');
@@ -1184,6 +1197,7 @@ let demoStepIndex = 0;
 let demoTimer = null;
 let currentBoardView = 'start';
 let currentHostPanel = 'zug';
+let helpModalView = null;
 
 const hostConnections = new Map();
 const phoneClient = {
@@ -2409,6 +2423,113 @@ function renderRulePrimer(target, rules) {
     article.innerHTML = `<strong>${rule.title}</strong><span>${rule.text}</span>`;
     target.appendChild(article);
   });
+}
+
+function toggleHelpModalSection(element, visible) {
+  if (!element) return;
+  element.classList.toggle('hidden', !visible);
+}
+
+function renderHelpModal() {
+  if (!helpModalView || !helpModalEl) return;
+
+  const { context, panel } = helpModalView;
+  const setupFacts = describeSetupAssistantFacts();
+  const turnFacts = describeTurnAssistantFacts();
+  const setupCoach = getSetupCoachData();
+  const turnCoach = describeTurnCoach();
+
+  toggleHelpModalSection(helpModalStepPathEl, false);
+  toggleHelpModalSection(helpModalCalloutEl, false);
+  toggleHelpModalSection(helpModalStepsEl, false);
+  toggleHelpModalSection(helpModalFactsEl, false);
+  toggleHelpModalSection(helpModalRuleSectionEl, false);
+  toggleHelpModalSection(helpModalCardSectionEl, false);
+
+  let kicker = 'Spielhilfe';
+  let title = 'Hilfe';
+  let intro = '';
+
+  if (context === 'setup' && panel === 'assistant') {
+    kicker = 'Start-Assistent';
+    title = 'Schritt für Schritt zum Spielstart';
+    intro = setupCoach.summary;
+    toggleHelpModalSection(helpModalStepPathEl, true);
+    toggleHelpModalSection(helpModalCalloutEl, true);
+    toggleHelpModalSection(helpModalStepsEl, true);
+    toggleHelpModalSection(helpModalFactsEl, true);
+    renderStepPath(helpModalStepPathEl, getSetupStepPath());
+    renderAssistantFacts(helpModalCalloutEl, setupFacts.callout);
+    renderAssistantSteps(helpModalStepsEl, setupCoach.steps);
+    renderAssistantFacts(helpModalFactsEl, setupFacts.rules);
+  }
+
+  if (context === 'setup' && panel === 'rules') {
+    kicker = 'Start-Regeln';
+    title = 'Grundregeln vor dem ersten Zug';
+    intro = 'Hier steht von null an, wer klicken darf, wie weit gezogen wird und wann eine Lok zurück ins Depot muss.';
+    toggleHelpModalSection(helpModalRuleSectionEl, true);
+    renderRulePrimer(helpModalRulePrimerEl, getRulePrimerCards());
+  }
+
+  if (context === 'setup' && panel === 'cards') {
+    kicker = 'Start-Kartenhilfe';
+    title = 'Wichtige Spielkarten im Überblick';
+    intro = 'Diese Karten tauchen am häufigsten auf. Vor dem Start könnt ihr kurz schauen, was sie im Spiel bedeuten.';
+    toggleHelpModalSection(helpModalCardSectionEl, true);
+    renderCardShowcase(helpModalCardLegendEl, CARD_SHOWCASE);
+  }
+
+  if (context === 'turn' && panel === 'assistant') {
+    kicker = 'Spiel-Assistent';
+    title = 'Nächste Schritte im laufenden Zug';
+    intro = turnCoach.summary;
+    toggleHelpModalSection(helpModalStepPathEl, true);
+    toggleHelpModalSection(helpModalCalloutEl, true);
+    toggleHelpModalSection(helpModalStepsEl, true);
+    toggleHelpModalSection(helpModalFactsEl, true);
+    renderStepPath(helpModalStepPathEl, getTurnStepPath());
+    renderAssistantFacts(helpModalCalloutEl, turnFacts.callout);
+    renderAssistantSteps(helpModalStepsEl, turnCoach.steps);
+    renderAssistantFacts(helpModalFactsEl, turnFacts.rules);
+  }
+
+  if (context === 'turn' && panel === 'rules') {
+    kicker = 'Spiel-Regeln';
+    title = 'Regeln für den aktuellen Zug';
+    intro = 'Wenn ihr unsicher seid, schaut hier nach: nur die aktive Person klickt, die Karte bestimmt die Zugweite und geschlagene Loks gehen zurück ins Depot.';
+    toggleHelpModalSection(helpModalFactsEl, true);
+    toggleHelpModalSection(helpModalRuleSectionEl, true);
+    renderAssistantFacts(helpModalFactsEl, turnFacts.rules);
+    renderRulePrimer(helpModalRulePrimerEl, getRulePrimerCards());
+  }
+
+  if (context === 'turn' && panel === 'cards') {
+    kicker = 'Kartenhilfe';
+    title = 'Was die Spielkarten gerade bedeuten';
+    intro = 'Öffne diese Hilfe, wenn ihr bei einer Aktionskarte oder Literaturkarte nicht sicher seid, was als Nächstes passiert.';
+    toggleHelpModalSection(helpModalCardSectionEl, true);
+    renderCardShowcase(helpModalCardLegendEl, getCompactCardShowcase());
+  }
+
+  if (helpModalKickerEl) helpModalKickerEl.textContent = kicker;
+  if (helpModalTitleEl) helpModalTitleEl.textContent = title;
+  if (helpModalIntroEl) helpModalIntroEl.textContent = intro;
+}
+
+function openHelpModal(context, panel) {
+  if (!helpModalEl) return;
+  helpModalView = { context, panel };
+  renderHelpModal();
+  helpModalEl.classList.remove('hidden');
+  helpModalEl.setAttribute('aria-hidden', 'false');
+}
+
+function closeHelpModal() {
+  if (!helpModalEl) return;
+  helpModalEl.classList.add('hidden');
+  helpModalEl.setAttribute('aria-hidden', 'true');
+  helpModalView = null;
 }
 
 function getActionCardGuide(card) {
@@ -5001,6 +5122,7 @@ function render() {
   renderLog();
   renderRecentCard();
   renderConnectionList();
+  renderHelpModal();
   syncAllPhones();
 }
 
@@ -5173,6 +5295,11 @@ function initBoardApp() {
   openGameBoardBtn?.addEventListener('click', openCurrentTurnView);
   jumpToTurnBtn?.addEventListener('click', openCurrentTurnView);
   jumpToPhonesBtn?.addEventListener('click', openPhoneConnectionsView);
+  boardAppEl.addEventListener('click', (event) => {
+    const helpButton = event.target.closest('[data-help-panel][data-help-context]');
+    if (!helpButton) return;
+    openHelpModal(helpButton.dataset.helpContext, helpButton.dataset.helpPanel);
+  });
 
   handAreaEl.addEventListener('click', (event) => {
     const cardButton = event.target.closest('.hand-card');
@@ -5205,6 +5332,17 @@ function initBoardApp() {
       if (state.pendingLiterature && state.pendingLiterature.type === 'schicksal') {
         closeLiteratureModal();
       }
+    }
+  });
+  helpModalCloseBtn?.addEventListener('click', closeHelpModal);
+  helpModalEl?.addEventListener('click', (event) => {
+    if (event.target instanceof HTMLElement && event.target.dataset.closeHelp === 'true') {
+      closeHelpModal();
+    }
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && helpModalView) {
+      closeHelpModal();
     }
   });
 
