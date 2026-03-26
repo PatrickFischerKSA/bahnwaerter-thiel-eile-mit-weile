@@ -1,0 +1,461 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bahnwärter Thiel - ein digitales Kartenspiel</title>
+  <meta
+    name="description"
+    content="Bahnwärter Thiel - ein digitales Kartenspiel: DOG-inspirierte Kartenmechanik mit Brett, Handy-Modus, Einflusskarten, Wissenskarten und erklärendem Demoablauf."
+  />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="page-shell">
+    <section id="phoneApp" class="phone-app hidden" aria-live="polite">
+      <div class="phone-shell">
+        <div class="phone-header">
+          <p class="eyebrow">Handy-Modus</p>
+          <h1 id="phoneTitle">Privater Spielschirm</h1>
+          <p id="phoneStatusText" class="lead compact">
+            Diese private Ansicht gehört genau einer Spielperson. Hier erscheinen nur die geheimen Karten und Entscheidungen dieses Handys.
+          </p>
+        </div>
+
+        <section id="phoneConnectPanel" class="panel phone-panel">
+          <div class="panel-head compact">
+            <h2>Verbindung herstellen</h2>
+            <p>1. Link oder QR-Code vom Brett auf diesem Handy öffnen. 2. Den hier angezeigten Antwort-Code kopieren. 3. Den Code zurück am Brett einfügen.</p>
+          </div>
+
+          <div class="phone-connect-box">
+            <label for="phoneAnswerOutput">2. Diesen Antwort-Code zurück ans Brett geben</label>
+            <textarea id="phoneAnswerOutput" class="signal-textarea" rows="8" readonly></textarea>
+            <div class="button-row">
+              <button id="copyPhoneAnswerBtn" class="primary-btn wide" type="button">2. Code kopieren</button>
+            </div>
+          </div>
+        </section>
+
+        <section id="phoneGamePanel" class="hidden">
+          <section class="panel phone-panel assistant-panel">
+            <div class="panel-head compact">
+              <h2>Spiel-Assistent</h2>
+              <p id="phoneAssistantSummary">Warte auf die erste Synchronisation vom Brett.</p>
+            </div>
+            <ol id="phoneAssistantSteps" class="assistant-steps compact"></ol>
+          </section>
+
+          <section class="panel phone-panel">
+            <div class="panel-head compact">
+              <h2>Dein Zugstatus</h2>
+              <p id="phoneTurnHint">Warte auf die erste Host-Synchronisation.</p>
+            </div>
+            <div id="phonePlayerChip" class="player-chip">Spielperson</div>
+          </section>
+
+          <section class="panel phone-panel">
+            <div class="panel-head compact">
+              <h2>Geheime Aktionskarten</h2>
+              <p>Nur auf diesem Gerät sichtbar. Das Brett zeigt sie im Handy-Modus nicht mehr offen an.</p>
+            </div>
+            <div id="phoneHandArea" class="phone-card-grid"></div>
+          </section>
+
+          <section class="panel phone-panel">
+            <div class="panel-head compact">
+              <h2>Einflusskarten</h2>
+              <p>Positive Effekte für dich oder gezielte Störungen gegen andere Spielende.</p>
+            </div>
+            <div id="phoneInfluenceArea" class="phone-card-grid"></div>
+          </section>
+
+          <section class="panel phone-panel">
+            <div class="panel-head compact">
+              <h2>Aktive Auswahl</h2>
+              <p id="phoneActionHint">Varianten, Lokwahl und Zusatzschritte erscheinen hier direkt auf dem Handy.</p>
+            </div>
+            <div id="phoneActiveCard" class="recent-card empty">Noch keine Karte gewählt.</div>
+            <div id="phoneActionOptions" class="action-options"></div>
+          </section>
+
+          <section class="panel phone-panel">
+            <div class="panel-head compact">
+              <h2>Öffentliche Runde</h2>
+              <p>Nur offene Informationen zur Partie.</p>
+            </div>
+            <div id="phoneScoreList" class="player-list"></div>
+          </section>
+        </section>
+      </div>
+    </section>
+
+    <div id="boardApp">
+    <header class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">Volldigitales Literaturspiel</p>
+        <h1>Bahnwärter Thiel - ein digitales Kartenspiel</h1>
+        <p class="lead">
+          Ein vollständig spielbares Brettspiel in einer DOG-inspirierten Kartenvariante:
+          mit Aktionskarten, Startzügen, Tauschkarte, 4 ±, 7er-Aufteilung, Wissenskarten und
+          literarischen Schicksalsfeldern rund um Gerhart Hauptmanns
+          <em>Bahnwärter Thiel</em>.
+        </p>
+      </div>
+      <div class="hero-note">
+        <p class="note-kicker">Textgrundlage</p>
+        <p>
+          Die Spielinhalte bündeln die wesentlichen Informationen aus dem Primärtext:
+          Figurenkonstellation, Handlungsverlauf, Naturraum, Bahnmotiv, Gewalt,
+          Visionen, Schuld und Wahnsinn.
+        </p>
+      </div>
+    </header>
+
+    <nav class="page-nav panel" aria-label="Schnellnavigation">
+      <div class="panel-head compact">
+        <h2>Schnellnavigation</h2>
+        <p>Wähle eine Fokusansicht, damit du nicht durch alle Bereiche scrollen musst.</p>
+      </div>
+      <div id="pageNavButtons" class="page-nav-buttons">
+        <button class="page-nav-btn active" type="button" data-view="start">Start</button>
+        <button class="page-nav-btn" type="button" data-view="spiel">Spiel</button>
+        <button class="page-nav-btn" type="button" data-view="demo">Demo</button>
+        <button class="page-nav-btn" type="button" data-view="kompass">Kompass</button>
+        <button class="page-nav-btn" type="button" data-view="alles">Alles</button>
+      </div>
+    </nav>
+
+    <main class="layout">
+      <section id="setupSection" class="setup-card panel app-section" data-section="start">
+        <div class="panel-head">
+          <h2>Partie vorbereiten</h2>
+          <p>Wähle 2 bis 4 lokale Spielende. Namen können direkt angepasst werden.</p>
+        </div>
+
+        <div class="count-picker" id="playerCountPicker" aria-label="Spielendenzahl">
+          <button class="count-btn active" type="button" data-count="2">2</button>
+          <button class="count-btn" type="button" data-count="3">3</button>
+          <button class="count-btn" type="button" data-count="4">4</button>
+        </div>
+
+        <section class="game-mode-card">
+          <div class="panel-head compact">
+            <h2>Spielmodus</h2>
+            <p>Wähle zwischen voller Partie und einer kürzeren Unterrichts- oder Proberunde.</p>
+          </div>
+          <div id="gameModePicker" class="mode-picker" aria-label="Spielmodus">
+            <button class="count-btn active" type="button" data-mode="normal">Normal</button>
+            <button class="count-btn" type="button" data-mode="kurz">Kurz</button>
+          </div>
+          <div id="gameModeDescription" class="setup-note-card mode-description">
+            <strong>Normalmodus</strong>
+            <p>Vier Figuren müssen ins Ziel, der Kartenzyklus läuft 6-5-4-3-2-1.</p>
+          </div>
+        </section>
+
+        <div id="playerInputs" class="player-inputs"></div>
+
+        <div class="mode-toggle">
+          <label class="toggle-card" for="phoneModeToggle">
+            <input id="phoneModeToggle" type="checkbox" />
+            <span>
+              <strong>Handy-Modus aktivieren</strong>
+              <small>Das Brett bleibt öffentlich, die gesamte Zugsteuerung läuft über die privaten Handy-Ansichten.</small>
+            </span>
+          </label>
+        </div>
+
+        <section class="setup-note-card start-assistant-card">
+          <div class="panel-head compact">
+            <h2>Spielstart-Assistent</h2>
+            <p id="setupCoachSummary">Lege die Runde fest und starte die Partie mit einem klaren Startsignal.</p>
+          </div>
+          <ol id="setupCoachSteps" class="assistant-steps"></ol>
+          <div class="button-row start-cta-row">
+            <button id="newGameBtn" class="primary-btn wide" type="button">Partie jetzt starten</button>
+            <button id="openPhoneConnectBtn" class="count-btn" type="button">Handys verbinden</button>
+            <button id="openGameBoardBtn" class="count-btn" type="button">Zum Spielbrett</button>
+          </div>
+        </section>
+
+        <div class="setup-note-card">
+          <strong>Host-Hinweis</strong>
+          <p>Nach dem Start findest du Verbindungen, Spielstand, letzte Karte und Protokoll gesammelt in der Host-Konsole links neben dem Spielfeld.</p>
+        </div>
+
+        <div class="rule-strip">
+          <span>Startkarten bringen Figuren aus dem Depot aufs Startfeld.</span>
+          <span>4 ± erlaubt Vor- oder Rückwärtszug wie bei DOG.</span>
+          <span>7 kann auf mehrere eigene Figuren verteilt werden.</span>
+          <span>Kurzmodus: 2 Figuren ins Ziel, Kartenzyklus 5-4-3.</span>
+        </div>
+      </section>
+
+      <section id="gameSection" class="game-stage app-section" data-section="spiel">
+        <section class="panel turn-assistant-panel">
+          <div class="panel-head compact">
+            <h2>Spiel-Assistent</h2>
+            <p id="turnCoachSummary">Starte eine Partie oder öffne die Verbindungen für die Handys.</p>
+          </div>
+          <ol id="turnCoachSteps" class="assistant-steps"></ol>
+          <div class="button-row assistant-actions">
+            <button id="jumpToTurnBtn" class="primary-btn" type="button">Zum aktuellen Zug</button>
+            <button id="jumpToPhonesBtn" class="count-btn" type="button">Zu den Handy-Verbindungen</button>
+          </div>
+        </section>
+
+        <section class="board-stage">
+          <section class="host-console panel">
+            <div class="panel-head compact">
+              <h2>Host-Konsole</h2>
+              <p>Links liegen die wichtigsten Host-Infos. Das Spielfeld bleibt rechts kleiner und dadurch komplett besser überblickbar.</p>
+            </div>
+
+            <div class="host-status-strip">
+              <div class="host-status-card emphasis">
+                <span class="mini-label">Am Zug</span>
+                <div id="currentPlayerChip" class="player-chip">Signalrot</div>
+              </div>
+              <div class="host-status-card">
+                <span class="mini-label">Runde</span>
+                <strong id="roundSize">6</strong>
+              </div>
+              <div class="host-status-card">
+                <span class="mini-label">Deck</span>
+                <strong id="deckCount">0</strong>
+              </div>
+              <div class="host-status-card">
+                <span class="mini-label">Handys</span>
+                <strong id="connectionCount">0 / 0</strong>
+              </div>
+            </div>
+
+            <section class="host-focus-card">
+              <p class="mini-label">Zugfokus</p>
+              <p id="turnHint" class="turn-hint">
+                Partie starten und dann eine Aktionskarte ausspielen. Bewegliche Figuren leuchten auf dem Brett.
+              </p>
+              <div id="activeCardSummary" class="recent-card empty">
+                Wähle eine spielbare Aktionskarte aus deiner Hand.
+              </div>
+            </section>
+
+            <details id="hostSection-zug" class="host-disclosure" data-panel="zug" open>
+              <summary>Spielzug</summary>
+              <div class="host-disclosure-body host-panel-pane">
+                <p class="detail-intro">Hier liegen nur die aktuellen Zugdetails. Alles andere bleibt zugeklappt, bis du es brauchst.</p>
+              <div class="host-turn-grid">
+                <div class="action-panel">
+                  <p class="mini-label">Handkarten</p>
+                  <div id="handArea" class="hand-area"></div>
+                  <p id="phonePrivacyNotice" class="privacy-note hidden">
+                    Im Handy-Modus bleibt die Aktionshand privat auf den verbundenen Telefonen.
+                  </p>
+                </div>
+
+                <div class="action-panel">
+                  <p class="mini-label">Mögliche Aktionen</p>
+                  <p class="action-panel-note">Sobald eine Karte gewählt ist, erscheinen hier Varianten, Teilschritte oder Brettaktionen.</p>
+                  <div id="actionOptions" class="action-options"></div>
+                </div>
+              </div>
+              </div>
+            </details>
+
+            <details id="hostSection-spielstand" class="host-disclosure" data-panel="spielstand">
+              <summary>Spielstand</summary>
+              <div class="host-disclosure-body host-panel-pane">
+                <p class="detail-intro">Fortschritt, Schutzmarken und Erkenntnispunkte aller Spielpersonen.</p>
+                <div id="playerList" class="player-list"></div>
+              </div>
+            </details>
+
+            <details id="hostSection-letzte" class="host-disclosure" data-panel="letzte">
+              <summary>Letzte Karte</summary>
+              <div class="host-disclosure-body host-panel-pane">
+                <p class="detail-intro">Hier bleibt die zuletzt gelöste Szene oder Frage sichtbar.</p>
+                <div id="recentCard" class="recent-card empty">
+                  Noch keine Karte aufgedeckt.
+                </div>
+              </div>
+            </details>
+
+            <details id="hostSection-protokoll" class="host-disclosure" data-panel="protokoll">
+              <summary>Protokoll</summary>
+              <div class="host-disclosure-body host-panel-pane">
+                <p class="detail-intro">Kurze Spielspur für Unterrichts- oder Gruppenrunden.</p>
+                <ul id="logList" class="log-list"></ul>
+              </div>
+            </details>
+
+            <details id="hostSection-handys" class="host-disclosure" data-panel="handys">
+              <summary>Handys</summary>
+              <div class="host-disclosure-body host-panel-pane">
+                <section id="phoneControlPanel" class="phone-control-panel">
+                  <div class="panel-head compact">
+                    <h2>Verbindungsassistent</h2>
+                    <p>Für jede Spielperson gleich: Einladung erzeugen, am Handy öffnen oder scannen, Antwort-Code zurückkopieren und hier einfügen.</p>
+                  </div>
+                  <div id="connectionList" class="connection-list"></div>
+                </section>
+              </div>
+            </details>
+          </section>
+
+          <section class="board-panel panel">
+            <div class="panel-head board-head">
+              <div>
+                <h2>Spielbrett</h2>
+                <p>
+                  Kompakter Host-Blick auf Strecke, Startfelder und das Schlussbild der Charité.
+                </p>
+              </div>
+              <div class="legend">
+                <span class="legend-item"><i class="legend-dot text" aria-hidden="true">📖</i> Text</span>
+                <span class="legend-item"><i class="legend-dot deutung" aria-hidden="true">👁</i> Deutung</span>
+                <span class="legend-item"><i class="legend-dot schicksal" aria-hidden="true">⚡</i> Schicksal</span>
+                <span class="legend-item"><i class="legend-dot start" aria-hidden="true">🚦</i> Startfeld</span>
+              </div>
+            </div>
+
+            <div id="board" class="board" aria-label="Spielbrett"></div>
+          </section>
+        </section>
+      </section>
+
+      <section id="demoSection" class="demo panel app-section" data-section="demo">
+        <div class="panel-head">
+          <h2>Demoablauf</h2>
+          <p>Eine kompakte Schritt-für-Schritt-Erklärung für Unterricht, Präsentation und Einführung mit eingeblendeten Mini-Handys für den ganzen Spielrhythmus.</p>
+        </div>
+
+        <div class="demo-layout">
+          <aside class="demo-sidebar">
+            <div id="demoStepList" class="demo-step-list"></div>
+            <div id="demoProgress" class="recent-card"></div>
+          </aside>
+
+          <div class="demo-main">
+            <div class="demo-copy">
+              <p id="demoEyebrow" class="mini-label">Schritt 1</p>
+              <h3 id="demoTitle">Partie vorbereiten</h3>
+              <p id="demoText" class="demo-text"></p>
+              <div id="demoNotes" class="demo-notes"></div>
+            </div>
+
+            <div class="demo-visuals">
+              <article class="demo-host-card">
+                <div class="demo-visual-head">
+                  <span class="mini-label">Host-Brett</span>
+                  <strong id="demoHostTitle">Öffentliche Ansicht</strong>
+                </div>
+                <div id="demoHostCard" class="demo-host-content"></div>
+              </article>
+
+              <div class="demo-phone-stack">
+                <article class="demo-phone">
+                  <div class="demo-phone-top">
+                    <span class="mini-label">Handy A</span>
+                    <strong id="demoPhoneOneLabel">Signalrot</strong>
+                  </div>
+                  <div id="demoPhoneOne" class="demo-phone-screen"></div>
+                </article>
+
+                <article class="demo-phone">
+                  <div class="demo-phone-top">
+                    <span class="mini-label">Handy B</span>
+                    <strong id="demoPhoneTwoLabel">Nebelblau</strong>
+                  </div>
+                  <div id="demoPhoneTwo" class="demo-phone-screen"></div>
+                </article>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="button-row demo-controls">
+          <button id="demoPrevBtn" class="count-btn" type="button">Zurück</button>
+          <button id="demoPlayBtn" class="count-btn" type="button">Demo abspielen</button>
+          <button id="demoNextBtn" class="primary-btn" type="button">Weiter</button>
+        </div>
+      </section>
+
+      <section id="compassSection" class="compass panel app-section" data-section="kompass">
+        <div class="panel-head">
+          <h2>Literatur-Kompass</h2>
+          <p>Kompakte Orientierung zum Text, direkt im Spiel eingebettet.</p>
+        </div>
+
+        <div class="compass-grid">
+          <article class="compass-card">
+            <h3>Figuren</h3>
+            <ul>
+              <li>Thiel: pflichtbewusst, innerlich gespalten, zunehmend psychisch zerrüttet.</li>
+              <li>Minna: erste Frau, zart, früh verstorben, bleibt als idealisierte Gegenfigur präsent.</li>
+              <li>Lene: zweite Frau, arbeitsstark, herrisch, brutal gegenüber Tobias.</li>
+              <li>Tobias: schwaches Kind, Zentrum von Fürsorge, Schuld und Katastrophe.</li>
+            </ul>
+          </article>
+
+          <article class="compass-card">
+            <h3>Räume und Motive</h3>
+            <ul>
+              <li>Märkischer Kiefernforst und abgelegener Bahnposten verstärken Isolation.</li>
+              <li>Die Bahn verbindet Technik, Tempo und tödliche Gefahr.</li>
+              <li>Das Wärterhäuschen wird nachts zur fast sakralen Erinnerungsstätte für Minna.</li>
+              <li>Pfiffe, Glocken, Dampf und Barrieren treiben die Spannung permanent an.</li>
+            </ul>
+          </article>
+
+          <article class="compass-card">
+            <h3>Zentrale Konflikte</h3>
+            <ul>
+              <li>Pflichtethos gegen sinnliche Abhängigkeit.</li>
+              <li>Idealisiertes Totengedenken gegen rohe Gegenwart mit Lene.</li>
+              <li>Väterliche Fürsorge gegen häusliche Gewalt.</li>
+              <li>Kontrollwunsch gegen psychischen Zusammenbruch.</li>
+            </ul>
+          </article>
+
+          <article class="compass-card">
+            <h3>Naturalistische Spuren</h3>
+            <ul>
+              <li>Milieu, Arbeitswelt und Körperlichkeit wirken stark auf das Verhalten der Figuren.</li>
+              <li>Die Erzählung beobachtet soziale Härte und psychische Eskalation fast studienhaft.</li>
+              <li>Der Text zeigt, wie Umgebung, Trieb und Gewalt ineinandergreifen.</li>
+              <li>Am Ende kippt die Beobachtung in Wahnsinn, Mord und totale Entgrenzung.</li>
+            </ul>
+          </article>
+        </div>
+
+        <div class="source-box">
+          <h3>Quellenhinweis</h3>
+          <p>
+            Die Karten und Infotexte beruhen auf dem Primärtext
+            <a href="https://projekt-gutenberg.org/authors/gerhart-hauptmann/books/bahnwaerter-thiel/" target="_blank" rel="noreferrer">Projekt Gutenberg: <em>Bahnwärter Thiel</em></a>
+            und auf der lokal vorhandenen Craft-Vorschau zum Materialdokument.
+          </p>
+        </div>
+      </section>
+    </main>
+    </div>
+  </div>
+
+  <div id="cardModal" class="modal hidden" aria-hidden="true">
+    <div class="modal-backdrop" data-close="true"></div>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="cardTitle">
+      <p id="cardType" class="modal-kicker">Karte</p>
+      <h2 id="cardTitle">Literaturkarte</h2>
+      <p id="cardPrompt" class="modal-prompt"></p>
+      <div id="cardOptions" class="option-list"></div>
+      <p id="cardFeedback" class="card-feedback"></p>
+      <div class="modal-actions">
+        <button id="cardContinueBtn" class="primary-btn hidden" type="button">Weiter</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
